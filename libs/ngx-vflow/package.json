@@ -33,6 +33,7 @@
     "@angular/compiler-cli": "catalog:libs",
     "@angular/core": "catalog:libs",
     "@angular/platform-browser": "catalog:libs",
+    "@angular/platform-server": "catalog:libs",
     "@vitest/browser": "catalog:libs",
     "happy-dom": "catalog:libs",
     "jsdom": "catalog:libs",

@@ -50,7 +50,8 @@ export class BackgroundComponent {
       const background = this.settingsService.background();
       return background?.type === 'image' ? background.src : null;
     },
-    loader: ({ params: src }) => (src ? loadImageSize(src) : Promise.resolve(null)),
+    // A server render loads no image: the browser that receives the page measures it.
+    loader: ({ params: src }) => (src && typeof Image !== 'undefined' ? loadImageSize(src) : Promise.resolve(null)),
   });
 
   protected readonly pattern = computed<Pattern | null>(() => {

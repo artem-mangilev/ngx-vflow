@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NodeModel } from '../models/node.model';
@@ -49,6 +50,7 @@ export interface ConnectionGesture {
 export class ConnectionService {
   private readonly settings = inject(FlowSettingsService);
   private readonly entities = inject(FlowEntitiesService);
+  private readonly document = inject(DOCUMENT);
 
   public readonly gesture = signal<ConnectionGesture | null>(null);
 
@@ -70,18 +72,21 @@ export class ConnectionService {
   private pendingStart: (() => void) | null = null;
   private stopContextMenu: (() => void) | null = null;
 
-  private readonly tracker = createPointerTracker({
-    threshold: () => this.settings.connectionDragThreshold(),
-    onStart: ({ point }) => {
-      this.pointer.set(point);
-      const begin = this.pendingStart;
-      this.pendingStart = null;
-      begin?.();
+  private readonly tracker = createPointerTracker(
+    {
+      threshold: () => this.settings.connectionDragThreshold(),
+      onStart: ({ point }) => {
+        this.pointer.set(point);
+        const begin = this.pendingStart;
+        this.pendingStart = null;
+        begin?.();
+      },
+      onMove: ({ point }) => this.pointer.set(point),
+      onEnd: () => this.end(),
+      onCancel: () => this.end(),
     },
-    onMove: ({ point }) => this.pointer.set(point),
-    onEnd: () => this.end(),
-    onCancel: () => this.end(),
-  });
+    this.document,
+  );
 
   constructor() {
     inject(DestroyRef).onDestroy(() => {
@@ -180,7 +185,7 @@ export class ConnectionService {
     this.setGesture({ source, sourceHandle: handle, oldEdge, candidate: null });
     // A context menu takes the pointer away without a release the gesture would see.
     this.stopContextMenu?.();
-    this.stopContextMenu = listen(document, 'contextmenu', () => this.end());
+    this.stopContextMenu = listen(this.document, 'contextmenu', () => this.end());
 
     const start = { node: source.rawNode, handle: eventHandle(handle) };
     if (oldEdge) this.reconnectStart$.next({ edge: oldEdge.edge, ...start });

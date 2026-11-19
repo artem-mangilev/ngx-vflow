@@ -1,5 +1,6 @@
+/** The operating system of the reader; `null` for an unknown one and on a server, which has no reader yet. */
 export function getOS() {
-  const userAgent = window.navigator.userAgent.toLowerCase();
+  const userAgent = (typeof navigator === 'undefined' ? '' : navigator.userAgent).toLowerCase();
   const macosPlatforms = /(macintosh|macintel|macppc|mac68k|macos)/i;
   const windowsPlatforms = /(win32|win64|windows|wince)/i;
   const iosPlatforms = /(iphone|ipad|ipod)/i;

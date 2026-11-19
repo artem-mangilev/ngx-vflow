@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { computed, DestroyRef, Directive, ElementRef, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
@@ -31,10 +32,11 @@ export class AutoPanDirective implements OnInit {
   private readonly pane = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
 
   private readonly documentPoint$ = merge(
-    fromEvent<PointerEvent>(document, 'pointerdown', { capture: true }),
-    fromEvent<PointerEvent>(document, 'pointermove', { capture: true }),
+    fromEvent<PointerEvent>(this.document, 'pointerdown', { capture: true }),
+    fromEvent<PointerEvent>(this.document, 'pointermove', { capture: true }),
   ).pipe(
     map((event) => ({ x: event.clientX, y: event.clientY })),
     map((point) => this.toViewportPoint(point)),

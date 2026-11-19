@@ -89,8 +89,8 @@ function suppressNextClick(view: Window) {
  * working. Moves and the release are read from the window in the capture phase and matched by pointer id. A mouse
  * move without pressed buttons ends the drag, because the release may have happened where the page could not see it.
  *
- * `element` is where the pointer is captured and the compatibility events are stopped; without it both options are
- * off, and the window of the document is used.
+ * `target` is the element where the pointer is captured and the compatibility events are stopped. A document as the
+ * target turns both options off: the gesture has no element of its own.
  */
 /** An element whose pointer events are typed: every HTML and SVG element. */
 export type GestureElement = Element & GlobalEventHandlers;
@@ -106,9 +106,12 @@ interface TrackedPress {
   captured: boolean;
 }
 
-export function createPointerTracker(options: PointerTrackerOptions, element?: Element): PointerTracker {
-  const doc = element?.ownerDocument ?? document;
-  const view = doc.defaultView ?? window;
+export function createPointerTracker(options: PointerTrackerOptions, target: Element | Document): PointerTracker {
+  // Only a document has no owner document.
+  const element = target.ownerDocument ? (target as Element) : undefined;
+  const doc = target.ownerDocument ?? (target as Document);
+  // Read at a press: the document of a server render has no window, and no press reaches it.
+  const view = () => doc.defaultView!;
   let gesture: TrackedPress | null = null;
 
   const context = (event: PointerEvent, current: TrackedPress): PointerDragContext => ({
@@ -122,10 +125,10 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     if (!gesture) return;
     const { press, captured } = gesture;
     gesture = null;
-    view.removeEventListener('pointermove', onPointerMove, true);
-    view.removeEventListener('pointerup', onPointerUp, true);
-    view.removeEventListener('pointercancel', onPointerCancel, true);
-    view.removeEventListener('blur', onBlur);
+    view().removeEventListener('pointermove', onPointerMove, true);
+    view().removeEventListener('pointerup', onPointerUp, true);
+    view().removeEventListener('pointercancel', onPointerCancel, true);
+    view().removeEventListener('blur', onBlur);
     doc.removeEventListener('selectstart', preventDefault, true);
     doc.removeEventListener('dragstart', preventDefault, true);
     element?.removeEventListener('mousedown', stopPropagation);
@@ -162,7 +165,7 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     release();
     if (current.started) {
       options.onEnd?.(ctx);
-      if (suppressClick) suppressNextClick(view);
+      if (suppressClick) suppressNextClick(view());
     }
   };
 
@@ -210,10 +213,10 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
       captured: false,
     };
 
-    view.addEventListener('pointermove', onPointerMove, true);
-    view.addEventListener('pointerup', onPointerUp, true);
-    view.addEventListener('pointercancel', onPointerCancel, true);
-    view.addEventListener('blur', onBlur);
+    view().addEventListener('pointermove', onPointerMove, true);
+    view().addEventListener('pointerup', onPointerUp, true);
+    view().addEventListener('pointercancel', onPointerCancel, true);
+    view().addEventListener('blur', onBlur);
     doc.addEventListener('selectstart', preventDefault, true);
     doc.addEventListener('dragstart', preventDefault, true);
     if (options.stopCompatibilityEvents && element) {

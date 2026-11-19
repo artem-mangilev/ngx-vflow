@@ -84,3 +84,16 @@ export function defineAngularNodeDomTestConfig(projectRoot: string, include: str
     },
   };
 }
+
+/**
+ * Specs of a project on the server: Node without a DOM of its own, where `@angular/platform-server` renders an
+ * application into a string, as a server render and a prerender of a build do. No TestBed: a spec bootstraps an
+ * application with `renderApplication`.
+ */
+export function defineAngularServerTestConfig(projectRoot: string, include: string[]): ViteUserConfig {
+  const { test, ...config } = defineAngularTestConfig(projectRoot, include);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { browser, setupFiles, ...shared } = test!;
+
+  return { ...config, test: { ...shared, name: 'server', environment: 'node' } };
+}

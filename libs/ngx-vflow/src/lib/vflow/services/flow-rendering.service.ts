@@ -51,8 +51,9 @@ export class FlowRenderingService {
 
   /**
    * False in a DOM that never lays out, such as jsdom and happy-dom, where nothing is ever measured. The flow
-   * then hides nothing: the `v-no-layout` class of its host disables the `data-v-pending` rule. Read once: the
-   * check forces a layout.
+   * then hides nothing: the `v-no-layout` class of its host disables the `data-v-pending` rule. True in a server
+   * render, which measures nothing either: what it renders is laid out later, in a browser. Read once: the check
+   * forces a layout.
    */
   public readonly hasLayout = domHasLayout(inject(DOCUMENT));
 
@@ -66,9 +67,12 @@ export class FlowRenderingService {
   public readonly viewport = signal<HTMLElement | null>(null);
 }
 
-/** A DOM without layout gives the window a size and the root element none. */
+/**
+ * A DOM without layout gives the window a size and the root element none. The window of a server render has no
+ * size: its HTML is laid out by the browser that receives it, so the flow waits for the first layout there too.
+ */
 function domHasLayout(document: Document): boolean {
   const view = document.defaultView;
 
-  return !view || view.innerWidth === 0 || document.documentElement.clientWidth > 0;
+  return !view || !view.innerWidth || document.documentElement.clientWidth > 0;
 }

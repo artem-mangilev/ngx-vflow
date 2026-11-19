@@ -17,6 +17,8 @@ catalogs:
     '@angular/compiler-cli': ^20.3.0
     '@angular/core': ^20.3.0
     '@angular/platform-browser': ^20.3.0
+    # The server specs of the core. Its peers are exact versions, so it is the Angular the lockfile holds.
+    '@angular/platform-server': 20.3.30
     '@schematics/angular': ^20.3.0
     '@vitest/browser': ~3.2.4
     'happy-dom': ^20.14.5

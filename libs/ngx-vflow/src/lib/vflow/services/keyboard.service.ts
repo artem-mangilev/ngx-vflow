@@ -1,7 +1,8 @@
+import { DOCUMENT } from '@angular/common';
 import { ElementRef, Injectable, Signal, computed, inject, untracked } from '@angular/core';
 import { KeyboardCommandName, KeyboardModifierName, KeyboardShortcuts } from '../types/keyboard-shortcuts.type';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, fromEvent, merge } from 'rxjs';
+import { EMPTY, Subject, fromEvent, merge } from 'rxjs';
 import { DeleteRequest } from '../interfaces/delete-request.interface';
 import { bindableSignal } from '../utils/signals/bindable-signal';
 import {
@@ -130,10 +131,14 @@ export class KeyboardService {
   private gesture = new Set<string>();
 
   constructor() {
+    const document = inject(DOCUMENT);
+    // The document of a server render has no window.
+    const view = document.defaultView;
+
     merge(
       fromEvent<KeyboardEvent>(document, 'keydown'),
       fromEvent<KeyboardEvent>(document, 'keyup'),
-      fromEvent(window, 'blur'),
+      view ? fromEvent(view, 'blur') : EMPTY,
     )
       .pipe(takeUntilDestroyed())
       .subscribe((event) => {

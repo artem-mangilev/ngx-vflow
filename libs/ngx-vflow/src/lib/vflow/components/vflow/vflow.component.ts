@@ -147,6 +147,10 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
     '[class.v-initializing]': '!flowInitialized()',
     // A DOM without layout never measures anything, so there nothing waits for a measurement (see the stylesheet).
     '[class.v-no-layout]': '!hasLayout',
+    // A flow rendered on a server is created anew in the browser instead of being hydrated. It moves its own
+    // elements between layers (resize controls, toolbars, edge labels), so the DOM a server sends is not the one
+    // Angular expects to adopt; and nothing of it is painted before the first layout, so nothing is lost.
+    ngSkipHydration: 'true',
   },
   imports: [
     KeyboardEntityDirective,

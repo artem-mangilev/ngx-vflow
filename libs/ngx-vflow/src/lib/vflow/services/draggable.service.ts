@@ -110,6 +110,9 @@ export class DraggableService {
     let pane: Element | null = null;
     let paneRect: DOMRectReadOnly | null = null;
     let panePositionObserver: IntersectionObserver | null = null;
+    const document = element.ownerDocument;
+    // The document of a server render has no window, and no drag starts there.
+    const view = document.defaultView;
 
     const invalidatePaneRect = () => {
       paneRect = null;
@@ -122,12 +125,12 @@ export class DraggableService {
     };
 
     const observePanePosition = () => {
-      if (!pane || !paneRect || typeof IntersectionObserver === 'undefined') {
+      if (!pane || !paneRect || !view || typeof IntersectionObserver === 'undefined') {
         return;
       }
 
       panePositionObserver?.disconnect();
-      const rootMargin = `${-paneRect.top}px ${paneRect.right - window.innerWidth}px ${paneRect.bottom - window.innerHeight}px ${-paneRect.left}px`;
+      const rootMargin = `${-paneRect.top}px ${paneRect.right - view.innerWidth}px ${paneRect.bottom - view.innerHeight}px ${-paneRect.left}px`;
       panePositionObserver = new IntersectionObserver(
         ([entry]) => {
           const currentRect = paneRect;
@@ -156,7 +159,7 @@ export class DraggableService {
         this.resizeObserverService.removeObserver(pane, handlePaneResize);
       }
       document.removeEventListener('scroll', invalidatePaneRect, true);
-      window.removeEventListener('resize', invalidatePaneRect);
+      view?.removeEventListener('resize', invalidatePaneRect);
       panePositionObserver?.disconnect();
       panePositionObserver = null;
       pane = null;
@@ -170,7 +173,7 @@ export class DraggableService {
       observePanePosition();
       this.resizeObserverService.addObserver(pane, handlePaneResize);
       document.addEventListener('scroll', invalidatePaneRect, true);
-      window.addEventListener('resize', invalidatePaneRect);
+      view?.addEventListener('resize', invalidatePaneRect);
     };
 
     const getPaneRect = () => {
