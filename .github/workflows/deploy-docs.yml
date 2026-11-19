@@ -2,6 +2,10 @@ name: deploy-docs
 
 on:
   workflow_dispatch:
+  # Once a day: the build asks GitHub and npm for the numbers of the landing page and prerenders them into it, so
+  # they are a day old at most. GitHub runs a schedule from the default branch only.
+  schedule:
+    - cron: '23 3 * * *'
 
 permissions:
   contents: read
