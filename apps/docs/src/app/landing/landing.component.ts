@@ -75,7 +75,7 @@ export class LandingComponent {
 
   protected readonly features: Feature[] = [
     {
-      title: 'Simple setup, complete core',
+      title: 'Simple initial setup',
       text: 'One package and one short template make a working editor. Dragging, panning, zooming, selection, connecting handles and keyboard navigation all come from the core library.',
       link: '/docs/getting-started/quickstart',
       linkText: 'Read the quickstart',
@@ -145,7 +145,6 @@ export class LandingComponent {
       ...loaded(this.stars(), 'GitHub stars', 'https://github.com/artem-mangilev/ngx-vflow'),
       ...loaded(this.downloads(), 'Downloads a month', 'https://www.npmjs.com/package/ngx-vflow'),
       { value: 'MIT', label: 'License' },
-      { value: '20+', label: 'Angular version' },
     ];
   });
   protected readonly copied = signal(false);

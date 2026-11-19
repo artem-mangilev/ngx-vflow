@@ -78,17 +78,18 @@
   </section>
 
   <!--
-    The library in numbers, as a band under the hero. A number that is still loading keeps its place; one that could
-    not be loaded gives it to the others.
+    The library in numbers, as a band under the hero: equal columns, each number centered in its own, so the row is
+    symmetric about the middle of the page. A number that is still loading keeps its place; one that could not be
+    loaded gives it to the others. On a screen too narrow for the row the last number takes a row of its own.
   -->
   <section class="border-b border-b-doc-border" aria-label="ngx-vflow in numbers">
     <div class="landing-width py-[clamp(28px,4vw,44px)]">
-      <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-x-8 gap-y-7 p-0">
+      <ul class="m-0 flex list-none flex-wrap gap-x-4 gap-y-7 p-0">
         @for (stat of stats(); track stat.label) {
-          <li>
+          <li class="min-w-24 flex-1 text-center">
             @if (stat.link) {
               <a
-                class="group inline-grid gap-1.5 no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                class="group inline-grid justify-items-center gap-1.5 no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
                 target="_blank"
                 rel="noreferrer"
                 [href]="stat.link">
@@ -97,12 +98,12 @@
                   >{{ stat.value }}</b
                 >
                 <span
-                  class="text-[0.9rem] text-doc-muted underline decoration-[color-mix(in_oklab,currentColor_45%,transparent)] underline-offset-3 group-hover:decoration-current"
+                  class="text-[0.9rem] text-balance text-doc-muted underline decoration-[color-mix(in_oklab,currentColor_45%,transparent)] underline-offset-3 group-hover:decoration-current"
                   >{{ stat.label }}</span
                 >
               </a>
             } @else {
-              <div class="grid gap-1.5">
+              <div class="grid justify-items-center gap-1.5">
                 <b
                   class="text-[clamp(1.75rem,3vw,2.25rem)] leading-none font-bold tracking-[-0.03em] text-brand-deep tabular-nums dark:text-brand-pale"
                   >{{ stat.value }}</b
@@ -120,10 +121,11 @@
     <section class="border-b border-b-doc-border">
       <!--
         Every second row is mirrored, so the flows alternate sides; the flow keeps the wide column. A wide feature puts
-        its text above the flow, the heading beside the paragraph, and gives the flow the whole column.
+        its text above the flow, the heading beside the paragraph, and gives the flow the whole column. The text
+        starts at the top of the flow, as the text of every section of the page starts at the top of what is beside it.
       -->
       <div
-        class="landing-width grid items-center gap-[clamp(32px,5vw,64px)] py-[clamp(56px,7vw,96px)] max-[900px]:grid-cols-1"
+        class="landing-width grid items-start gap-[clamp(32px,5vw,64px)] py-[clamp(56px,7vw,96px)] max-[900px]:grid-cols-1"
         [class]="
           odd && !feature.wide ? 'grid-cols-[minmax(0,7fr)_minmax(0,5fr)]' : 'grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'
         ">
