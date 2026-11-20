@@ -37,6 +37,12 @@ async function rightHandleOffset(node: Locator, card: Locator) {
   return Math.abs(handle.centerX - (await box(card)).right);
 }
 
+/** Distance between the bottom handle's center and the card's bottom edge, in screen pixels. */
+async function bottomHandleOffset(node: Locator, card: Locator) {
+  const handle = await box(node.locator('[data-v-handle][data-v-handle-position="bottom"]').first());
+  return Math.abs(handle.y + handle.height / 2 - (await box(card)).bottom);
+}
+
 async function dragControl(page: Page, control: Locator, dx: number, dy: number) {
   const start = await box(control);
   const x = start.centerX;
@@ -59,8 +65,8 @@ test.describe('overview resizer', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/examples/feature-overview');
-    node = page.locator('[data-v-node][aria-label="Node transform"]');
-    card = node.getByTestId('transform');
+    node = page.locator('[data-v-node][aria-label="Resizable node"]');
+    card = node.getByTestId('resizable');
     await node.scrollIntoViewIfNeeded();
     await expect(node).toHaveCSS('visibility', 'visible');
     await card.click();
@@ -70,11 +76,16 @@ test.describe('overview resizer', () => {
   test('outlines a content-sized node and places its handles on the card edges', async () => {
     await expect(card).not.toHaveAttribute('style', /width/);
     await expectOutline(node, card);
-    await expect.poll(() => rightHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
+    await expect.poll(() => bottomHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
   });
 
   test('grows the node, its handles and the reported size by the dragged distance', async ({ page }) => {
-    const output = page.locator('[data-v-node][aria-label="Node output-size"]');
+    const output = page.locator('[data-v-node][aria-label="Size inspector"]');
+    // The flow of the overview snaps to a grid, a resize included; without it the node grows by the dragged distance.
+    // The switch is in another node, so the press on it moves the selection there.
+    await page.getByLabel('Snap to grid').uncheck();
+    await card.click();
+    await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
     const zoom = await zoomOf(node);
     const before = await offsetSize(card);
     await expect.poll(() => reportedSize(output)).toEqual(before);
@@ -92,7 +103,7 @@ test.describe('overview resizer', () => {
     expect(Math.abs(after.height - before.height - 60 / zoom)).toBeLessThanOrEqual(TOLERANCE);
     await expect.poll(() => reportedSize(output)).toEqual(after);
     await expectOutline(node, card);
-    await expect.poll(() => rightHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
+    await expect.poll(() => bottomHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
   });
 });
 

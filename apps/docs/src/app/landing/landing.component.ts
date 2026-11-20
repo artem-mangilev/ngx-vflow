@@ -127,7 +127,7 @@ export class LandingComponent {
       text: 'A minimap, background patterns, a node toolbar, a resizer, alignment guides, snapping to a grid, a selection box and keyboard shortcuts come with the core package. Each is opt-in.',
       link: '/examples/feature-overview',
       linkText: 'Open this example with its code',
-      demoLabel: 'Live flow with a minimap, a resizable node, a node toolbar and alignment guides',
+      demoLabel: 'Live flow with a minimap, a resizable node with a toolbar, a group and the settings of the canvas',
       demo: AllFeaturesDemoComponent,
       demoHeight: 'h-130',
       wide: true,

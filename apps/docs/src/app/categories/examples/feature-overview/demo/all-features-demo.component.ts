@@ -1,42 +1,43 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DemoIconComponent, DocsButton, DocsPresentations, SCENE_BACKGROUND } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
+  AnyComponentEdgeEvent,
   AnyComponentNodeEvent,
-  Connection,
+  Background,
+  ConnectionSettings,
   Vflow,
-  addEdges,
-  createEdge,
+  isComponentEdgeEvent,
   isComponentNodeEvent,
-  removeElements,
 } from 'ngx-vflow';
-import { TransformNodeComponent } from './components/transform-node.component';
-import { EdgeData, FlowStoreService } from './services/flow-store.service';
+import { InspectorNodeComponent } from './components/inspector-node.component';
+import { RemovableEdgeComponent } from './components/removable-edge.component';
+import { ResizableNodeComponent } from './components/resizable-node.component';
+import { BackgroundPattern, FlowStoreService, GRID } from './services/flow-store.service';
 
 @Component({
   template: `<vflow
     #flow
     [nodes]="store.nodes()"
     [edges]="store.edges()"
-    [background]="background"
+    [background]="backgrounds[store.background()]"
+    [snapGrid]="store.snapToGrid() ? grid : undefined"
+    [alignmentHelper]="store.alignmentGuides()"
+    [connection]="connection()"
     [parentsBelowEdges]="true"
-    [alignmentHelper]="true"
-    (connect)="connect($event)"
+    (connect)="store.connect($event)"
+    (reconnect)="store.reconnect($event)"
+    (deleteRequest)="store.remove($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"
-    (componentNodeEvent)="handleComponentEvent($event)"
+    (componentNodeEvent)="handleNodeEvent($event)"
+    (componentEdgeEvent)="handleEdgeEvent($event)"
     (initialized)="flow.fitView({ maxZoom: 1 })">
-    <!-- The nodes with a component draw themselves; this template draws the group. -->
-    <docs-node *vNode="let ctx" [ctx]="ctx" />
-
+    <!-- Every node and the edges with a button are components; this template draws the other edges. -->
     <ng-template let-ctx vEdge [vEdgeOf]="store.edges()">
       @let data = ctx.data();
 
       <svg:g vEdgeInteractionArea>
-        <svg:path
-          vuiEdge
-          [attr.d]="ctx.path()"
-          [attr.marker-end]="ctx.markerEnd()"
-          [attr.stroke-dasharray]="data.animated ? '8 4' : null">
+        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.stroke-dasharray]="data.animated ? '8 4' : null">
           @if (data.animated) {
             <!-- The dashes move by one dash and one gap, so the loop has no seam. -->
             <svg:animate attributeName="stroke-dashoffset" values="0;-12" dur="1s" repeatCount="indefinite" />
@@ -47,62 +48,52 @@ import { EdgeData, FlowStoreService } from './services/flow-store.service';
       @if (data.label; as label) {
         <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
       }
-
-      @if (data.deletable) {
-        <span *vEdgeLabel vuiEdgeLabel class="px-0! py-0!">
-          <button
-            docsButton="plain"
-            small
-            icon
-            type="button"
-            vNoSelect
-            aria-label="Delete the connection"
-            (click)="deleteEdge(ctx.edge.id)">
-            <app-demo-icon name="close" />
-          </button>
-        </span>
-      }
     </ng-template>
 
-    <v-minimap />
+    <v-minimap [pannable]="true" [zoomable]="true" />
     <vui-controls class="absolute bottom-2.5 left-2.5" />
   </vflow>`,
-  // The page that shows the demo draws the frame; the demo brings its height: the scene at full size with room under
-  // it for the controls and the minimap.
+  // The page that shows the demo draws the frame; the demo brings its height: the scene at full size, with its lower
+  // corners left free for the controls and the minimap.
   host: { class: 'block h-130 w-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, DocsButton, DemoIconComponent, Vflow, Vui],
+  imports: [Vflow, Vui],
   providers: [FlowStoreService],
 })
 export class AllFeaturesDemoComponent {
   protected readonly store = inject(FlowStoreService);
-  protected readonly background = SCENE_BACKGROUND;
 
-  protected connect(connection: Connection): void {
-    const edge = createEdge<EdgeData>({
-      ...connection,
-      id: crypto.randomUUID(),
-      markers: { end: { type: 'arrow-closed' } },
-      data: { deletable: true },
-    });
+  protected readonly grid: [number, number] = [GRID, GRID];
+  protected readonly backgrounds: Record<BackgroundPattern, Background | null> = {
+    dots: SCENE_BACKGROUND,
+    grid: { type: 'grid', gap: GRID },
+    none: null,
+  };
 
-    this.store.edges.update((edges) => addEdges([edge], { nodes: this.store.nodes(), edges }));
+  /**
+   * The line that follows the pointer looks like the edge the connection becomes. An inspector reads one node, so
+   * its port accepts a connection only while no edge ends there. The edge whose end is being dragged does not count:
+   * the connection replaces it.
+   */
+  protected readonly connection = computed<ConnectionSettings>(() => ({
+    curve: this.store.curve(),
+    markerEnd: 'arrow-closed',
+    validator: ({ target, reconnectedEdge }) =>
+      target.node.component !== InspectorNodeComponent ||
+      !this.store.edges().some((edge) => edge.target === target.node.id && edge.id !== reconnectedEdge?.id),
+  }));
+
+  // The outputs of a component node reach the flow as one event; the guard narrows it to the outputs of a class.
+  protected handleNodeEvent(event: AnyComponentNodeEvent): void {
+    if (!isComponentNodeEvent(event, ResizableNodeComponent)) return;
+
+    if (event.eventName === 'duplicated') this.store.duplicate(event.nodeId);
+    if (event.eventName === 'deleted') this.store.remove({ nodeIds: [event.nodeId] });
   }
 
-  protected deleteEdge(id: string): void {
-    this.store.edges.update((edges) => edges.filter((edge) => edge.id !== id));
-  }
-
-  /** The Delete button of the node toolbar: the node goes together with its edges. */
-  protected handleComponentEvent(event: AnyComponentNodeEvent): void {
-    if (isComponentNodeEvent(event, TransformNodeComponent) && event.eventName === 'deleted') {
-      const { nodes, edges } = removeElements(
-        { nodeIds: [event.nodeId] },
-        { nodes: this.store.nodes(), edges: this.store.edges() },
-      );
-
-      this.store.nodes.set(nodes);
-      this.store.edges.set(edges);
+  protected handleEdgeEvent(event: AnyComponentEdgeEvent): void {
+    if (isComponentEdgeEvent(event, RemovableEdgeComponent) && event.eventName === 'removed') {
+      this.store.remove({ edgeIds: [event.edgeId] });
     }
   }
 }

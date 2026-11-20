@@ -6,7 +6,7 @@ import { FlowStoreService } from '../services/flow-store.service';
 
 type Metric = 'width' | 'height' | 'x' | 'y';
 
-export interface OutputData {
+export interface InspectorData {
   title: string;
   /** The values of the connected node to show, one per row. */
   rows: Metric[];
@@ -14,12 +14,15 @@ export interface OutputData {
 
 const LABELS: Record<Metric, string> = { width: 'W', height: 'H', x: 'X', y: 'Y' };
 
-/** Shows the size or the position of the node connected to it, read from the store the demo provides. */
+/**
+ * Shows the size or the position of the node wired into it, so the values follow a drag and a resize of that node,
+ * and change when the edge is dragged to another node.
+ */
 @Component({
   template: `
-    <article vuiNode class="w-45 text-[13px]">
+    <article vuiNode class="w-40 text-[13px]">
       <header vuiNodeHeader>
-        <span docsNodeIcon tile class="[--icon-color:var(--color-slate-500)]"><app-demo-icon name="download" /></span>
+        <span docsNodeIcon tile class="[--icon-color:var(--color-slate-500)]"><app-demo-icon name="search" /></span>
         <span vuiTitle>{{ ctx.data().title }}</span>
       </header>
       @for (row of rows(); track row.metric) {
@@ -28,30 +31,38 @@ const LABELS: Record<Metric, string> = { width: 'W', height: 'H', x: 'X', y: 'Y'
           <span class="ms-auto tabular-nums">{{ row.value }}</span>
         </div>
       }
-      <span vuiPort handleType="target" position="left"></span>
+      <span vuiPort handleType="target" position="top" [vuiPortConnected]="!!source()"></span>
     </article>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vui, DocsNodeIcon, DemoIconComponent],
 })
-export class OutputNodeComponent {
-  protected readonly ctx = injectNode<OutputData>();
+export class InspectorNodeComponent {
+  protected readonly ctx = injectNode<InspectorData>();
   private readonly store = inject(FlowStoreService);
+
+  /** The node at the other end of the edge that ends here; the flow lets only one edge in. */
+  protected readonly source = computed(() => {
+    const edge = this.store.edges().find((edge) => edge.target === this.ctx.node.id);
+
+    return edge && this.store.nodes().find((node) => node.id === edge.source);
+  });
 
   protected readonly rows = computed(() =>
     this.ctx.data().rows.map((metric) => ({ metric, label: LABELS[metric], value: this.read(metric) })),
   );
 
-  /** A value of the node wired into this one; a dash while nothing is connected. */
+  /** A dash while nothing is connected, and for a size nobody has measured yet, as in a page rendered on a server. */
   private read(metric: Metric): string {
-    const edge = this.store.edges().find((edge) => edge.target === this.ctx.node.id);
-    const source = this.store.nodes().find((node) => node.id === edge?.source);
+    const source = this.source();
 
     if (!source) return '–';
 
     if (metric === 'x' || metric === 'y') return `${Math.floor(source.point()[metric])}`;
 
     // A content-sized node has no size in its data; the flow reports measured and resized sizes as changes.
-    return `${Math.floor(this.store.sizes()[source.id]?.[metric] ?? 0)}px`;
+    const size = this.store.sizes()[source.id];
+
+    return size ? `${Math.floor(size[metric])}px` : '–';
   }
 }
