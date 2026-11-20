@@ -109,7 +109,9 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
       this.drag = createPointerDrag(this.host, {
         filter: (event) => event.pointerType !== 'touch' && this.dragFilter(event),
         capture: true,
-        clickDistance: () => 0,
+        // A hand moves between a press and its release. Within the tolerance the press stays a click of the element
+        // it landed on, such as an edge or a control in an edge label, although the pane already follows the pointer.
+        clickDistance: () => this.settings.paneClickDistance(),
         stopCompatibilityEvents: true,
         onStart: ({ event }) => {
           this.interrupt();
@@ -430,12 +432,9 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     }
   }
 
+  /** The same measure as the click distance of the drag: a gesture that keeps its click is a click on the pane. */
   private isClick({ start, end }: ViewportGesture) {
-    const delta = this.settings.paneClickDistance();
-    const diffX = Math.abs(end.x - start.x);
-    const diffY = Math.abs(end.y - start.y);
-
-    return delta === 0 ? diffX === 0 && diffY === 0 : diffX < delta && diffY < delta;
+    return Math.hypot(end.x - start.x, end.y - start.y) <= this.settings.paneClickDistance();
   }
 
   private set(state: ViewportState) {

@@ -482,7 +482,7 @@ ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoo
 - Tests that dispatch synthetic mouse or touch events to pan, drag, resize, connect or draw a selection box must dispatch `pointerdown`, `pointermove` and `pointerup` with `pointerId` and `pointerType`. Moves and the release may target `window` or `document`. Handles react to `pointerenter` and `pointerleave`. Wheel and `dblclick` events are unchanged.
 - A press that starts a library gesture does not propagate to ancestors, neither as `pointerdown` nor as its compatibility `mousedown` or `touchstart`.
 - The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](/docs/viewport/viewport-gestures) for how touch scrolling follows the settings.
-- Once a pan moves, the pane captures the pointer until release, so nodes under the cursor do not receive hover events during a pan.
+- Once a pan moves beyond `paneClickDistance`, the pane captures the pointer until release, so nodes under the cursor do not receive hover events during a pan. A press released within that distance is still a click of the element it landed on, such as an edge or a control in an edge label.
 - A pinch that may zoom but not pan scales around the point where the fingers started, instead of drifting with them.
 
 ### Viewport methods

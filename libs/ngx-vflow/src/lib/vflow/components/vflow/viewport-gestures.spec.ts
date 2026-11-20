@@ -543,6 +543,30 @@ describe('public viewport gesture settings', () => {
     expect(node.selected!()).toBe(false);
   });
 
+  it('keeps the click and the pointer of a press that moves within the pane click tolerance', async () => {
+    const control = document.createElement('button');
+    pane.appendChild(control);
+    const capture = vi.spyOn(pane, 'setPointerCapture').mockImplementation(() => undefined);
+    let clicks = 0;
+    control.addEventListener('click', () => clicks++);
+    const before = flow.viewport().x;
+
+    // A hand moves a few pixels between the press and the release: the pane follows, the control is still clicked.
+    pointerDrag(control, { x: 100 }, [{ x: 103 }]);
+    control.click();
+    expect(flow.viewport().x).toBe(before + 3);
+    expect(capture).not.toHaveBeenCalled();
+    expect(clicks).toBe(1);
+
+    fixture.componentRef.setInput('paneClickDistance', 2);
+    fixture.detectChanges();
+    pointerDrag(control, { x: 100 }, [{ x: 103 }]);
+    control.click();
+    expect(capture).toHaveBeenCalledTimes(1);
+    expect(clicks).toBe(1);
+    await pause(0);
+  });
+
   it('suppresses the click after a pan and keeps a plain click', async () => {
     let clicks = 0;
     pane.addEventListener('click', () => clicks++);

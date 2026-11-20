@@ -99,3 +99,37 @@ test('selects nodes with a Shift selection box instead of panning', async ({ pag
   await expect(selected).not.toHaveCount(0);
   expect(await viewport(graph)).toEqual(start);
 });
+
+// A hand moves a few pixels between a press and its release. A press on an edge or on a control in an edge label
+// belongs to the pane, which pans from the first pixel; within the pane click distance it is still a click.
+test('clicks an edge and a control in an edge label although the pointer moves during the press', async ({ page }) => {
+  await page.goto('/docs/edges/labels');
+  const graph = page.locator('vflow').first();
+  await graph.scrollIntoViewIfNeeded();
+  await expect(graph.locator('[data-v-edge]')).toHaveCount(2);
+  const press = async (at: { x: number; y: number }) => {
+    await page.mouse.move(at.x, at.y);
+    await page.mouse.down();
+    await page.mouse.move(at.x + 2, at.y + 1);
+    await page.mouse.up();
+  };
+
+  const line = await graph
+    .locator('[data-v-edge] path.vui-edge')
+    .first()
+    .evaluate((path: SVGPathElement) => {
+      const point = path.getPointAtLength(path.getTotalLength() * 0.3);
+      const matrix = path.getScreenCTM()!;
+      return {
+        x: point.x * matrix.a + point.y * matrix.c + matrix.e,
+        y: point.x * matrix.b + point.y * matrix.d + matrix.f,
+      };
+    });
+  await press(line);
+  await expect(graph.locator('[data-v-edge][data-v-selected]')).toHaveCount(1);
+
+  const remove = graph.getByRole('button', { name: 'Remove' });
+  await expect(remove).toBeVisible();
+  await press(await center(remove));
+  await expect(graph.locator('[data-v-edge]')).toHaveCount(1);
+});

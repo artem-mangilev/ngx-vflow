@@ -111,6 +111,22 @@ describe('createPointerDrag', () => {
     drag.destroy();
   });
 
+  it('captures the pointer only once it moves beyond the click distance', () => {
+    const capture = vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined);
+    const drag = create({ capture: true, clickDistance: () => 3 });
+    dispatchPointer(element, 'pointerdown', { x: 0 });
+    dispatchPointer(window, 'pointermove', { x: 2 });
+    // The drag follows the pointer from the press, yet a release here still clicks the pressed element.
+    expect(calls).toEqual(['start:0', 'move:2']);
+    expect(capture).not.toHaveBeenCalled();
+    dispatchPointer(window, 'pointermove', { x: 5 });
+    expect(capture).toHaveBeenCalledExactlyOnceWith(1);
+    dispatchPointer(window, 'pointermove', { x: 1 });
+    expect(capture).toHaveBeenCalledTimes(1);
+    dispatchPointer(window, 'pointerup', { x: 1 });
+    drag.destroy();
+  });
+
   it('cancels on pointercancel, window blur and destroy, and ends a mouse drag without pressed buttons', () => {
     const drag = create();
     dispatchPointer(element, 'pointerdown', { x: 0 });

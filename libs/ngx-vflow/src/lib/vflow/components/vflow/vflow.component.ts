@@ -259,7 +259,10 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   /** Pan with scrolling, taking priority over ordinary wheel zoom. */
   public readonly panOnScroll = input<boolean>();
 
-  /** Viewport click tolerance in CSS pixels. Default: 6. */
+  /**
+   * Distance in CSS pixels a press that pans may move and still be a click: the click reaches the element under it,
+   * and on the empty pane it clears the selection. Default: 6.
+   */
   public readonly paneClickDistance = input<number>();
 
   /** Distance in CSS pixels before node drag starts. Default: 0. */

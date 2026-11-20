@@ -14,11 +14,15 @@ export interface PointerDragContext {
 export interface PointerTrackerOptions {
   /** Client-space distance the pointer has to exceed before the drag starts; read when the press is accepted. */
   threshold?: () => number;
-  /** Distance after which the click that follows the release is suppressed. Defaults to the threshold. */
+  /**
+   * Distance within which a press is still a click, however the drag itself starts: beyond it the click that follows
+   * the release is suppressed and, with {@link capture}, the pointer is captured. Defaults to the threshold.
+   */
   clickDistance?: () => number;
   /**
-   * Captures the pointer on the element once it moves, so that the gesture survives iframes and pointer-events
-   * changes. A press released without moving keeps its original click target. Needs an element.
+   * Captures the pointer on the element once it moves beyond the click distance, so that the gesture survives
+   * iframes and pointer-events changes. A press released within that distance keeps its original click target: a
+   * captured pointer would deliver the release and the click to the element instead. Needs an element.
    */
   capture?: boolean;
   /**
@@ -142,7 +146,7 @@ export function createPointerTracker(options: PointerTrackerOptions, target: Ele
     const point = clientPoint(event);
     const distance = Math.hypot(point.x - current.start.x, point.y - current.start.y);
     if (distance > current.clickDistance) current.moved = true;
-    if (options.capture && element && !current.captured && distance > 0) {
+    if (options.capture && element && !current.captured && current.moved) {
       try {
         element.setPointerCapture(event.pointerId);
         current.captured = true;
