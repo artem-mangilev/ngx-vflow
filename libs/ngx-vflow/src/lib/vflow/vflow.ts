@@ -21,6 +21,7 @@ import { VflowMinimapComponent } from './public-components/minimap/minimap.compo
 import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { VflowResizableComponent } from './public-components/resizable/resizable.component';
 import { VflowHandleDirective } from './public-directives/handle.directive';
+import { VflowPortalDirective } from './public-directives/portal.directive';
 
 export const Vflow = [
   VflowNoKeyboardDirective,
@@ -41,4 +42,5 @@ export const Vflow = [
   VflowEdgeTemplateDirective,
   VflowConnectionTemplateDirective,
   VflowMarkerTemplateDirective,
+  VflowPortalDirective,
 ] as const;

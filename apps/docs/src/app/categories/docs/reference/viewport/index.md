@@ -141,8 +141,25 @@ An opted-in minimap captures pointer input only inside its own rectangle and sup
 
 Two-finger touchscreen pinch, minimap keyboard navigation, and viewport translation bounds are not included. Per-node presentation hooks are planned separately.
 
+## Portal
+
+`VflowPortalDirective`, selector `ng-template[vPortal]`, is part of the `Vflow` imports array. The flow renders its
+template in a layer of the viewport, in flow space. The template has no context: it closes over the place that
+declares it, which may be anywhere inside `vflow`.
+
+| Input          | Default          | Description                                                                                                                                                                            |
+| -------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vPortal`      | `{ x: 0, y: 0 }` | Flow-space point of the top-left corner of the content. With `null` or `undefined` nothing renders                                                                                     |
+| `vPortalLayer` | `above`          | `above`: over the nodes, edges and edge labels, under the alignment guides, the selection box and the connection line. `below`: under every node and edge, groups below edges included |
+
+- The content is outside the graph: alignment guides, the minimap, `fitView()`, `getNodeRect()`, `getNodesBounds()`, `getNodesAtPoint()`, `getIntersectingNodes()`, culling, the selection box, click selection and keyboard navigation do not see it. It is always rendered.
+- The layers and the content let the pointer through. An element with `pointer-events: auto` takes it: a press pans the viewport and a click clears the selection, as on the pane, unless the element is inside `vNoPan`, `vNoDrag` or `vNoWheel`.
+- Several portals in one layer paint in the order they were declared.
+- Nothing is measured: on a server the content renders at its point. Until the first layout completes it is hidden with the rest of the viewport.
+
 ## See also
 
 - [Gestures](/docs/viewport/viewport-gestures)
 - [Controlling the viewport](/docs/viewport/viewport-control)
 - [Minimap](/docs/viewport/minimap)
+- [Content on the canvas](/docs/viewport/portal)

@@ -32,6 +32,7 @@ class TaskNodeComponent {
       <svg:g vEdgeInteractionArea><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
       <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>
     </ng-template>
+    <span *vPortal="{ x: 10, y: 20 }" class="portal-note">portal note</span>
     <v-minimap />
   </vflow>`,
   imports: [Vflow],
@@ -94,10 +95,22 @@ describe('Vflow in a DOM without layout', () => {
     const visibility = (selector: string) => getComputedStyle(element.querySelector(selector)!).visibility;
 
     expect(
-      ['[data-v-node] button', '.note', '.edge-path', '.v-edge-labels-layer > *', '.v-viewport', 'v-minimap'].filter(
-        (selector) => visibility(selector) === 'hidden',
-      ),
+      [
+        '[data-v-node] button',
+        '.note',
+        '.edge-path',
+        '.v-edge-labels-layer > *',
+        '.portal-note',
+        '.v-viewport',
+        'v-minimap',
+      ].filter((selector) => visibility(selector) === 'hidden'),
     ).toEqual([]);
+  });
+
+  it('renders portal content at its flow point', () => {
+    const note = element.querySelector('.portal-note')!;
+
+    expect(note.closest<HTMLElement>('[portalHost]')!.style.transform).toBe('translate(10px, 20px)');
   });
 
   it('renders an edge presentation with a path between the node positions and its label', () => {

@@ -50,6 +50,7 @@ const chord: CurveFactory = ({ sourcePoint, targetPoint }) => ({
         <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>
       </ng-template>
       <ng-template vConnection let-ctx><svg:path [attr.d]="ctx.path()" /></ng-template>
+      <span *vPortal="{ x: 10, y: 20 }" class="portal-note">portal note</span>
       <v-minimap />
     </vflow>
     <vflow [nodes]="[]" [background]="{ type: 'image', src: 'tile.png' }" />
@@ -133,6 +134,13 @@ describe('Vflow in a server render', () => {
     expect(html).toContain('data-v-edge="task-sized"');
     expect(html).toContain('<v-minimap');
     expect(html).toContain('<v-node-toolbar');
+  });
+
+  it('renders portal content at its flow point, which needs no measurement', () => {
+    const portal = html.match(/<div[^>]*portalhost[^>]*>\s*<span[^>]*>portal note/i)?.[0];
+
+    expect(portal).toBeDefined();
+    expect(portal).toContain('translate(10px, 20px)');
   });
 
   it('waits for the first layout, which the browser that receives the page makes', () => {

@@ -9,6 +9,7 @@ import {
   isComponentEdgeEvent,
   isComponentNodeEvent,
 } from 'ngx-vflow';
+import { Note, NoteComponent } from './components/note.component';
 import { RemovableEdgeComponent } from './components/removable-edge.component';
 import { StepNodeComponent } from './components/step-node.component';
 import { FlowStoreService } from './services/flow-store.service';
@@ -50,6 +51,11 @@ import { FlowStoreService } from './services/flow-store.service';
       }
     </ng-template>
 
+    <!-- The notes are not nodes: a portal places each one at a point of the flow. -->
+    @for (note of notes; track note.number) {
+      <app-note *vPortal="note.point" [note]="note" />
+    }
+
     <v-minimap [pannable]="true" [zoomable]="true" />
     <vui-controls class="absolute bottom-2.5 left-2.5" />
   </vflow>`,
@@ -57,13 +63,41 @@ import { FlowStoreService } from './services/flow-store.service';
   // corners left free for the controls and the minimap.
   host: { class: 'block h-130 w-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, NoteComponent],
   providers: [FlowStoreService],
 })
 export class AllFeaturesDemoComponent {
   protected readonly store = inject(FlowStoreService);
 
   protected readonly background = SCENE_BACKGROUND;
+
+  /** What to try, next to the parts it is about. */
+  protected readonly notes: readonly Note[] = [
+    {
+      number: 1,
+      text: 'A selected node shows its toolbar: copy the node or delete it.',
+      point: { x: 0, y: 50 },
+      arrow: { side: 'right', width: 156, height: 84, path: 'M4 12 C76 12 132 40 152 80' },
+    },
+    {
+      number: 2,
+      text: 'An edge carries a label and a control. Drag its end to another port.',
+      point: { x: 0, y: 300 },
+      arrow: { side: 'right', width: 64, height: 32, path: 'M4 12 L58 18' },
+    },
+    {
+      number: 3,
+      text: 'A group moves its children and keeps them inside. Select it to resize it.',
+      point: { x: 750, y: 0 },
+      arrow: { side: 'below', width: 24, height: 28, path: 'M12 2 L12 24' },
+    },
+    {
+      number: 4,
+      text: 'An input takes one edge: a second one is refused.',
+      point: { x: 272, y: 364 },
+      arrow: { side: 'left', width: 60, height: 50, path: 'M56 12 C32 14 12 26 6 46' },
+    },
+  ];
 
   /**
    * An input takes one edge, so a port accepts a connection only while no edge ends there. The edge whose end is

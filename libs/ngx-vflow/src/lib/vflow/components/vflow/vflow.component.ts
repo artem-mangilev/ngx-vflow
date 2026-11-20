@@ -21,6 +21,8 @@ import { ViewportGesturesDirective } from '../../directives/viewport-gestures.di
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
+import { PortalService } from '../../services/portal.service';
+import { PortalHostComponent } from '../portal/portal-host.component';
 import { outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
@@ -135,6 +137,7 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
     ResizeObserverService,
     AfterRenderBatchService,
     AlignmentService,
+    PortalService,
   ],
   hostDirectives: [ViewportCullingDirective],
   host: {
@@ -170,6 +173,7 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
     SelectionBoxComponent,
     SelectionBoxContextDirective,
     AutoPanDirective,
+    PortalHostComponent,
   ],
 })
 export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
@@ -187,6 +191,7 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private flowRenderingService = inject(FlowRenderingService);
+  protected portalService = inject(PortalService);
 
   // #endregion
 

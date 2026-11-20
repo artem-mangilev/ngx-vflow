@@ -14,7 +14,6 @@ import {
   removeElements,
   toStaticNode,
 } from 'ngx-vflow';
-import { AnnotationData, AnnotationNodeComponent } from '../components/annotation-node.component';
 import { GroupData, GroupNodeComponent } from '../components/group-node.component';
 import { RemovableEdgeComponent } from '../components/removable-edge.component';
 import { StepData, StepNodeComponent } from '../components/step-node.component';
@@ -33,25 +32,11 @@ function step(id: string, point: StaticNode['point'], data: StepData, parentId?:
   return { id, point, parentId, component: StepNodeComponent, ariaLabel: data.title, data };
 }
 
-/** A note is a node that stays where it is: it cannot be dragged, and it cannot be selected, so nothing removes it. */
-function note(point: StaticNode['point'], data: AnnotationData): StaticNode<AnnotationData> {
-  return {
-    id: `note-${data.number}`,
-    point,
-    component: AnnotationNodeComponent,
-    draggable: false,
-    selectable: false,
-    focusable: false,
-    ariaLabel: `Note ${data.number}`,
-    data,
-  };
-}
-
 /** The graph of the demo. The flow and the component nodes read and change it, so it is provided once, by the demo. */
 @Injectable()
 export class FlowStoreService {
   readonly nodes = signal(
-    createNodes<StepData | GroupData | AnnotationData>([
+    createNodes<StepData | GroupData>([
       step(
         'order',
         { x: 0, y: 200 },
@@ -131,44 +116,6 @@ export class FlowStoreService {
           ports: [{ type: 'target', position: 'top' }],
         },
         'fulfilment',
-      ),
-
-      note(
-        { x: 0, y: 50 },
-        {
-          number: 1,
-          text: 'A selected node shows its toolbar: copy the node or delete it.',
-          arrow: { side: 'right', width: 156, height: 84, path: 'M4 12 C76 12 132 40 152 80' },
-        },
-      ),
-      note(
-        { x: 0, y: 300 },
-        {
-          number: 2,
-          text: 'An edge carries a label and a control. Drag its end to another port.',
-          arrow: { side: 'right', width: 64, height: 32, path: 'M4 12 L58 18' },
-        },
-      ),
-      note(
-        { x: 750, y: 0 },
-        {
-          number: 3,
-          text: 'A group moves its children and keeps them inside. Select it to resize it.',
-          arrow: { side: 'below', width: 24, height: 28, path: 'M12 2 L12 24' },
-        },
-      ),
-      note(
-        { x: 272, y: 364 },
-        {
-          number: 4,
-          text: 'An input takes one edge: a second one is refused.',
-          arrow: { side: 'left', width: 60, height: 50, path: 'M56 12 C32 14 12 26 6 46' },
-        },
-      ),
-      note({ x: 390, y: 470 }, { number: 5, text: 'Drag a node: guides show where it lines up with the others.' }),
-      note(
-        { x: 600, y: 470 },
-        { number: 6, text: 'Hold Shift and drag to select several nodes. Delete removes the selection.' },
       ),
     ]),
   );

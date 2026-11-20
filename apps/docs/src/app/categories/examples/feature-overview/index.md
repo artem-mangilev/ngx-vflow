@@ -1,4 +1,4 @@
-A small order workflow that shows the parts of an editor together. The notes on the canvas say what to try; each of them is a node too, one that cannot be dragged or selected.
+A small order workflow that shows the parts of an editor together. The notes on the canvas say what to try. They are not nodes: a [portal](/docs/viewport/portal) places them at points of the flow, so they pan and zoom with it while the guides, the minimap and the selection leave them out.
 
 {{ NgDocActions.demoPane("AllFeaturesDemoComponent") }}
 
@@ -24,7 +24,7 @@ Where each part is described:
 
 ```
 
-```typescript group="feature-overview" name="annotation-node.component.ts" file="./demo/components/annotation-node.component.ts"
+```typescript group="feature-overview" name="note.component.ts" file="./demo/components/note.component.ts"
 
 ```
 

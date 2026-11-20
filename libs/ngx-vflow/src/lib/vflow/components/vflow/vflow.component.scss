@@ -239,6 +239,24 @@
   pointer-events: none;
 }
 
+// Content of the application in flow space. The layers have no size and let the pointer through; so does the
+// content, unless it asks for the pointer itself. Below every entity, groups under edges included; above every entity
+// and under the overlays, so the alignment guides, the selection box and the connection line stay visible.
+.v-portal-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+
+  &[data-v-portal-layer='below'] {
+    z-index: -1000000;
+  }
+
+  &[data-v-portal-layer='above'] {
+    z-index: 999999;
+  }
+}
+
 .v-overlay-svg {
   position: absolute;
   top: 0;

@@ -131,6 +131,8 @@ export * from './lib/vflow/public-directives/handle.directive';
 export * from './lib/vflow/public-directives/edge-interaction-area.directive';
 export * from './lib/vflow/public-directives/drag-handle.directive';
 export * from './lib/vflow/public-directives/gesture-exclusions.directive';
+export * from './lib/vflow/public-directives/portal.directive';
+export type { PortalLayer } from './lib/vflow/services/portal.service';
 
 // Host directive of `vflow` (`@internal`): the compiler requires it in the entry point.
 export { ViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';
