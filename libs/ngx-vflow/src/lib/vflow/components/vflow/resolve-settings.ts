@@ -1,9 +1,20 @@
 import { Signal, computed } from '@angular/core';
+import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { VFLOW_SETTINGS_DEFAULTS, VflowSettings } from '../../interfaces/vflow-settings.interface';
 import { suppliedEntries, withDefaults } from '../../utils/with-defaults';
 
-/** The inputs of the flow that are settings: `undefined` while an input is not bound. */
-export type SettingInputs = { readonly [K in keyof VflowSettings]: Signal<VflowSettings[K] | undefined> };
+/** The settings whose input has the type of the setting; the connection input is typed by its flow. */
+type PlainSetting = Exclude<keyof VflowSettings, 'connection'>;
+
+type PlainSettingInputs = { readonly [K in PlainSetting]: Signal<VflowSettings[K] | undefined> };
+
+/**
+ * The inputs of the flow that are settings: `undefined` while an input is not bound. The connection input carries
+ * the node and edge types of its flow, so it is accepted with any of them.
+ */
+export type SettingInputs = PlainSettingInputs & {
+  readonly connection: Signal<ConnectionSettings<never, never> | undefined>;
+};
 
 /** One signal per setting in effect, as `VflowComponent.settings` exposes them. */
 export type ResolvedVflowSettingSignals = {
@@ -35,19 +46,25 @@ export function resolveSettings(
 ): ResolvedVflowSettingSignals {
   const providedValue = <K extends keyof VflowSettings>(key: K): VflowSettings[K] | undefined => provided?.()[key];
 
-  const scalar = <K extends keyof VflowSettings>(key: K): Signal<VflowSettings[K]> =>
-    computed(() => inputs[key]() ?? providedValue(key) ?? VFLOW_SETTINGS_DEFAULTS[key]);
+  const plain: PlainSettingInputs = inputs;
+
+  const scalar = <K extends PlainSetting>(key: K): Signal<VflowSettings[K]> =>
+    computed(() => plain[key]() ?? providedValue(key) ?? VFLOW_SETTINGS_DEFAULTS[key]);
 
   const distance = (key: 'paneClickDistance' | 'nodeDragThreshold' | 'connectionDragThreshold'): Signal<number> => {
     const value = scalar(key);
     return computed(() => nonNegative(value()));
   };
 
-  const merged = <K extends 'connection'>(key: K): Signal<VflowSettings[K]> =>
-    computed(() => withDefaults(withDefaults(VFLOW_SETTINGS_DEFAULTS[key], providedValue(key)), inputs[key]()));
+  // The settings are read without the node and edge types of the flow: its validator is handed the nodes and edges
+  // of that flow either way.
+  const connectionInput = inputs.connection as Signal<ConnectionSettings | undefined>;
+  const connection = computed(() =>
+    withDefaults(withDefaults(VFLOW_SETTINGS_DEFAULTS.connection, providedValue('connection')), connectionInput()),
+  );
 
   const booleanOrObject = <K extends 'autoPan' | 'alignmentHelper'>(key: K): Signal<VflowSettings[K]> =>
-    computed(() => layerBooleanOrObject(VFLOW_SETTINGS_DEFAULTS[key], [providedValue(key), inputs[key]()]));
+    computed(() => layerBooleanOrObject(VFLOW_SETTINGS_DEFAULTS[key], [providedValue(key), plain[key]()]));
 
   return {
     minZoom: scalar('minZoom'),
@@ -70,7 +87,7 @@ export function resolveSettings(
     edgesFocusable: scalar('edgesFocusable'),
     selectionMode: scalar('selectionMode'),
     selectionBoxMode: scalar('selectionBoxMode'),
-    connection: merged('connection'),
+    connection,
     snapGrid: scalar('snapGrid'),
     elevateNodesOnSelect: scalar('elevateNodesOnSelect'),
     elevateEdgesOnSelect: scalar('elevateEdgesOnSelect'),

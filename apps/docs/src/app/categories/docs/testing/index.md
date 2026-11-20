@@ -77,7 +77,7 @@ it('connects two steps', async () => {
   fixture.detectChanges();
   await fixture.whenStable();
 
-  expect(fixture.componentInstance.connections).toEqual([{ source: 'start', target: 'end', sourceHandleType: 'source', targetHandleType: 'target' }]);
+  expect(fixture.componentInstance.connections).toEqual([{ source: 'start', target: 'end' }]);
 });
 ```
 

@@ -10,7 +10,8 @@ import { ConnectionForValidation } from '../interfaces/connection-settings.inter
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 import {
   ConnectEndEvent,
-  ConnectionEventHandle,
+  ConnectionEndpoint,
+  ConnectionHandle,
   ConnectionEventOutcome,
   ConnectStartEvent,
   ReconnectEndEvent,
@@ -125,10 +126,7 @@ export class ConnectionService {
     const gesture = this.gesture();
     if (!gesture || handle === gesture.sourceHandle) return;
 
-    let valid = false;
-    if (handle.canAccept()) {
-      valid = this.isValid(this.toConnection(gesture, handle), gesture.oldEdge);
-    }
+    const valid = handle.canAccept() && this.isValid(this.toEnds(gesture, handle), gesture.oldEdge);
 
     this.setGesture({ ...gesture, candidate: { node: handle.parentNode, handle, valid } });
   }
@@ -154,17 +152,15 @@ export class ConnectionService {
     const gesture = this.gesture();
     if (!gesture) return;
 
-    const { source, sourceHandle, oldEdge, candidate } = gesture;
-    const from = { node: source.rawNode, handle: eventHandle(sourceHandle) };
+    const { sourceHandle, oldEdge, candidate } = gesture;
+    const from = endpoint(sourceHandle);
     let outcome: ConnectionEventOutcome = { valid: null, to: null };
-    let connection: ConnectionForValidation | null = null;
+    let connection: Connection | null = null;
 
     if (candidate && candidate.handle.canAccept()) {
-      connection = this.toConnection(gesture, candidate.handle);
-      outcome = {
-        valid: this.isValid(connection, oldEdge),
-        to: { node: candidate.node.rawNode, handle: eventHandle(candidate.handle) },
-      };
+      const ends = this.toEnds(gesture, candidate.handle);
+      connection = toConnection(ends);
+      outcome = { valid: this.isValid(ends, oldEdge), to: endpoint(candidate.handle) };
     }
 
     this.setGesture(null);
@@ -187,7 +183,7 @@ export class ConnectionService {
     this.stopContextMenu?.();
     this.stopContextMenu = listen(this.document, 'contextmenu', () => this.end());
 
-    const start = { node: source.rawNode, handle: eventHandle(handle) };
+    const start = endpoint(handle);
     if (oldEdge) this.reconnectStart$.next({ edge: oldEdge.edge, ...start });
     else this.connectStart$.next(start);
   }
@@ -219,37 +215,49 @@ export class ConnectionService {
     this.gesture.set(next);
   }
 
-  /** Typed handles keep their roles whichever end the gesture started from. */
-  private toConnection(gesture: ConnectionGesture, handle: HandleModel): ConnectionForValidation {
-    const { source, target, sourceHandle, targetHandle } = adjustDirection({
+  /**
+   * The ends of the connection the gesture would make with the handle. Typed handles keep their roles whichever end
+   * the gesture started from.
+   */
+  private toEnds(gesture: ConnectionGesture, handle: HandleModel): ConnectionEnds {
+    const { sourceHandle, targetHandle } = adjustDirection({
       source: gesture.source,
       sourceHandle: gesture.sourceHandle,
       target: handle.parentNode,
       targetHandle: handle,
     } satisfies ConnectionInternal);
 
-    return {
-      source: source.rawNode.id,
-      target: target.rawNode.id,
-      sourceHandle: sourceHandle.id(),
-      targetHandle: targetHandle.id(),
-      sourceHandleType: sourceHandle.type(),
-      targetHandleType: targetHandle.type(),
-    };
+    return { source: endpoint(sourceHandle), target: endpoint(targetHandle) };
   }
 
   /**
    * Rejects a duplicate before the validators run, so the application validator sees only connections the built-in
-   * rules accept. A reconnected edge is no duplicate of itself.
+   * rules accept. A reconnected edge is no duplicate of itself, and the validators are told which edge it is.
    */
-  private isValid(connection: ConnectionForValidation, reconnectedEdge?: EdgeModel) {
+  private isValid(ends: ConnectionEnds, reconnectedEdge?: EdgeModel) {
     const settings = this.entities.connection();
+    const connection = toConnection(ends);
     const duplicate =
       !settings.allowDuplicateConnections &&
       this.entities.edges().some((model) => model !== reconnectedEdge && sameConnection(model.edge, connection));
 
-    return !duplicate && settings.validator(connection);
+    return (
+      !duplicate && settings.validator(reconnectedEdge ? { ...ends, reconnectedEdge: reconnectedEdge.edge } : ends)
+    );
   }
+}
+
+/** Both ends of a connection in their edge roles: what the validators read, without the reconnected edge. */
+type ConnectionEnds = Pick<ConnectionForValidation, 'source' | 'target'>;
+
+/** The connection as the flow reports it and as an edge stores it: the ids of its ends. */
+function toConnection({ source, target }: ConnectionEnds): Connection {
+  return {
+    source: source.node.id,
+    target: target.node.id,
+    sourceHandle: source.handle.id,
+    targetHandle: target.handle.id,
+  };
 }
 
 /** The nodes a gesture involves: the source, the candidate and both ends of a reconnected edge. */
@@ -262,8 +270,12 @@ function participants(gesture: ConnectionGesture | null): Set<NodeModel> {
   return nodes;
 }
 
-function eventHandle(handle: HandleModel): ConnectionEventHandle {
+function connectionHandle(handle: HandleModel): ConnectionHandle {
   return { id: handle.id(), type: handle.type(), position: handle.position() };
+}
+
+function endpoint(handle: HandleModel): ConnectionEndpoint {
+  return { node: handle.parentNode.rawNode, handle: connectionHandle(handle) };
 }
 
 /**

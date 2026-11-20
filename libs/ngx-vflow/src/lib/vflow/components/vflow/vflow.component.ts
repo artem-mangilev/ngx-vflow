@@ -320,9 +320,10 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   public readonly selectionBoxMode = input<SelectionBoxMode>();
 
   /**
-   * Settings for connection (it renders when user tries to create edge between nodes)
+   * Settings for connection (it renders when user tries to create edge between nodes). Its `validator` reads the
+   * nodes and edges of this flow in their own types.
    */
-  public readonly connection = input<ConnectionSettings>();
+  public readonly connection = input<ConnectionSettings<N, E>>();
 
   /**
    * Snap grid for node movement. Passes as [x, y]

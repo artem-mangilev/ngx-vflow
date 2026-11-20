@@ -5,7 +5,7 @@ import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { Connection } from '../../interfaces/connection.interface';
-import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
+import { ConnectionForValidation, ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import {
   ConnectEndEvent,
   ReconnectEndEvent,
@@ -113,7 +113,7 @@ describe('connection outputs', () => {
   });
 
   it('emits no connection that the validator, the handle roles or the self-connection rule reject', async () => {
-    const validator = vi.fn((connection: Connection) => connection.target !== 'c');
+    const validator = vi.fn(({ target }: ConnectionForValidation) => target.node.id !== 'c');
     await setup({ validator });
 
     await connect(handle('a', 'out'), handle('c', 'in'));
@@ -124,15 +124,9 @@ describe('connection outputs', () => {
     expect(host.connectEnds.map(({ valid }) => valid)).toEqual([false, false, false]);
     // Only the connection the built-in rules accept reaches the application validator.
     expect(validator).toHaveBeenCalled();
-    for (const [connection] of validator.mock.calls) {
-      expect(connection).toEqual({
-        source: 'a',
-        target: 'c',
-        sourceHandle: 'out',
-        targetHandle: 'in',
-        sourceHandleType: 'source',
-        targetHandleType: 'target',
-      });
+    for (const [{ source, target }] of validator.mock.calls) {
+      expect(source).toEqual({ node: host.nodes[0], handle: { id: 'out', type: 'source', position: 'right' } });
+      expect(target).toEqual({ node: host.nodes[2], handle: { id: 'in', type: 'target', position: 'left' } });
     }
   });
 

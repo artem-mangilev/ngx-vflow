@@ -20,6 +20,7 @@ import {
   createNodes,
   DeleteRequest,
   Edge,
+  NodeWithDefaults,
   removeElements,
   Vflow,
   VflowComponent,
@@ -372,11 +373,11 @@ export class PipelineDemoComponent {
   });
 
   /** Ports of the same type connect, and an edge may not close a cycle: the pictures are evaluated along the edges. */
-  protected readonly connection: ConnectionSettings = {
-    validator: (c) => {
-      const source = this.port(c.source, 'outputs', c.sourceHandle);
-      const target = this.port(c.target, 'inputs', c.targetHandle);
-      return !!source && source.type === target?.type && !this.reaches(c.target, c.source);
+  protected readonly connection: ConnectionSettings<NodeWithDefaults<LabData>> = {
+    validator: ({ source, target }) => {
+      const output = this.port(source.node.data(), 'outputs', source.handle.id);
+      const input = this.port(target.node.data(), 'inputs', target.handle.id);
+      return !!output && output.type === input?.type && !this.reaches(target.node.id, source.node.id);
     },
   };
 
@@ -388,7 +389,7 @@ export class PipelineDemoComponent {
 
   /** An input takes one edge: a new connection replaces the old one. */
   protected connect(connection: Connection) {
-    const type = this.port(connection.source, 'outputs', connection.sourceHandle)!.type;
+    const type = this.port(this.data(connection.source), 'outputs', connection.sourceHandle)!.type;
     const edge = createEdge({ ...connection, id: crypto.randomUUID(), data: { type } });
     this.edges.update((edges) =>
       addEdges([edge], {
@@ -536,8 +537,7 @@ export class PipelineDemoComponent {
     return this.edges().find((edge) => edge.target === id && edge.targetHandle === 'in:' + input)?.source;
   }
 
-  private port(id: string, side: 'inputs' | 'outputs', handle?: string) {
-    const data = this.data(id);
+  private port(data: LabData | undefined, side: 'inputs' | 'outputs', handle?: string) {
     const prefix = side === 'inputs' ? 'in:' : 'out:';
     return data && this.ports(data)[side].find((port) => prefix + port.id === handle);
   }

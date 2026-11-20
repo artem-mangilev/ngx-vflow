@@ -79,8 +79,8 @@ export type * from './lib/vflow/interfaces/template-context.interface';
 export type {
   ConnectEndEvent,
   ConnectStartEvent,
-  ConnectionEventEndpoint,
-  ConnectionEventHandle,
+  ConnectionEndpoint,
+  ConnectionHandle,
   ConnectionEventOutcome,
   ReconnectEndEvent,
   ReconnectEvent,

@@ -31,6 +31,16 @@ port where it ended.
 
 A reconnected edge is not a duplicate of itself, so it can be dropped back on the handle it came from. `addEdges` accepts self-connections and duplicates: the rules belong to the gesture, not to the graph.
 
+The `validator` receives both ends of the connection, `source` and `target`. Each end is `{ node, handle }`: your node object, and the `id`, `type` and `position` of the handle. A rule reads the data of a node from the end, without looking the node up by its id. The ends are in the roles they would have in the edge, whichever handle the drag started from. To read your own node data, give the settings your node type, as in `ConnectionSettings<NodeWithDefaults<MyData>>`.
+
+The `validator` also runs while the end of an edge is dragged to another handle. The connection it receives then carries that edge as `reconnectedEdge`. If your rule counts edges, for example "a handle accepts one edge", leave this edge out of the count: the connection replaces it.
+
+```ts
+const connection: ConnectionSettings = {
+  validator: ({ target, reconnectedEdge }) => !edges().some((edge) => edge.target === target.node.id && edge.id !== reconnectedEdge?.id),
+};
+```
+
 The `validator` of the demo passes a connection only when both of its ends carry the same type of value: `Text out` connects to `Text in`, and `Number out` to `Number in`. A handle under a rejected connection turns red. If the `validator` returns `false`, the `(connect)` event won't be triggered because there is no valid connection.
 
 {{ NgDocActions.demoPane("ConnectionValidationDemoComponent") }}

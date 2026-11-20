@@ -136,13 +136,11 @@ export class RelationshipsDemoComponent implements TeamBoard {
 
   /** People connect to people once, in either direction. */
   protected readonly connection: ConnectionSettings = {
-    validator: ({ source, target }) =>
-      source !== target &&
-      this.isPerson(source) &&
-      this.isPerson(target) &&
+    validator: ({ source: { node: a }, target: { node: b } }) =>
+      a.component === PersonNodeComponent &&
+      b.component === PersonNodeComponent &&
       !this.edges().some(
-        (edge) =>
-          (edge.source === source && edge.target === target) || (edge.source === target && edge.target === source),
+        (edge) => (edge.source === a.id && edge.target === b.id) || (edge.source === b.id && edge.target === a.id),
       ),
   };
 

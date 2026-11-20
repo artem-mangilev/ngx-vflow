@@ -118,9 +118,7 @@ describe('Vflow in a DOM without layout', () => {
     target.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
     await settle();
 
-    expect(host.connects).toEqual([
-      { source: 'task', target: 'note', sourceHandleType: 'source', targetHandleType: 'target' },
-    ]);
+    expect(host.connects).toEqual([{ source: 'task', target: 'note' }]);
   });
 
   it('selects a node on a click on its presentation and reports the change', async () => {

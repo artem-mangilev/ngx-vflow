@@ -23,6 +23,7 @@ import {
   createNodes,
   DeleteRequest,
   Edge,
+  NodeWithDefaults,
   removeElements,
   Vflow,
   VflowComponent,
@@ -371,11 +372,13 @@ export class HeroFlowComponent {
   });
 
   /** A color connects to either end of the gradient, the angle to the angle. */
-  protected readonly connection: ConnectionSettings = {
-    validator: ({ source, target, targetHandle }) => {
-      const kind = this.data(source)?.kind;
+  protected readonly connection: ConnectionSettings<NodeWithDefaults<MixerData>> = {
+    validator: ({ source, target }) => {
+      const { kind } = source.node.data();
 
-      return target === 'gradient' && (kind === 'angle') === (targetHandle === 'angle') && kind !== 'gradient';
+      return (
+        target.node.id === 'gradient' && (kind === 'angle') === (target.handle.id === 'angle') && kind !== 'gradient'
+      );
     },
   };
 

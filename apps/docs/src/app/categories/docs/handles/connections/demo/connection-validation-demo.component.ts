@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Connection, ConnectionSettings, Edge, Vflow, addEdges, createNodes } from 'ngx-vflow';
+import { Connection, ConnectionSettings, Edge, NodeWithDefaults, Vflow, addEdges, createNodes } from 'ngx-vflow';
+
+type ValueNode = NodeWithDefaults<{ text: string; value: string }>;
 
 @Component({
   template: `<vflow
@@ -27,17 +29,13 @@ export class ConnectionValidationDemoComponent {
 
   protected readonly edges = signal<Edge[]>([]);
 
-  protected readonly connection: ConnectionSettings = {
-    // A connection is valid when both of its ends carry the same type of value.
-    validator: ({ source, target }) => this.valueOf(source) === this.valueOf(target),
+  protected readonly connection: ConnectionSettings<ValueNode> = {
+    // A connection is valid when both of its ends carry the same type of value. Each end comes with its node.
+    validator: ({ source, target }) => source.node.data().value === target.node.data().value,
   };
 
   // Runs for valid connections only.
   protected connect(connection: Connection): void {
     this.edges.update((edges) => addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges }));
-  }
-
-  private valueOf(nodeId: string): string | undefined {
-    return this.nodes.find((node) => node.id === nodeId)?.data().value;
   }
 }

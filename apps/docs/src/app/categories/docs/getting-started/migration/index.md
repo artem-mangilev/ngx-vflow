@@ -514,6 +514,28 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 `ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array.
 
+### Connection validator
+
+The `validator` of `ConnectionSettings` receives the ends of the connection instead of their ids. `source` and `target` are `{ node, handle }`, the shape `(connectEnd)` reports: your node object, and the `id`, `type` and `position` of the handle. A rule that looked a node up by its id reads it from the end:
+
+```ts
+// v2
+validator: ({ source, target }) => typeOf(source) === typeOf(target),
+
+// v3
+validator: ({ source, target }) => source.node.data().type === target.node.data().type,
+```
+
+| v2 field                               | v3                                         |
+| -------------------------------------- | ------------------------------------------ |
+| `source`, `target`                     | `source.node.id`, `target.node.id`         |
+| `sourceHandle`, `targetHandle`         | `source.handle.id`, `target.handle.id`     |
+| `sourceHandleType`, `targetHandleType` | `source.handle.type`, `target.handle.type` |
+
+`ConnectionSettings`, `ConnectionForValidation` and `ConnectionValidatorFn` take the node and edge types, as in `ConnectionSettings<NodeWithDefaults<MyData>>`; the `[connection]` input expects the types of the `[nodes]` and `[edges]` of its flow. The validator also runs while the end of an edge is dragged to another handle, and then receives that edge as `reconnectedEdge`.
+
+`(connect)` and the `connection` of `(reconnect)` carry a `Connection` alone: `source`, `target`, `sourceHandle` and `targetHandle`. The object no longer has the `sourceHandleType` and `targetHandleType` fields, so an edge made by spreading the connection does not store them.
+
 ### Graph operations take the event payloads
 
 - `removeNodes(nodeIds, graph)` became `removeElements({ nodeIds, edgeIds }, graph)`, which also removes the edges you list. Its first argument has the shape of `DeleteRequest`, so `removeElements(request, { nodes, edges })` replaces `removeNodes(nodeIds, { nodes, edges: removeEdges(edgeIds, edges) })`. `RemoveNodesResult` became `RemoveElementsResult`.

@@ -29,16 +29,17 @@ export class ConnectionModel {
 /**
  * Internal validator that not allows self connections
  */
-const notSelfValidator: ConnectionValidatorFn = (connection) => {
-  return connection.source !== connection.target;
+const notSelfValidator: ConnectionValidatorFn = ({ source, target }) => {
+  return source.node.id !== target.node.id;
 };
 
 /**
  * Internal validator that rejects a connection between two `source` or two `target` handles. A handle of type
  * `any` connects in either direction.
  */
-const notSameTypedHandlesValidator: ConnectionValidatorFn = (connection) => {
-  const { sourceHandleType, targetHandleType } = connection;
+const notSameTypedHandlesValidator: ConnectionValidatorFn = ({ source, target }) => {
+  const sourceType = source.handle.type;
+  const targetType = target.handle.type;
 
-  return sourceHandleType === 'any' || targetHandleType === 'any' || sourceHandleType !== targetHandleType;
+  return sourceType === 'any' || targetType === 'any' || sourceType !== targetType;
 };

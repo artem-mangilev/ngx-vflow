@@ -23,6 +23,7 @@ import {
   createNodes,
   DeleteRequest,
   Edge,
+  NodeWithDefaults,
   StaticNode,
   Vflow,
   VflowComponent,
@@ -309,18 +310,19 @@ export class EntitiesDemoComponent {
         this.edges().flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
       ),
   );
-  protected readonly connection: ConnectionSettings = {
-    validator: (c) => {
-      const source = this.field(c.source, 'out:', c.sourceHandle);
-      const target = this.field(c.target, 'in:', c.targetHandle);
-      return !!source && !!target && source.type === target.type;
+  protected readonly connection: ConnectionSettings<NodeWithDefaults<EntityData | FrameData>> = {
+    validator: ({ source, target }) => {
+      const from = this.field(source.node.data(), 'out:', source.handle.id);
+      const to = this.field(target.node.data(), 'in:', target.handle.id);
+      return !!from && !!to && from.type === to.type;
     },
   };
 
   /** The label says what the connection does: a mapping copies its source field, a relation is one to many. */
   protected connect(connection: Connection) {
-    const mapping = this.nodes.find((node) => node.id === connection.source)?.parentId?.() === 'mapping';
-    const source = this.field(connection.source, 'out:', connection.sourceHandle)!;
+    const node = this.nodes.find((node) => node.id === connection.source);
+    const mapping = node?.parentId() === 'mapping';
+    const source = this.field(node?.data(), 'out:', connection.sourceHandle)!;
     const edge = createEdge({
       ...connection,
       id: crypto.randomUUID(),
@@ -420,8 +422,7 @@ export class EntitiesDemoComponent {
     this.edges.update((edges) => edges.filter((edge) => edge.id !== id));
   }
 
-  private field(nodeId: string, prefix: 'in:' | 'out:', handle?: string) {
-    const data = this.nodes.find((node) => node.id === nodeId)?.data();
+  private field(data: EntityData | FrameData | undefined, prefix: 'in:' | 'out:', handle?: string) {
     return data?.kind === 'entity' ? data.fields.find((field) => prefix + field.id === handle) : undefined;
   }
 }

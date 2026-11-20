@@ -126,16 +126,11 @@ describe('ConnectionService', () => {
     dispatchPointer(document, 'pointerup', { x: 150 });
 
     expect(connection.gesture()).toBeNull();
+    // The reported connection is what an edge stores: the ids of its ends, and nothing of the handles besides.
     expect(connects).toEqual([
-      {
-        source: 'source',
-        target: 'target',
-        sourceHandle: undefined,
-        targetHandle: undefined,
-        sourceHandleType: 'source',
-        targetHandleType: 'target',
-      },
+      { source: 'source', target: 'target', sourceHandle: undefined, targetHandle: undefined },
     ]);
+    expect(Object.keys(connects[0] as object)).toEqual(['source', 'target', 'sourceHandle', 'targetHandle']);
     expect(ends).toEqual([
       {
         valid: true,
@@ -259,5 +254,60 @@ describe('ConnectionService', () => {
     expect(oldEdge.reconnecting()).toBe(false);
     expect(ends.map((end) => end.valid)).toEqual([null]);
     expect(validator).not.toHaveBeenCalled();
+  });
+
+  it('should hand the application validator both ends with their nodes and handles, in their edge roles', () => {
+    const validator = vi.fn().mockReturnValue(true);
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
+
+    const source = createHandle(createNodeModel('source'), 'source');
+    const target = createHandle(createNodeModel('target'), 'target');
+
+    // Dragged from the target handle: the source handle is still the source of the connection.
+    connection.start(target);
+    connection.hover(source);
+
+    expect(validator).toHaveBeenCalledExactlyOnceWith({
+      source: { node: source.parentNode.rawNode, handle: { id: undefined, type: 'source', position: 'right' } },
+      target: { node: target.parentNode.rawNode, handle: { id: undefined, type: 'target', position: 'left' } },
+    });
+    expect(validator.mock.calls[0][0].source.node).toBe(source.parentNode.rawNode);
+  });
+
+  it('should tell the application validator which edge is reconnected, and keep it out of the reported connection', () => {
+    const validator = vi.fn().mockReturnValue(true);
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
+
+    const retained = createHandle(createNodeModel('source'), 'source');
+    const candidate = createHandle(createNodeModel('other'), 'target');
+    const oldEdge = createEdgeModel('old');
+    const reconnects: { connection: object }[] = [];
+    connection.reconnect$.subscribe((event) => reconnects.push(event));
+
+    connection.start(retained, undefined, oldEdge);
+    connection.hover(candidate);
+    connection.end();
+
+    // Asked on the hover and again on the release.
+    expect(validator).toHaveBeenCalledTimes(2);
+    for (const [asked] of validator.mock.calls) {
+      expect(asked.source.node).toBe(retained.parentNode.rawNode);
+      expect(asked.target.node).toBe(candidate.parentNode.rawNode);
+      expect(asked.reconnectedEdge).toBe(oldEdge.edge);
+    }
+    expect(reconnects).toHaveLength(1);
+    expect(reconnects[0].connection).toEqual({ source: 'source', target: 'other' });
+    expect(reconnects[0].connection).not.toHaveProperty('reconnectedEdge');
+  });
+
+  it('should ask the application validator about a new connection without a reconnected edge', () => {
+    const validator = vi.fn().mockReturnValue(true);
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
+
+    connection.start(createHandle(createNodeModel('source'), 'source'));
+    connection.hover(createHandle(createNodeModel('target'), 'target'));
+
+    expect(validator).toHaveBeenCalledTimes(1);
+    expect(validator.mock.calls[0][0]).not.toHaveProperty('reconnectedEdge');
   });
 });
