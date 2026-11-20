@@ -1,10 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import {
-  BuiltInCurve,
   Connection,
-  NodeSizeChange,
   ReconnectEvent,
   RemoveElementsRequest,
+  StaticNode,
   addEdges,
   addNodes,
   createEdge,
@@ -15,118 +14,199 @@ import {
   removeElements,
   toStaticNode,
 } from 'ngx-vflow';
+import { AnnotationData, AnnotationNodeComponent } from '../components/annotation-node.component';
 import { GroupData, GroupNodeComponent } from '../components/group-node.component';
-import { InspectorData, InspectorNodeComponent } from '../components/inspector-node.component';
 import { RemovableEdgeComponent } from '../components/removable-edge.component';
-import { ResizableNodeComponent } from '../components/resizable-node.component';
-import { SettingsNodeComponent } from '../components/settings-node.component';
-import { TableData, TableNodeComponent } from '../components/table-node.component';
+import { StepData, StepNodeComponent } from '../components/step-node.component';
 
-/** Data of an edge the `vEdge` template of the flow draws; an edge with a component draws itself. */
+/** Data of an edge: both the `vEdge` template of the flow and the edge component read it. */
 export interface EdgeData {
   label?: string;
   /** Drawn with moving dashes. */
   animated?: boolean;
 }
 
-export type BackgroundPattern = 'dots' | 'grid' | 'none';
+/** Every edge has an arrow, and either of its ends can be dragged to another port. */
+const EDGE = { markers: { end: 'arrow-closed' as const }, reconnectable: true };
 
-/** The step of the grid the nodes snap to: the gap of the background patterns, so a pattern shows the grid. */
-export const GRID = 20;
+function step(id: string, point: StaticNode['point'], data: StepData, parentId?: string): StaticNode<StepData> {
+  return { id, point, parentId, component: StepNodeComponent, ariaLabel: data.title, data };
+}
 
-/** An edge with a button that removes it; either of its ends can be dragged to another port. */
-const REMOVABLE_EDGE = {
-  component: RemovableEdgeComponent,
-  markers: { end: 'arrow-closed' as const },
-  reconnectable: true,
-};
+/** A note is a node that stays where it is: it cannot be dragged, and it cannot be selected, so nothing removes it. */
+function note(point: StaticNode['point'], data: AnnotationData): StaticNode<AnnotationData> {
+  return {
+    id: `note-${data.number}`,
+    point,
+    component: AnnotationNodeComponent,
+    draggable: false,
+    selectable: false,
+    focusable: false,
+    ariaLabel: `Note ${data.number}`,
+    data,
+  };
+}
 
-/**
- * The graph of the demo and the settings of its canvas. The flow and the component nodes read and change them, so the
- * store is provided once, by the demo.
- */
+/** The graph of the demo. The flow and the component nodes read and change it, so it is provided once, by the demo. */
 @Injectable()
 export class FlowStoreService {
-  // The settings node changes these; the flow reads them through its inputs.
-  readonly snapToGrid = signal(true);
-  readonly alignmentGuides = signal(true);
-  readonly background = signal<BackgroundPattern>('dots');
-  /** Curve of every edge and of the line that follows the pointer while a connection is dragged. */
-  readonly curve = signal<BuiltInCurve>('bezier');
-
-  /** Latest size of every node, reported by `(nodesChanges.size)` for content-sized and resized nodes alike. */
-  readonly sizes = signal<Record<string, { width: number; height: number }>>({});
-
-  // Every point is a multiple of the grid step, so the scene starts on the grid the nodes snap to.
   readonly nodes = signal(
-    createNodes([
+    createNodes<StepData | GroupData | AnnotationData>([
+      step(
+        'order',
+        { x: 0, y: 200 },
+        {
+          title: 'New order',
+          meta: 'Webhook',
+          kind: 'trigger',
+          icon: 'play',
+          ports: [{ type: 'source', position: 'right' }],
+        },
+      ),
+      // Selected from the start, so its toolbar is there to see.
       {
-        id: 'table',
-        point: { x: 0, y: 100 },
-        component: TableNodeComponent,
-        ariaLabel: 'Table',
-        data: {
-          fields: [
-            { name: 'id', type: 'number' },
-            { name: 'name', type: 'string' },
-            { name: 'count', type: 'number' },
-          ],
-        } satisfies TableData,
+        ...step(
+          'stock',
+          { x: 340, y: 160 },
+          {
+            title: 'Check stock',
+            meta: 'Warehouse API',
+            kind: 'action',
+            icon: 'search',
+            ports: [
+              { type: 'target', position: 'left' },
+              { type: 'source', position: 'right', id: 'in-stock' },
+              { type: 'source', position: 'bottom', id: 'out-of-stock' },
+            ],
+          },
+        ),
+        selected: true,
       },
-      { id: 'resizable', point: { x: 320, y: 0 }, component: ResizableNodeComponent, ariaLabel: 'Resizable node' },
-      { id: 'settings', point: { x: 580, y: 0 }, component: SettingsNodeComponent, ariaLabel: 'Canvas settings' },
+      step(
+        'notify',
+        { x: 160, y: 420 },
+        {
+          title: 'Notify customer',
+          meta: 'Back-order notice',
+          kind: 'notice',
+          icon: 'alert',
+          ports: [{ type: 'target', position: 'top' }],
+          channels: ['Email', 'SMS', 'Push'],
+          channel: 'Email',
+        },
+      ),
       // A group is a node with a size; its children are positioned inside it and move with it.
       {
-        id: 'inspectors',
-        point: { x: 240, y: 300 },
-        width: 380,
-        height: 200,
+        id: 'fulfilment',
+        point: { x: 700, y: 100 },
+        width: 280,
+        height: 320,
         component: GroupNodeComponent,
-        ariaLabel: 'Group of inspectors',
-        data: { title: 'Group' } satisfies GroupData,
+        ariaLabel: 'Fulfilment',
+        data: { title: 'Fulfilment' },
       },
-      {
-        id: 'size',
-        parentId: 'inspectors',
-        point: { x: 20, y: 60 },
-        component: InspectorNodeComponent,
-        ariaLabel: 'Size inspector',
-        data: { title: 'Size', rows: ['width', 'height'] } satisfies InspectorData,
-      },
-      {
-        id: 'position',
-        parentId: 'inspectors',
-        point: { x: 200, y: 60 },
-        component: InspectorNodeComponent,
-        ariaLabel: 'Position inspector',
-        data: { title: 'Position', rows: ['x', 'y'] } satisfies InspectorData,
-      },
+      step(
+        'pack',
+        { x: 40, y: 100 },
+        {
+          title: 'Pack',
+          meta: 'Print the label',
+          kind: 'action',
+          icon: 'layers',
+          ports: [
+            { type: 'target', position: 'left' },
+            { type: 'source', position: 'bottom' },
+          ],
+        },
+        'fulfilment',
+      ),
+      step(
+        'ship',
+        { x: 40, y: 220 },
+        {
+          title: 'Ship',
+          meta: 'Hand over to the courier',
+          kind: 'action',
+          icon: 'upload',
+          ports: [{ type: 'target', position: 'top' }],
+        },
+        'fulfilment',
+      ),
+
+      note(
+        { x: 0, y: 50 },
+        {
+          number: 1,
+          text: 'A selected node shows its toolbar: copy the node or delete it.',
+          arrow: { side: 'right', width: 156, height: 84, path: 'M4 12 C76 12 132 40 152 80' },
+        },
+      ),
+      note(
+        { x: 0, y: 300 },
+        {
+          number: 2,
+          text: 'An edge carries a label and a control. Drag its end to another port.',
+          arrow: { side: 'right', width: 64, height: 32, path: 'M4 12 L58 18' },
+        },
+      ),
+      note(
+        { x: 750, y: 0 },
+        {
+          number: 3,
+          text: 'A group moves its children and keeps them inside. Select it to resize it.',
+          arrow: { side: 'below', width: 24, height: 28, path: 'M12 2 L12 24' },
+        },
+      ),
+      note(
+        { x: 272, y: 364 },
+        {
+          number: 4,
+          text: 'An input takes one edge: a second one is refused.',
+          arrow: { side: 'left', width: 60, height: 50, path: 'M56 12 C32 14 12 26 6 46' },
+        },
+      ),
+      note({ x: 390, y: 470 }, { number: 5, text: 'Drag a node: guides show where it lines up with the others.' }),
+      note(
+        { x: 600, y: 470 },
+        { number: 6, text: 'Hold Shift and drag to select several nodes. Delete removes the selection.' },
+      ),
     ]),
   );
 
+  // One edge of every built-in curve.
   readonly edges = signal(
     createEdges<EdgeData>([
+      { id: 'order-stock', source: 'order', target: 'stock', curve: 'bezier', data: { animated: true }, ...EDGE },
       {
-        id: 'id-input',
-        source: 'table',
-        sourceHandle: 'id',
-        target: 'resizable',
-        targetHandle: 'input',
-        data: { label: 'Animated', animated: true },
+        id: 'stock-pack',
+        source: 'stock',
+        sourceHandle: 'in-stock',
+        target: 'pack',
+        curve: 'smooth-step',
+        data: { label: 'In stock' },
+        ...EDGE,
       },
-      { id: 'name-input', source: 'table', sourceHandle: 'name', target: 'resizable', targetHandle: 'input' },
-      { id: 'output-size', source: 'resizable', sourceHandle: 'output', target: 'size', ...REMOVABLE_EDGE },
-      { id: 'output-position', source: 'resizable', sourceHandle: 'output', target: 'position', ...REMOVABLE_EDGE },
+      { id: 'pack-ship', source: 'pack', target: 'ship', curve: 'straight', ...EDGE },
+      {
+        id: 'stock-notify',
+        source: 'stock',
+        sourceHandle: 'out-of-stock',
+        target: 'notify',
+        curve: 'step',
+        component: RemovableEdgeComponent,
+        data: { label: 'Out of stock' },
+        ...EDGE,
+      },
     ]),
   );
 
-  /** A new edge takes the curve of the others. */
+  /** A new edge is drawn by the component with the button, so it can be removed at once. */
   connect(connection: Connection): void {
     const edge = createEdge<EdgeData>({
       ...connection,
-      ...REMOVABLE_EDGE,
+      ...EDGE,
       id: crypto.randomUUID(),
-      curve: this.curve(),
+      component: RemovableEdgeComponent,
     });
 
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes(), edges }));
@@ -144,7 +224,7 @@ export class FlowStoreService {
     this.edges.set(edges);
   }
 
-  /** Adds a copy of the node two grid cells down and to the right, and moves the selection to it. */
+  /** Adds a copy of the node a little down and to the right, and moves the selection to it. */
   duplicate(nodeId: string): void {
     const node = this.nodes().find((node) => node.id === nodeId);
 
@@ -155,27 +235,11 @@ export class FlowStoreService {
     const copy = createNode({
       ...toStaticNode(node),
       id: crypto.randomUUID(),
-      point: { x: x + 2 * GRID, y: y + 2 * GRID },
+      point: { x: x + 40, y: y + 40 },
       selected: true,
     });
 
     node.selected.set(false);
     this.nodes.update((nodes) => addNodes([copy], nodes));
-  }
-
-  /** The curve of an edge is a signal, so the edges are redrawn without a new array. */
-  setCurve(curve: BuiltInCurve): void {
-    this.curve.set(curve);
-
-    for (const edge of this.edges()) {
-      edge.curve.set(curve);
-    }
-  }
-
-  applySizeChanges(changes: NodeSizeChange[]): void {
-    this.sizes.update((sizes) => ({
-      ...sizes,
-      ...Object.fromEntries(changes.map((change) => [change.id, change.size])),
-    }));
   }
 }

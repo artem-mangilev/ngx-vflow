@@ -37,12 +37,6 @@ async function rightHandleOffset(node: Locator, card: Locator) {
   return Math.abs(handle.centerX - (await box(card)).right);
 }
 
-/** Distance between the bottom handle's center and the card's bottom edge, in screen pixels. */
-async function bottomHandleOffset(node: Locator, card: Locator) {
-  const handle = await box(node.locator('[data-v-handle][data-v-handle-position="bottom"]').first());
-  return Math.abs(handle.y + handle.height / 2 - (await box(card)).bottom);
-}
-
 async function dragControl(page: Page, control: Locator, dx: number, dy: number) {
   const start = await box(control);
   const x = start.centerX;
@@ -53,58 +47,31 @@ async function dragControl(page: Page, control: Locator, dx: number, dy: number)
   await page.mouse.up();
 }
 
-async function reportedSize(output: Locator) {
-  const text = (await output.textContent()) ?? '';
-  const match = text.match(/W:\s*(\d+)px\s*H:\s*(\d+)px/);
-  return match ? { width: Number(match[1]), height: Number(match[2]) } : null;
-}
+test('overview: the selected group shows its resizer and grows by the dragged distance', async ({ page }) => {
+  await page.goto('/examples/feature-overview');
+  const node = page.locator('[data-v-node][aria-label="Fulfilment"]');
+  const group = node.locator('section');
+  await node.scrollIntoViewIfNeeded();
+  await expect(node).toHaveCSS('visibility', 'visible');
+  await expect(node.locator('[data-v-resize-control]')).toHaveCount(0);
 
-test.describe('overview resizer', () => {
-  let node: Locator;
-  let card: Locator;
+  await group.locator('header').click();
+  await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
+  await expectOutline(node, group);
 
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/examples/feature-overview');
-    node = page.locator('[data-v-node][aria-label="Resizable node"]');
-    card = node.getByTestId('resizable');
-    await node.scrollIntoViewIfNeeded();
-    await expect(node).toHaveCSS('visibility', 'visible');
-    await card.click();
-    await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
-  });
+  const zoom = await zoomOf(node);
+  const before = await offsetSize(group);
+  await dragControl(
+    page,
+    node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
+    40,
+    30,
+  );
 
-  test('outlines a content-sized node and places its handles on the card edges', async () => {
-    await expect(card).not.toHaveAttribute('style', /width/);
-    await expectOutline(node, card);
-    await expect.poll(() => bottomHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
-  });
-
-  test('grows the node, its handles and the reported size by the dragged distance', async ({ page }) => {
-    const output = page.locator('[data-v-node][aria-label="Size inspector"]');
-    // The flow of the overview snaps to a grid, a resize included; without it the node grows by the dragged distance.
-    // The switch is in another node, so the press on it moves the selection there.
-    await page.getByLabel('Snap to grid').uncheck();
-    await card.click();
-    await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
-    const zoom = await zoomOf(node);
-    const before = await offsetSize(card);
-    await expect.poll(() => reportedSize(output)).toEqual(before);
-
-    await dragControl(
-      page,
-      node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
-      80,
-      60,
-    );
-
-    await expect(card).toHaveAttribute('style', /width: \d+px/);
-    const after = await offsetSize(card);
-    expect(Math.abs(after.width - before.width - 80 / zoom)).toBeLessThanOrEqual(TOLERANCE);
-    expect(Math.abs(after.height - before.height - 60 / zoom)).toBeLessThanOrEqual(TOLERANCE);
-    await expect.poll(() => reportedSize(output)).toEqual(after);
-    await expectOutline(node, card);
-    await expect.poll(() => bottomHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
-  });
+  const after = await offsetSize(group);
+  expect(Math.abs(after.width - before.width - 40 / zoom)).toBeLessThanOrEqual(TOLERANCE);
+  expect(Math.abs(after.height - before.height - 30 / zoom)).toBeLessThanOrEqual(TOLERANCE);
+  await expectOutline(node, group);
 });
 
 test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {

@@ -1,43 +1,43 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
   AnyComponentEdgeEvent,
   AnyComponentNodeEvent,
-  Background,
   ConnectionSettings,
   Vflow,
   isComponentEdgeEvent,
   isComponentNodeEvent,
 } from 'ngx-vflow';
-import { InspectorNodeComponent } from './components/inspector-node.component';
 import { RemovableEdgeComponent } from './components/removable-edge.component';
-import { ResizableNodeComponent } from './components/resizable-node.component';
-import { BackgroundPattern, FlowStoreService, GRID } from './services/flow-store.service';
+import { StepNodeComponent } from './components/step-node.component';
+import { FlowStoreService } from './services/flow-store.service';
 
 @Component({
   template: `<vflow
     #flow
     [nodes]="store.nodes()"
     [edges]="store.edges()"
-    [background]="backgrounds[store.background()]"
-    [snapGrid]="store.snapToGrid() ? grid : undefined"
-    [alignmentHelper]="store.alignmentGuides()"
-    [connection]="connection()"
+    [background]="background"
+    [alignmentHelper]="true"
+    [connection]="connection"
     [parentsBelowEdges]="true"
     (connect)="store.connect($event)"
     (reconnect)="store.reconnect($event)"
     (deleteRequest)="store.remove($event)"
-    (nodesChanges.size)="store.applySizeChanges($event)"
     (componentNodeEvent)="handleNodeEvent($event)"
     (componentEdgeEvent)="handleEdgeEvent($event)"
     (initialized)="flow.fitView({ maxZoom: 1 })">
-    <!-- Every node and the edges with a button are components; this template draws the other edges. -->
+    <!-- Every node is a component, and so is the edge with a button; this template draws the other edges. -->
     <ng-template let-ctx vEdge [vEdgeOf]="store.edges()">
       @let data = ctx.data();
 
       <svg:g vEdgeInteractionArea>
-        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.stroke-dasharray]="data.animated ? '8 4' : null">
+        <svg:path
+          vuiEdge
+          [attr.d]="ctx.path()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.stroke-dasharray]="data.animated ? '8 4' : null">
           @if (data.animated) {
             <!-- The dashes move by one dash and one gap, so the loop has no seam. -->
             <svg:animate attributeName="stroke-dashoffset" values="0;-12" dur="1s" repeatCount="indefinite" />
@@ -63,29 +63,26 @@ import { BackgroundPattern, FlowStoreService, GRID } from './services/flow-store
 export class AllFeaturesDemoComponent {
   protected readonly store = inject(FlowStoreService);
 
-  protected readonly grid: [number, number] = [GRID, GRID];
-  protected readonly backgrounds: Record<BackgroundPattern, Background | null> = {
-    dots: SCENE_BACKGROUND,
-    grid: { type: 'grid', gap: GRID },
-    none: null,
-  };
+  protected readonly background = SCENE_BACKGROUND;
 
   /**
-   * The line that follows the pointer looks like the edge the connection becomes. An inspector reads one node, so
-   * its port accepts a connection only while no edge ends there. The edge whose end is being dragged does not count:
-   * the connection replaces it.
+   * An input takes one edge, so a port accepts a connection only while no edge ends there. The edge whose end is
+   * being dragged does not count: the connection replaces it.
    */
-  protected readonly connection = computed<ConnectionSettings>(() => ({
-    curve: this.store.curve(),
+  protected readonly connection: ConnectionSettings = {
     markerEnd: 'arrow-closed',
     validator: ({ target, reconnectedEdge }) =>
-      target.node.component !== InspectorNodeComponent ||
-      !this.store.edges().some((edge) => edge.target === target.node.id && edge.id !== reconnectedEdge?.id),
-  }));
+      !this.store
+        .edges()
+        .some(
+          (edge) =>
+            edge.target === target.node.id && edge.targetHandle === target.handle.id && edge.id !== reconnectedEdge?.id,
+        ),
+  };
 
   // The outputs of a component node reach the flow as one event; the guard narrows it to the outputs of a class.
   protected handleNodeEvent(event: AnyComponentNodeEvent): void {
-    if (!isComponentNodeEvent(event, ResizableNodeComponent)) return;
+    if (!isComponentNodeEvent(event, StepNodeComponent)) return;
 
     if (event.eventName === 'duplicated') this.store.duplicate(event.nodeId);
     if (event.eventName === 'deleted') this.store.remove({ nodeIds: [event.nodeId] });
