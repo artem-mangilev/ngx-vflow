@@ -102,7 +102,9 @@ test('selects nodes with a Shift selection box instead of panning', async ({ pag
 
 // A hand moves a few pixels between a press and its release. A press on an edge or on a control in an edge label
 // belongs to the pane, which pans from the first pixel; within the pane click distance it is still a click.
-test('clicks an edge and a control in an edge label although the pointer moves during the press', async ({ page }) => {
+test('clicks an edge, a control in an edge label and a node although the pointer moves during the press', async ({
+  page,
+}) => {
   await page.goto('/docs/edges/labels');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
@@ -132,4 +134,11 @@ test('clicks an edge and a control in an edge label although the pointer moves d
   await expect(remove).toBeVisible();
   await press(await center(remove));
   await expect(graph.locator('[data-v-edge]')).toHaveCount(1);
+
+  // The same press on a node stays under the node drag threshold: the node is selected and keeps its place.
+  const node = graph.locator('[data-v-node]').first();
+  const before = await node.boundingBox();
+  await press(await center(node));
+  await expect(node).toHaveAttribute('data-v-selected', '');
+  expect(await node.boundingBox()).toEqual(before);
 });

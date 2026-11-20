@@ -74,10 +74,12 @@ Touch panning stays on; only `false` turns it off.
 
 ## Require a small movement before a drag starts
 
-If a slight movement during a click should not move a node or start a connection, set a threshold in CSS pixels:
+A hand moves a little between a press and its release. So that such a press stays a click, a node drag starts after the pointer moves 3 CSS pixels, and a press that pans is still a click of the element under it within 6 pixels. A connection starts at the press.
+
+If you want other distances, set them in CSS pixels. Zero starts a drag at the press:
 
 ```html
-<vflow [nodes]="nodes" [nodeDragThreshold]="3" [connectionDragThreshold]="3" />
+<vflow [nodes]="nodes" [nodeDragThreshold]="6" [connectionDragThreshold]="3" [paneClickDistance]="10" />
 ```
 
 ## Keep controls inside nodes usable

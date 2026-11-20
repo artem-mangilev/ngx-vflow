@@ -483,6 +483,7 @@ ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoo
 - A press that starts a library gesture does not propagate to ancestors, neither as `pointerdown` nor as its compatibility `mousedown` or `touchstart`.
 - The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](/docs/viewport/viewport-gestures) for how touch scrolling follows the settings.
 - Once a pan moves beyond `paneClickDistance`, the pane captures the pointer until release, so nodes under the cursor do not receive hover events during a pan. A press released within that distance is still a click of the element it landed on, such as an edge or a control in an edge label.
+- A node drag starts after the pointer moves 3 pixels: `nodeDragThreshold` is `3` by default. A press with a slight hand movement is a click that selects the node and does not move it. Set `[nodeDragThreshold]="0"` to drag from the first pixel, as version 2 did.
 - A pinch that may zoom but not pan scales around the point where the fingers started, instead of drifting with them.
 
 ### Viewport methods

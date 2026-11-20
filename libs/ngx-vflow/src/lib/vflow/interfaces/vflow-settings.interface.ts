@@ -79,7 +79,7 @@ export const VFLOW_SETTINGS_DEFAULTS: Readonly<VflowSettings> = {
   panOnDrag: true,
   panOnScroll: false,
   paneClickDistance: 6,
-  nodeDragThreshold: 0,
+  nodeDragThreshold: 3,
   connectionDragThreshold: 0,
   background: null,
   virtualization: false,

@@ -195,6 +195,11 @@ describe('DraggableService', () => {
     return { model, ...dragSurface };
   }
 
+  /** Makes a press start the drag, for the specs about what a drag in progress observes before its first move. */
+  function dragFromThePress() {
+    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(0) });
+  }
+
   function dispatchPanePosition(rect: DOMRectReadOnly, pane: Element) {
     panePositionCallback?.(
       [{ boundingClientRect: rect, target: pane } as IntersectionObserverEntry],
@@ -215,6 +220,19 @@ describe('DraggableService', () => {
     expect(model.point()).toEqual({ x: 16, y: 20 });
     expect(drags).toEqual(['start']);
     dispatchMouse(window, 'mouseup', 162, 100);
+  });
+
+  it('keeps a press that moves within the default threshold a click: no drag, no move, no suppressed click', () => {
+    const drags = dragEvents();
+    const { model, element } = startNodeDrag(new DOMRect(0, 0, 400, 300));
+    let clicks = 0;
+    element.addEventListener('click', () => clicks++);
+    dispatchMouse(window, 'mousemove', 152, 101);
+    dispatchMouse(window, 'mouseup', 152, 101);
+    element.click();
+    expect(model.point()).toEqual({ x: 10, y: 20 });
+    expect(drags).toEqual([]);
+    expect(clicks).toBe(1);
   });
 
   it('does not emit node drag end for a release below the threshold', () => {
@@ -420,6 +438,7 @@ describe('DraggableService', () => {
   });
 
   it('should refresh pane geometry after root resize and document scroll', () => {
+    dragFromThePress();
     const { model, pane, getPaneRect } = startNodeDrag(
       new DOMRect(100, 50, 800, 600),
       new DOMRect(120, 50, 700, 600),
@@ -450,6 +469,7 @@ describe('DraggableService', () => {
   });
 
   it('should refresh pane geometry after a position-only document layout change', () => {
+    dragFromThePress();
     const { model, pane, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600), new DOMRect(120, 50, 800, 600));
 
     dispatchPanePosition(new DOMRect(120, 50, 800, 600), pane);
@@ -474,6 +494,7 @@ describe('DraggableService', () => {
   });
 
   it('should keep cached pane geometry while the viewport pans and zooms', () => {
+    dragFromThePress();
     const { model, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600));
 
     viewportService.readableViewport.set({ x: 20, y: 0, zoom: 1 });
@@ -495,8 +516,13 @@ describe('DraggableService', () => {
 
     beforeEach(() => {
       TestBed.inject(FlowSettingsService).bind({ alignmentHelper: signal(true) });
+      // The specs move a node by a few pixels to reach an alignment: every pixel from the press counts.
+      dragFromThePress();
       alignment = TestBed.inject(AlignmentService);
     });
+
+    // A spec leaves its drag in progress to read the guides; the release keeps it from following the next spec.
+    afterEach(() => dispatchMouse(window, 'mouseup', 0, 0));
 
     function placed(params: Parameters<typeof createModel>[0], x: number, y: number) {
       const model = createModel(params);

@@ -265,7 +265,10 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
    */
   public readonly paneClickDistance = input<number>();
 
-  /** Distance in CSS pixels before node drag starts. Default: 0. */
+  /**
+   * Distance in CSS pixels a press on a node moves before the drag starts. A press released within it is a click:
+   * the node keeps its place and is selected. Default: 3.
+   */
   public readonly nodeDragThreshold = input<number>();
 
   /** Distance in CSS pixels before connection or reconnection starts. Default: 0. */

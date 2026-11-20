@@ -234,8 +234,11 @@ describe('VflowHandleDirective', () => {
 
     // A press on the drag handle drags the node instead of starting a connection.
     dispatchMouse(elementOf(a).querySelector('.title')!, 'mousedown', { x: 0, y: 0 });
+    expect(connection.gesture()).toBeNull();
+    // The drag starts once the pointer passes the node drag threshold.
+    dispatchMouse(window, 'mousemove', { x: 10, y: 0 });
     expect(drags).toEqual(['start']);
-    dispatchMouse(window, 'mouseup', { x: 0, y: 0 });
+    dispatchMouse(window, 'mouseup', { x: 10, y: 0 });
     expect(drags).toEqual(['start', 'end']);
 
     dispatchMouse(elementOf(a).querySelector('.body')!, 'mousedown', { x: 0, y: 0 });

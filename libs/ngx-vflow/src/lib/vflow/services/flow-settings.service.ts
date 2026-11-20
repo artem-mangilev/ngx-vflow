@@ -41,7 +41,7 @@ export class FlowSettingsService {
   public panOnDrag = bindableSignal<boolean | readonly number[]>(true);
   public panOnScroll = bindableSignal(false);
   public paneClickDistance = bindableSignal(6);
-  public nodeDragThreshold = bindableSignal(0);
+  public nodeDragThreshold = bindableSignal(3);
   public connectionDragThreshold = bindableSignal(0);
 
   public minZoom = bindableSignal(0.5);
