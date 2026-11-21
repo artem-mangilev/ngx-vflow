@@ -100,7 +100,7 @@ const TRAFFIC = [0.62, 0.7, 0.64, 0.8, 0.72, 0.92, 0.7, 0.76, 1.1, 0.84, 0.7, 0.
         <span vuiPort handleType="source" position="right" [canStart]="false"></span>
       </article>
 
-      <vui-controls class="absolute bottom-2.5 left-2.5" />
+      <vui-controls vPanel="bottom-left" />
     </vflow>
   `,
 })

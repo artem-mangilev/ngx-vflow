@@ -9,7 +9,8 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
-    <v-minimap [pannable]="true" [zoomable]="true" />
+    <!-- The frame is ordinary CSS on the element. -->
+    <v-minimap vPanel="bottom-right" class="rounded-lg border border-vui-border" [pannable]="true" [zoomable]="true" />
   </vflow>`,
   host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,8 +25,19 @@ export class MinimapDemoComponent {
     { id: 'picking', point: { x: 400, y: 240 }, data: { text: 'Picking' } },
     { id: 'packing', point: { x: 600, y: 120 }, data: { text: 'Packing' } },
     { id: 'shipping', point: { x: 800, y: 120 }, data: { text: 'Shipping' } },
-    { id: 'delivered', point: { x: 1000, y: 0 }, data: { text: 'Delivered' } },
-    { id: 'returned', point: { x: 1000, y: 240 }, data: { text: 'Returned' } },
+    // The two outcomes stand out in the minimap. The color is a token of the theme, so it follows light and dark.
+    {
+      id: 'delivered',
+      point: { x: 1000, y: 0 },
+      data: { text: 'Delivered' },
+      minimap: { background: 'var(--vui-accent)' },
+    },
+    {
+      id: 'returned',
+      point: { x: 1000, y: 240 },
+      data: { text: 'Returned' },
+      minimap: { background: 'transparent', borderColor: 'var(--vui-accent)', borderWidth: 1 },
+    },
   ]);
 
   protected readonly edges = createEdges([

@@ -266,10 +266,10 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
               <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
             }
           </ng-template>
-          <vui-controls class="absolute bottom-2.5 left-2.5" />
+          <vui-controls vPanel="bottom-left" />
         </vflow>
       </div>
-      <div vuiToolbar class="absolute top-2.5 left-2.5 z-2 pl-2" data-testid="palette">
+      <div vuiToolbar vPanel="top-left" class="z-2 pl-2" data-testid="palette">
         <app-demo-icon name="plus" />
         <select #palette docsSelect plain aria-label="Add a node" (change)="add(palette.value); palette.value = ''">
           <option value="" disabled selected>Add node</option>

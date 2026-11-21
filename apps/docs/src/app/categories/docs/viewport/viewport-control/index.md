@@ -18,15 +18,14 @@ private readonly flow = viewChild.required(VflowComponent);
 ```
 
 A component of your own placed inside `vflow`, such as a toolbar of viewport buttons, injects the flow it is in. The
-flow renders such an element above the pane, in a layer the size of the flow, so position it with CSS; the pointer
-still reaches the pane around it. [`vui-controls`](/packages/ui/overview#viewport-controls) of `@vflow/ui` works this
+flow renders such an element above the pane, in a layer the size of the flow: place it with
+[`vPanel`](/docs/viewport/panel) or with your own CSS. The pointer still reaches the pane around it. [`vui-controls`](/packages/ui/overview#viewport-controls) of `@vflow/ui` works this
 way.
 
 ```ts
 @Component({
   selector: 'app-zoom-bar',
   template: `<button type="button" (click)="flow.zoomIn()">Zoom in</button>`,
-  host: { class: 'absolute top-2 right-2' },
 })
 export class ZoomBarComponent {
   protected readonly flow = inject(VflowComponent);
@@ -36,7 +35,7 @@ export class ZoomBarComponent {
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
   <!-- node and edge templates -->
-  <app-zoom-bar />
+  <app-zoom-bar vPanel="top-right" />
 </vflow>
 ```
 

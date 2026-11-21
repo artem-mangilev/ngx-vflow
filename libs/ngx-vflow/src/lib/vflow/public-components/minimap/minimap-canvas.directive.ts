@@ -3,25 +3,33 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
-  afterNextRender,
+  NgZone,
   afterRenderEffect,
   computed,
+  effect,
   inject,
   input,
-  signal,
 } from '@angular/core';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
-import { FlowSettingsService } from '../../services/flow-settings.service';
-import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
-import { FlowRenderingService } from '../../services/flow-rendering.service';
-import { getNodesFlowBounds } from '../../utils/nodes';
-import { clamp, getViewportBounds, getViewportForBounds } from '../../utils/viewport';
-import { MinimapPosition } from './minimap.component';
-import { KeyboardService } from '../../services/keyboard.service';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { EMPTY, fromEvent, map } from 'rxjs';
+import { VFLOW_NODE_COMPONENTS } from '../../features/with-entity-components';
+import { VFLOW_MINIMAP_SETTINGS } from '../../features/with-minimap-settings';
+import { createPointerDrag, PointerDragContext } from '../../gestures/pointer-drag';
+import { wheelPanDelta } from '../../gestures/wheel';
 import { Point } from '../../interfaces/point.interface';
-import { clientToFlowPosition } from '../../utils/coordinates';
-import { isPointInRect } from '../../utils/rect';
-import { isGroupNode } from '../../utils/is-group-node';
+import { Rect } from '../../interfaces/rect';
+import { ViewportState } from '../../interfaces/viewport.interface';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { KeyboardService } from '../../services/keyboard.service';
+import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
+import { cssPalette } from '../../utils/css-palette';
+import { getNodesFlowBounds } from '../../utils/nodes';
+import { getBoundsOfRects, isPointInRect } from '../../utils/rect';
+import { resizable } from '../../utils/resizable';
+import { clamp, getViewportBounds } from '../../utils/viewport';
+import { minimapNodeBatches } from './minimap-nodes';
 
 /**
  * Zoom factor of one wheel event on the minimap: half a zoom-key step (`ZOOM_STEP` 1.2, so about 1.095 per event),
@@ -29,271 +37,303 @@ import { isGroupNode } from '../../utils/is-group-node';
  */
 const MINIMAP_WHEEL_ZOOM = Math.sqrt(ZOOM_STEP);
 
-const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
+/** Gap in CSS pixels between the content of the minimap and its edges. */
+const PADDING = 5;
 
+/** The smallest side, in CSS pixels, of the viewport as the minimap marks it, so a deep zoom into a large graph stays findable. */
+const MIN_VIEWPORT_SIZE = 8;
+
+const MASK = 'var(--v-minimap-mask)';
+const VIEWPORT_OUTLINE = 'var(--v-minimap-viewport)';
+
+/**
+ * Draws the minimap and navigates with it. Everything drawn is derived:
+ *
+ * - `transform` maps flow space to the canvas, from the bounds of the nodes united with the viewport;
+ * - `batches` are the nodes as paths in flow space, from their geometry and styles;
+ * - `picture` is the batches painted in the transform, so it is painted again only when one of the two changes;
+ * - a frame is the picture under the mask that leaves the viewport open.
+ *
+ * While the viewport stays within the nodes the transform does not change, so a frame of a camera move costs the
+ * same whatever the size of the graph.
+ */
 @Directive({
   selector: 'canvas[minimapCanvas]',
   host: {
     '[style.pointer-events]': 'pannable() || zoomable() ? "auto" : "none"',
     '[style.touch-action]': 'pannable() || zoomable() ? "none" : "auto"',
     '[style.cursor]': 'pannable() ? "grab" : "auto"',
-    '(pointerdown)': 'onPointerDown($event)',
-    '(pointermove)': 'onPointerMove($event)',
-    '(pointerup)': 'onPointerUp($event)',
-    '(pointercancel)': 'cancelDrag($event)',
-    '(lostpointercapture)': 'cancelDrag($event)',
+    '(click)': 'onClick($event)',
+    '(auxclick)': 'onClick($event)',
+    // Nothing pressed or clicked on the minimap reaches the flow around it.
+    '(pointerdown)': '$event.stopPropagation()',
     '(mousedown)': '$event.stopPropagation()',
     '(touchstart)': '$event.stopPropagation()',
-    '(click)': '$event.stopPropagation()',
     '(dblclick)': '$event.stopPropagation()',
   },
 })
 export class MinimapCanvasDirective {
-  public position = input.required<MinimapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
 
-  private document = inject(DOCUMENT);
+  private view = inject(DOCUMENT).defaultView;
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private entities = inject(FlowEntitiesService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
-  private flowRendering = inject(FlowRenderingService);
   private keyboard = inject(KeyboardService);
-  private drag?: { id: number; start: Point; offset: Point; moved: boolean };
-  private pixelRatio = signal(this.document.defaultView?.devicePixelRatio || 1);
-  private previews = this.document.createElement('canvas');
-  private width = computed(() => this.settings.computedFlowWidth() * 0.2);
-  private height = computed(() => this.settings.computedFlowHeight() * 0.2);
-  private themeVersion = signal(0);
+  private flowInitialized = inject(FlowRenderingService).flowInitialized;
+  private minimapSettings = inject(VFLOW_MINIMAP_SETTINGS, { optional: true });
 
-  /**
-   * Canvas cannot read CSS variables, so the resolved `--v-*` tokens are sampled from computed style.
-   * The sample is refreshed when an attribute changes on any ancestor of the flow (class, data-*, style)
-   * or when the color scheme preference changes; other stylesheet edits are not observed. A sample with the
-   * same values, such as after the flow wrote `--v-zoom` at the end of a gesture, changes nothing downstream.
-   */
-  private theme = computed(
-    () => {
-      this.themeVersion();
-      const view = this.document.defaultView;
-      const style = view?.getComputedStyle(this.canvas);
-      const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
-      const fallback = token('--v-background', '#fff');
-      const root = this.flowRendering.root();
-      const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
-      return {
-        mask: token('--v-minimap-mask', 'rgb(177, 177, 183)'),
-        selected: token('--v-minimap-selected', '#0f4c75'),
-        background: TRANSPARENT.has(rootBackground) ? fallback : rootBackground,
-      };
-    },
-    { equal: (a, b) => Object.keys(a).every((key) => a[key as keyof typeof a] === b[key as keyof typeof b]) },
+  /** The box the application's CSS gives the canvas. */
+  private box = toSignal(resizable([this.canvas], inject(NgZone)).pipe(map(([entry]) => entry.contentRect)));
+  private pixelRatio = toSignal(
+    this.view ? fromEvent(this.view, 'resize').pipe(map(() => this.view?.devicePixelRatio || 1)) : EMPTY,
+    { initialValue: this.view?.devicePixelRatio || 1 },
   );
 
-  // The graph bitmap depends on geometry and selection, never on the camera.
-  private graph = computed(() => {
-    const width = this.width();
-    const height = this.height();
-    const nodes = this.entities.nodes();
-    const ratio = this.pixelRatio();
-    const theme = this.theme();
-    const image = this.previews;
-    image.width = Math.max(0, Math.round(width * ratio));
-    image.height = Math.max(0, Math.round(height * ratio));
-    // An empty bitmap needs no context; jsdom reports every getContext call as not implemented.
-    const context = width > 0 && height > 0 ? image.getContext('2d') : null;
-    const transform =
-      nodes.length && width > 0 && height > 0
-        ? getViewportForBounds(
-            getNodesFlowBounds(nodes),
-            { width, height },
-            { minZoom: Number.MIN_VALUE, maxZoom: 0.3 },
-          )
-        : { x: 0, y: 0, zoom: 0.2 };
-    if (context) {
-      context.setTransform(
-        ratio * transform.zoom,
-        0,
-        0,
-        ratio * transform.zoom,
-        ratio * transform.x,
-        ratio * transform.y,
-      );
-      // ponytail: redraw all previews on graph edits; use dirty regions if edits become the bottleneck.
-      for (const node of nodes) {
-        const group = isGroupNode(node);
-        const { x, y } = node.globalPoint();
-        const selected = node.selected();
-        context.beginPath();
-        context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? theme.mask : theme.background;
-        context.globalAlpha = group ? 0.08 : 1;
-        context.fill();
-        context.globalAlpha = 1;
-        context.strokeStyle = selected ? theme.selected : theme.mask;
-        context.lineWidth = group && !selected ? 1.5 : 2;
-        context.stroke();
-      }
-    }
-    return { image, transform };
-  });
-
-  constructor() {
-    const view = this.document.defaultView;
-    const updateRatio = () => this.pixelRatio.set(view?.devicePixelRatio || 1);
-    const cancelDrag = () => this.cancelDrag();
-    const wheel = (event: WheelEvent) => this.onWheel(event);
-    const refreshTheme = () => this.themeVersion.update((version) => version + 1);
-    const scheme = view?.matchMedia?.('(prefers-color-scheme: dark)');
-    // zone.js in happy-dom replaces MutationObserver with a class without methods: the theme is then read once.
-    const created = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
-    const observer = typeof created?.observe === 'function' ? created : undefined;
-    // Ancestors are complete only once the projected minimap is attached to the document.
-    afterNextRender(() => {
-      for (let element = this.canvas.parentElement; element; element = element.parentElement) {
-        observer?.observe(element, { attributes: true });
-      }
-      refreshTheme();
-    });
-    view?.addEventListener('resize', updateRatio);
-    view?.addEventListener('blur', cancelDrag);
-    scheme?.addEventListener('change', refreshTheme);
-    this.canvas.addEventListener('wheel', wheel, { passive: false });
-    inject(DestroyRef).onDestroy(() => {
-      this.cancelDrag();
-      observer?.disconnect();
-      view?.removeEventListener('resize', updateRatio);
-      view?.removeEventListener('blur', cancelDrag);
-      scheme?.removeEventListener('change', refreshTheme);
-      this.canvas.removeEventListener('wheel', wheel);
-    });
-
-    afterRenderEffect(() => {
-      if (!this.pannable()) this.cancelDrag();
-      const width = this.width();
-      const height = this.height();
+  /** CSS pixels of the canvas, and its bitmap in device pixels. */
+  private size = computed(
+    () => {
+      const [width, height] = [this.box()?.width ?? 0, this.box()?.height ?? 0];
       const ratio = this.pixelRatio();
-      const position = this.position();
-      this.canvas.style.width = width + 'px';
-      this.canvas.style.height = height + 'px';
-      this.canvas.style.left = (position.endsWith('left') ? 10 : this.settings.computedFlowWidth() - width - 10) + 'px';
-      this.canvas.style.top =
-        (position.startsWith('top') ? 10 : this.settings.computedFlowHeight() - height - 10) + 'px';
-      const pixelWidth = Math.max(0, Math.round(width * ratio));
-      const pixelHeight = Math.max(0, Math.round(height * ratio));
-      if (this.canvas.width !== pixelWidth) this.canvas.width = pixelWidth;
-      if (this.canvas.height !== pixelHeight) this.canvas.height = pixelHeight;
-      if (width <= 0 || height <= 0) return;
-      const context = this.canvas.getContext('2d');
-      if (!context) return;
-      const { image, transform } = this.graph();
-      const viewport = getViewportBounds(
-        this.viewport.readableViewport(),
-        this.settings.computedFlowWidth(),
-        this.settings.computedFlowHeight(),
-      );
-      const theme = this.theme();
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      context.clearRect(0, 0, width, height);
-      context.fillStyle = theme.mask;
-      context.globalAlpha = 0.35;
-      context.fillRect(0, 0, width, height);
-      context.globalAlpha = 1;
-      context.fillStyle = theme.background;
-      context.fillRect(
-        transform.x + viewport.x * transform.zoom,
-        transform.y + viewport.y * transform.zoom,
-        viewport.width * transform.zoom,
-        viewport.height * transform.zoom,
-      );
-      if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = theme.mask;
-      context.lineWidth = 1;
-      context.strokeRect(0.5, 0.5, width - 1, height - 1);
-    });
-  }
+      return { width, height, pixelWidth: Math.round(width * ratio), pixelHeight: Math.round(height * ratio) };
+    },
+    { equal: (a, b) => a.width === b.width && a.height === b.height && a.pixelWidth === b.pixelWidth },
+  );
 
-  private flowPoint(event: PointerEvent): Point | undefined {
-    const rect = this.canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0 || this.width() <= 0 || this.height() <= 0) return;
-    return clientToFlowPosition(
-      {
-        x: ((event.clientX - rect.left) * this.width()) / rect.width,
-        y: ((event.clientY - rect.top) * this.height()) / rect.height,
-      },
-      { viewport: this.graph().transform, containerPosition: { x: 0, y: 0 } },
-    );
-  }
-
-  private canPan(event: PointerEvent) {
-    const buttons = this.settings.panOnDrag();
-    return (
-      this.pannable() &&
-      !this.keyboard.isActiveModifier('selection') &&
-      (buttons !== false || this.keyboard.isActiveModifier('panActivation')) &&
-      (event.pointerType === 'touch' || !Array.isArray(buttons) || buttons.includes(event.button))
-    );
-  }
-
-  protected onPointerDown(event: PointerEvent) {
-    event.stopPropagation();
-    if (this.drag || !event.isPrimary || !this.canPan(event)) return;
-    const point = this.flowPoint(event);
-    if (!point) return;
-    event.preventDefault();
-    const bounds = getViewportBounds(
+  /** The flow area the pane shows. */
+  private visible = computed(() =>
+    getViewportBounds(
       this.viewport.readableViewport(),
       this.settings.computedFlowWidth(),
       this.settings.computedFlowHeight(),
-    );
-    const inside = isPointInRect(point, bounds);
-    this.drag = {
-      id: event.pointerId,
-      start: { x: event.clientX, y: event.clientY },
-      offset: inside
-        ? { x: bounds.x + bounds.width / 2 - point.x, y: bounds.y + bounds.height / 2 - point.y }
-        : { x: 0, y: 0 },
-      moved: false,
-    };
-    this.canvas.setPointerCapture?.(event.pointerId);
-    if (!inside) this.centerOn(point);
+    ),
+  );
+
+  /**
+   * Flow space to the CSS pixels of the canvas: the bounds of the nodes united with the viewport, so the viewport is
+   * inside the minimap wherever the camera is.
+   */
+  private transform = computed(
+    () => {
+      const nodes = this.entities.nodes();
+      const bounds = nodes.length ? getBoundsOfRects([getNodesFlowBounds(nodes), this.visible()]) : this.visible();
+      return fit(bounds, this.size());
+    },
+    { equal: (a, b) => a.x === b.x && a.y === b.y && a.zoom === b.zoom },
+  );
+
+  private batches = computed(() =>
+    minimapNodeBatches(this.entities.nodes(), this.minimapSettings?.().nodeStyles ?? {}),
+  );
+
+  /**
+   * Every color the minimap paints with, as it is written: the tokens of the mask and the colors of node styles.
+   * None while the canvas has no size, which is also while it is hidden: nothing is painted then.
+   */
+  private colors = computed(
+    () => {
+      if (!this.size().pixelWidth || !this.size().pixelHeight) return [];
+      const styles = this.batches().flatMap(({ style }) => [style.background, style.borderColor]);
+      return [...new Set([MASK, VIEWPORT_OUTLINE, ...styles])];
+    },
+    { equal: (a, b) => a.length === b.length && a.every((color, index) => color === b[index]) },
+  );
+
+  /** Those colors as the canvas takes them, resolved on the minimap element and following its theme. */
+  private palette = cssPalette(this.canvas.parentElement ?? this.canvas, this.colors);
+
+  private bitmap = inject(DOCUMENT).createElement('canvas');
+
+  /** The nodes painted in the current transform; `null` where there is nothing to paint on. */
+  private picture = computed(() => {
+    const { width, height, pixelWidth, pixelHeight } = this.size();
+    // An empty bitmap needs no context; jsdom reports every getContext call as not implemented.
+    if (!pixelWidth || !pixelHeight) return null;
+    this.bitmap.width = pixelWidth;
+    this.bitmap.height = pixelHeight;
+    const context = this.bitmap.getContext('2d');
+    if (!context) return null;
+
+    const { x, y, zoom } = this.transform();
+    const palette = this.palette();
+    const [scaleX, scaleY] = [pixelWidth / width, pixelHeight / height];
+    context.setTransform(scaleX * zoom, 0, 0, scaleY * zoom, scaleX * x, scaleY * y);
+    for (const { style, path } of this.batches()) {
+      const fill = palette.get(style.background);
+      if (isVisible(fill)) {
+        context.fillStyle = fill;
+        context.fill(path);
+      }
+      const stroke = style.borderWidth > 0 ? palette.get(style.borderColor) : undefined;
+      if (isVisible(stroke)) {
+        context.strokeStyle = stroke;
+        // The width is in CSS pixels of the minimap: it does not shrink with the graph.
+        context.lineWidth = style.borderWidth / zoom;
+        context.stroke(path);
+      }
+    }
+    // A new object each time: the bitmap is the same element, and the frame must see that it was painted again.
+    return { image: this.bitmap };
+  });
+
+  /** Where the last event of a drag was, to move the viewport by what the pointer moved since. */
+  private dragged: Point = { x: 0, y: 0 };
+
+  constructor() {
+    const drag = createPointerDrag(this.canvas, {
+      filter: (event) => event.isPrimary && this.canPanWith(event),
+      threshold: () => this.settings.paneClickDistance(),
+      capture: true,
+      onStart: (context) => {
+        this.dragged = context.start;
+        // A drag that starts outside the viewport brings the viewport under the pointer first.
+        const pressed = this.canPan() && this.flowPoint(context.press);
+        if (pressed && !isPointInRect(pressed, this.visible())) this.centerOn(pressed);
+        this.panBy(context);
+      },
+      onMove: (context) => this.panBy(context),
+    });
+    inject(DestroyRef).onDestroy(() => drag.destroy());
+
+    // The listener is not passive: an opted-in minimap keeps the wheel from scrolling the page.
+    fromEvent<WheelEvent>(this.canvas, 'wheel', { passive: false })
+      .pipe(takeUntilDestroyed())
+      .subscribe((event) => this.onWheel(event));
+
+    if (typeof ngDevMode === 'undefined' || ngDevMode) this.warnAboutUnknownComponents();
+
+    afterRenderEffect(() => {
+      const { width, height, pixelWidth, pixelHeight } = this.size();
+      if (this.canvas.width !== pixelWidth) this.canvas.width = pixelWidth;
+      if (this.canvas.height !== pixelHeight) this.canvas.height = pixelHeight;
+      // Until the first layout the nodes have placeholder sizes and the minimap is hidden.
+      if (!pixelWidth || !pixelHeight || !this.flowInitialized()) return;
+      const context = this.canvas.getContext('2d');
+      if (!context) return;
+
+      context.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
+      context.clearRect(0, 0, width, height);
+      const picture = this.picture();
+      if (picture) context.drawImage(picture.image, 0, 0, width, height);
+
+      // The mask covers everything but the viewport, above the nodes: the part of the graph out of view is dimmed.
+      const { x, y, zoom } = this.transform();
+      const visible = this.visible();
+      const marked = atLeast(
+        {
+          x: x + visible.x * zoom,
+          y: y + visible.y * zoom,
+          width: visible.width * zoom,
+          height: visible.height * zoom,
+        },
+        MIN_VIEWPORT_SIZE,
+      );
+      context.beginPath();
+      context.rect(0, 0, width, height);
+      context.rect(marked.x, marked.y, marked.width, marked.height);
+      const palette = this.palette();
+      context.fillStyle = palette.get(MASK) ?? 'transparent';
+      context.fill('evenodd');
+      const outline = palette.get(VIEWPORT_OUTLINE);
+      if (isVisible(outline)) {
+        context.strokeStyle = outline;
+        context.lineWidth = 1;
+        context.strokeRect(marked.x + 0.5, marked.y + 0.5, marked.width - 1, marked.height - 1);
+      }
+    });
   }
 
-  protected onPointerMove(event: PointerEvent) {
+  /** A click centers the viewport on the clicked point. A drag swallows the click that follows it. */
+  protected onClick(event: MouseEvent) {
     event.stopPropagation();
-    const drag = this.drag;
-    if (!drag || drag.id !== event.pointerId) return;
-    // Mouse move events have button=-1; the accepted button is checked on pointerdown.
-    if (
-      !this.pannable() ||
-      this.keyboard.isActiveModifier('selection') ||
-      (this.settings.panOnDrag() === false && !this.keyboard.isActiveModifier('panActivation'))
-    ) {
-      this.cancelDrag();
+    const point = this.canPanWith(event) && this.flowPoint(event);
+    if (point) this.centerOn(point);
+  }
+
+  /** Whether the gesture settings of the flow let the minimap pan now. */
+  private canPan() {
+    return (
+      this.pannable() &&
+      !this.keyboard.isActiveModifier('selection') &&
+      (this.settings.panOnDrag() !== false || this.keyboard.isActiveModifier('panActivation'))
+    );
+  }
+
+  /** {@link canPan} with this button: an array of mouse buttons in `panOnDrag` never restricts a finger. */
+  private canPanWith(event: MouseEvent) {
+    const buttons = this.settings.panOnDrag();
+    // A click is a pointer event in current browsers, so it knows a finger too.
+    const touch = (event as PointerEvent).pointerType === 'touch';
+    return this.canPan() && (touch || !Array.isArray(buttons) || buttons.includes(event.button));
+  }
+
+  /**
+   * Moves the viewport by what the pointer moved since the last event, at the scale the minimap has now. The scale
+   * changes while the viewport reaches beyond the nodes, so a point of the canvas has no fixed flow point to follow.
+   */
+  private panBy({ point }: PointerDragContext) {
+    const rect = this.canvas.getBoundingClientRect();
+    const last = this.dragged;
+    this.dragged = point;
+    // The settings and the modifier keys may change during a drag.
+    if (!rect.width || !this.canPan()) return;
+    const viewport = this.viewport.readableViewport();
+    const scale = (this.size().width / rect.width / this.transform().zoom) * viewport.zoom;
+    this.viewport.change({
+      x: viewport.x - (point.x - last.x) * scale,
+      y: viewport.y - (point.y - last.y) * scale,
+      zoom: viewport.zoom,
+    });
+  }
+
+  private onWheel(event: WheelEvent) {
+    event.stopPropagation();
+    // An opted-in minimap owns wheel input even at a zoom limit or with a gesture disabled.
+    if (!this.pannable() && !this.zoomable()) return;
+    event.preventDefault();
+    const viewport = this.viewport.readableViewport();
+    const scrollPan =
+      !event.ctrlKey &&
+      (this.settings.panOnScroll() || this.keyboard.isActiveModifier('panActivation')) &&
+      !this.keyboard.isActiveModifier('zoomActivation');
+    if (scrollPan) {
+      if (!this.pannable() || this.keyboard.isActiveModifier('selection')) return;
+      const delta = wheelPanDelta(event, this.size().height);
+      const scale = viewport.zoom / this.transform().zoom;
+      this.viewport.change({ ...viewport, x: viewport.x + delta.x * scale, y: viewport.y + delta.y * scale });
       return;
     }
-    const point = this.flowPoint(event);
-    if (!point) return;
-    event.preventDefault();
-    drag.moved ||=
-      Math.hypot(event.clientX - drag.start.x, event.clientY - drag.start.y) > this.settings.paneClickDistance();
-    if (drag.moved) this.centerOn({ x: point.x + drag.offset.x, y: point.y + drag.offset.y });
+    const allowed = event.ctrlKey
+      ? this.settings.zoomOnPinch()
+      : this.settings.zoomOnScroll() || this.keyboard.isActiveModifier('zoomActivation');
+    if (!this.zoomable() || !allowed) return;
+    const zoom = clamp(
+      viewport.zoom * MINIMAP_WHEEL_ZOOM ** -Math.sign(event.deltaY),
+      this.settings.minZoom(),
+      this.settings.maxZoom(),
+    );
+    // Around the middle of the pane.
+    this.centerOn(
+      {
+        x: (this.settings.computedFlowWidth() / 2 - viewport.x) / viewport.zoom,
+        y: (this.settings.computedFlowHeight() / 2 - viewport.y) / viewport.zoom,
+      },
+      zoom,
+    );
   }
 
-  protected onPointerUp(event: PointerEvent) {
-    this.onPointerMove(event);
-    if (this.drag?.id !== event.pointerId) return;
-    const point = this.flowPoint(event);
-    if (!this.drag.moved && point) this.centerOn(point);
-    this.cancelDrag();
-  }
-
-  protected cancelDrag(event?: PointerEvent) {
-    const drag = this.drag;
-    if (event && drag?.id !== event.pointerId) return;
-    this.drag = undefined;
-    if (drag && this.canvas.hasPointerCapture?.(drag.id)) this.canvas.releasePointerCapture(drag.id);
+  /** The flow point the minimap shows under the pointer. */
+  private flowPoint(event: MouseEvent): Point | undefined {
+    const rect = this.canvas.getBoundingClientRect();
+    const { width, height } = this.size();
+    if (!rect.width || !rect.height || !width || !height) return;
+    const { x, y, zoom } = this.transform();
+    return {
+      x: (((event.clientX - rect.left) * width) / rect.width - x) / zoom,
+      y: (((event.clientY - rect.top) * height) / rect.height - y) / zoom,
+    };
   }
 
   private centerOn(point: Point, zoom = this.viewport.readableViewport().zoom) {
@@ -304,42 +344,44 @@ export class MinimapCanvasDirective {
     });
   }
 
-  private onWheel(event: WheelEvent) {
-    event.stopPropagation();
-    // An opted-in minimap owns wheel input even at a zoom limit or with a gesture disabled.
-    if (!this.pannable() && !this.zoomable()) return;
-    event.preventDefault();
-    if (this.drag) return;
-    const viewport = this.viewport.readableViewport();
-    const scrollPan =
-      !event.ctrlKey &&
-      (this.settings.panOnScroll() || this.keyboard.isActiveModifier('panActivation')) &&
-      !this.keyboard.isActiveModifier('zoomActivation');
-    if (scrollPan) {
-      if (!this.pannable() || this.keyboard.isActiveModifier('selection')) return;
-      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.height() : 1;
-      const scale = (unit * viewport.zoom) / this.graph().transform.zoom;
-      this.viewport.change({ ...viewport, x: viewport.x - event.deltaX * scale, y: viewport.y - event.deltaY * scale });
-      return;
-    }
-    if (
-      !this.zoomable() ||
-      !(event.ctrlKey
-        ? this.settings.zoomOnPinch()
-        : this.settings.zoomOnScroll() || this.keyboard.isActiveModifier('zoomActivation'))
-    )
-      return;
-    const zoom = clamp(
-      viewport.zoom * MINIMAP_WHEEL_ZOOM ** -Math.sign(event.deltaY),
-      this.settings.minZoom(),
-      this.settings.maxZoom(),
-    );
-    this.centerOn(
-      {
-        x: (this.settings.computedFlowWidth() / 2 - viewport.x) / viewport.zoom,
-        y: (this.settings.computedFlowHeight() / 2 - viewport.y) / viewport.zoom,
-      },
-      zoom,
-    );
+  private warnAboutUnknownComponents() {
+    const components = inject(VFLOW_NODE_COMPONENTS, { optional: true });
+    const warned = new Set<string>();
+    effect(() => {
+      const registered = components?.() ?? {};
+      for (const key of Object.keys(this.minimapSettings?.().nodeStyles ?? {})) {
+        if (key in registered || warned.has(key)) continue;
+        warned.add(key);
+        console.warn(
+          `[ngx-vflow] withMinimapSettings() styles the nodes of "${key}", but no node component is registered under that key with withNodeComponents().`,
+        );
+      }
+    });
   }
+}
+
+/** A resolved color that paints something; a color the palette has not resolved yet does not. */
+function isVisible(color: string | undefined): color is string {
+  return !!color && color !== 'transparent' && color !== 'rgba(0, 0, 0, 0)';
+}
+
+/** The transform that centers `bounds` in a box, inside its padding. Bounds without a size keep 1:1. */
+function fit(bounds: Rect, { width, height }: { width: number; height: number }): ViewportState {
+  const fitted = Math.min(
+    bounds.width > 0 ? Math.max(1, width - PADDING * 2) / bounds.width : Infinity,
+    bounds.height > 0 ? Math.max(1, height - PADDING * 2) / bounds.height : Infinity,
+  );
+  const zoom = Number.isFinite(fitted) ? fitted : 1;
+  return {
+    x: width / 2 - (bounds.x + bounds.width / 2) * zoom,
+    y: height / 2 - (bounds.y + bounds.height / 2) * zoom,
+    zoom,
+  };
+}
+
+/** `rect` grown around its center until no side is shorter than `size`. */
+function atLeast(rect: Rect, size: number): Rect {
+  const width = Math.max(rect.width, size);
+  const height = Math.max(rect.height, size);
+  return { x: rect.x - (width - rect.width) / 2, y: rect.y - (height - rect.height) / 2, width, height };
 }

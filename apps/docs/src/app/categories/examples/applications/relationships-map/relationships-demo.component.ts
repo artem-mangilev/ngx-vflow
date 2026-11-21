@@ -82,7 +82,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
               <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
             }
           </ng-template>
-          <vui-controls class="absolute bottom-2.5 left-2.5" />
+          <vui-controls vPanel="bottom-left" />
         </vflow>
       </div>
     </docs-demo>

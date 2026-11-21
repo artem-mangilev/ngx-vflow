@@ -122,7 +122,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
           <svg:g *vEdge="let ctx" vEdgeInteractionArea>
             <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
-          <vui-controls class="absolute bottom-2.5 left-2.5" />
+          <vui-controls vPanel="bottom-left" />
         </vflow>
       </div>
     </docs-demo>

@@ -17,28 +17,31 @@ element of the application. The values of the handle attributes are in the
 
 ## Core tokens
 
-| Token                       | Default              | Part                                                               |
-| --------------------------- | -------------------- | ------------------------------------------------------------------ |
-| `--v-background`            | `#fff`               | The canvas; also fills nodes in the minimap                        |
-| `--v-background-pattern`    | `rgb(177, 177, 183)` | Dots and grid lines                                                |
-| `--v-selection-box`         | `#0f4c75`            | Stroke of the selection box; its fill is the same color at 12%     |
-| `--v-resize-control`        | `#0f4c75`            | Resize handles and lines                                           |
-| `--v-resize-control-border` | `#fff`               | The border that separates a resize handle from the node            |
-| `--v-alignment-guides`      | `#1b262c`            | Alignment guides, drawn at 50%                                     |
-| `--v-connection`            | `rgb(177, 177, 183)` | The line of a connection in progress without a template            |
-| `--v-minimap-mask`          | `rgb(177, 177, 183)` | The minimap mask outside the viewport, at 35%, and node outlines   |
-| `--v-minimap-selected`      | `#0f4c75`            | Outline of selected nodes in the minimap                           |
-| `--v-focus`                 | `#005fcc`            | Focus halo of nodes and edges                                      |
-| `--v-focus-halo`            | `4px`                | How far the halo reaches beyond a node and to each side of an edge |
-| `--v-focus-radius`          | `0px`                | Corner radius of a focused node, so the halo follows its shape     |
-| `--v-node-toolbar-offset`   | `10px`               | Gap between a node and its toolbar                                 |
+| Token                       | Default                  | Part                                                               |
+| --------------------------- | ------------------------ | ------------------------------------------------------------------ |
+| `--v-background`            | `#fff`                   | The canvas; also the default background of the minimap             |
+| `--v-background-pattern`    | `rgb(177, 177, 183)`     | Dots and grid lines                                                |
+| `--v-selection-box`         | `#0f4c75`                | Stroke of the selection box; its fill is the same color at 12%     |
+| `--v-resize-control`        | `#0f4c75`                | Resize handles and lines                                           |
+| `--v-resize-control-border` | `#fff`                   | The border that separates a resize handle from the node            |
+| `--v-alignment-guides`      | `#1b262c`                | Alignment guides, drawn at 50%                                     |
+| `--v-connection`            | `rgb(177, 177, 183)`     | The line of a connection in progress without a template            |
+| `--v-minimap-node`          | `rgb(226, 226, 226)`     | Fill of nodes in the minimap, and the outline of groups            |
+| `--v-minimap-mask`          | `rgb(240 240 240 / 0.6)` | The minimap mask over the graph outside the viewport               |
+| `--v-minimap-viewport`      | `transparent`            | Outline of the viewport in the minimap, 1px                        |
+| `--v-focus`                 | `#005fcc`                | Focus halo of nodes and edges                                      |
+| `--v-focus-halo`            | `4px`                    | How far the halo reaches beyond a node and to each side of an edge |
+| `--v-focus-radius`          | `0px`                    | Corner radius of a focused node, so the halo follows its shape     |
+| `--v-node-toolbar-offset`   | `10px`                   | Gap between a node and its toolbar                                 |
+| `--v-panel-offset`          | `10px`                   | Gap between a `vPanel` element and the edges of the flow           |
 
 - A token set on the `vflow` element or any ancestor applies to the flow; a value set inside the flow wins for that
   subtree.
 - Under `forced-colors: active` core maps its color tokens to system colors (`Canvas`, `GrayText`, `Highlight`,
   `CanvasText`), whatever the theme sets.
-- The minimap is a canvas. It samples the resolved tokens and repaints when an attribute or a class changes on an
-  ancestor of the flow, or when `prefers-color-scheme` changes; edits to a stylesheet alone are not observed.
+- The minimap is a canvas. It resolves its tokens and the colors of node styles on the `v-minimap` element and
+  repaints when one of them computes to another color, whatever changed it: a class, an attribute, a stylesheet or a
+  media query.
 
 ## `--v-zoom`
 
@@ -54,8 +57,10 @@ ends, not on every frame of a gesture.
 | `data-v-resize-control` (`handle` or `line`), `data-v-resize-control-position` | Resize controls, see [Resizing](/docs/nodes/resizer)                    |
 | `data-v-alignment-guides`, `data-v-alignment-guide` (`line` or `point`)        | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping) |
 | `data-v-marker="<type>"`                                                       | An edge marker, see [Markers](/docs/edges/markers)                      |
+| `data-v-panel="<position>"`                                                    | An element placed with `vPanel`, see [Panels](/docs/viewport/panel)     |
 
-These parts are rendered by the library, outside the view of an application component.
+These parts are rendered by the library, outside the view of an application component, except the panel, which is
+an element of the application.
 
 ## Gesture attributes
 

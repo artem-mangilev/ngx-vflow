@@ -1,4 +1,4 @@
-The inputs, methods, signals and events of `VflowComponent` that concern the viewport, and the minimap. Every input
+The inputs, methods, signals and events of `VflowComponent` that concern the viewport, the minimap and panels. Every input
 is also a key of `withSettings()`, see [Configuration](/docs/getting-started/configuration).
 
 ## Gesture inputs
@@ -123,23 +123,64 @@ may change.
 
 ## Minimap
 
-`VflowMinimapComponent`, selector `v-minimap`, is projected into `vflow` by its selector. It draws on a canvas, caches
-node previews during pan and zoom, updates them when node geometry or selection changes, and keeps the image sharp
-on high-DPI displays.
+`VflowMinimapComponent`, selector `v-minimap`, is part of the `Vflow` imports array and goes inside `vflow`. The
+element is the block: it has no frame and no position of its own. It draws on a canvas that fills it, caches the
+nodes during pan and zoom, updates them when node geometry or a style changes, and keeps the image sharp on
+high-DPI displays.
 
-| Input      | Default        | Description                                              |
-| ---------- | -------------- | -------------------------------------------------------- |
-| `position` | `bottom-right` | `top-left`, `top-right`, `bottom-left` or `bottom-right` |
-| `pannable` | `false`        | Click, drag and scroll panning                           |
-| `zoomable` | `false`        | Wheel and trackpad pinch zoom                            |
+| Input      | Default | Description                    |
+| ---------- | ------- | ------------------------------ |
+| `pannable` | `false` | Click, drag and scroll panning |
+| `zoomable` | `false` | Wheel and trackpad pinch zoom  |
 
-- `pannable` enables click/tap, mouse drag, single-finger touch drag, and scroll panning. Clicking centers the main viewport on the chosen point without changing zoom. Dragging its visible area preserves the grab offset; dragging elsewhere centers first and then follows the pointer. The main flow's `paneClickDistance` distinguishes a click from a drag, in client-space CSS pixels.
+Block:
+
+- By default `width: clamp(120px, 20%, 240px)`, `aspect-ratio: 4 / 3`, `background: var(--v-background)` and `overflow: hidden`, all without specificity. Any CSS of the application changes the size, the background, the border and the radius.
+- Place it with [`vPanel`](#panel) or with your own CSS.
+
+What it shows:
+
+- The bounds of the minimap are the bounds of the nodes united with the viewport, with 5 pixels of padding, so the viewport is always inside the minimap. While the viewport reaches beyond the nodes, the minimap zooms out as the viewport moves.
+- A mask of `--v-minimap-mask` covers everything outside the viewport, above the nodes. The viewport is marked at least 8 by 8 pixels large, and outlined with `--v-minimap-viewport`.
+- Selection is not shown.
+
+`MinimapNodeStyle`:
+
+| Key            | Default                 | Description                                                                   |
+| -------------- | ----------------------- | ----------------------------------------------------------------------------- |
+| `background`   | `var(--v-minimap-node)` | Fill; any CSS color, `var()` included                                         |
+| `borderColor`  | `transparent`           | Color of the outline                                                          |
+| `borderWidth`  | `0`                     | Width of the outline in CSS pixels of the minimap, drawn inside the rectangle |
+| `borderRadius` | `2`                     | Corner radius in flow units, limited to half the shorter side                 |
+
+- The style of a node is the defaults, under `nodeStyles[key]` of `withMinimapSettings()` for a node whose `component` is that key, under `Node.minimap`. Each level overrides only the keys it sets.
+- The defaults of a node with children are an outline: no fill, `borderColor` of `var(--v-minimap-node)`, `borderWidth` of 1. Parents are painted before their members.
+- The outline is centered on the edge of the rectangle.
+- Colors are resolved on the `v-minimap` element, once per distinct value, and again when one of them computes to another color, see [Tokens and attributes](/docs/reference/styling#core-tokens).
+- While the viewport stays within the bounds of the nodes, a pan or a zoom repaints only the mask. When the viewport reaches beyond them, every frame paints the nodes again, as one path per style.
+
+Gestures:
+
+- `pannable` enables click/tap, mouse drag, single-finger touch drag, and scroll panning. A click centers the main viewport on the chosen point without changing zoom. A drag begins once the pointer has moved farther than the main flow's `paneClickDistance`, in client-space CSS pixels: it moves the viewport by the movement of the pointer at the current scale of the minimap, and a drag that begins outside the marked viewport centers it on the pressed point first.
 - `zoomable` enables wheel and trackpad pinch zoom around the main viewport center. Each wheel event multiplies or divides zoom by half the step of the zoom keys and `zoomIn()` / `zoomOut()` (`√1.2`, about `1.095`), according to scroll direction: a trackpad sends many wheel events per gesture. Zoom respects the main flow's `minZoom` and `maxZoom`.
-- Both switches default to `false` and additionally respect the main flow's gesture settings. `panOnDrag` and its permitted mouse buttons control dragging and clicking; the pan activation key can enable these gestures. Selection activation takes priority over panning. `panOnScroll` or the pan activation key routes ordinary scrolling to pan, unless the zoom activation key is held. `zoomOnScroll` or the zoom activation key enables wheel zoom; `zoomOnPinch` controls trackpad pinch. The minimap switches must still be enabled.
+- Both switches default to `false` and additionally respect the main flow's gesture settings. `panOnDrag` and its permitted mouse buttons control dragging and clicking; the pan activation key can enable these gestures. Selection activation takes priority over panning. `panOnScroll` or the pan activation key routes ordinary scrolling to pan, unless the zoom activation key is held. `zoomOnScroll` or the zoom activation key controls wheel zoom, and `zoomOnPinch` controls trackpad pinch.
 
-An opted-in minimap captures pointer input only inside its own rectangle and suppresses wheel page scrolling there, including at zoom limits or when a main-flow gesture is disabled. The surrounding pane remains interactive. A drag continues outside the minimap using pointer capture; pointer cancellation, lost capture, window blur, or disabling `pannable` ends it. Main pan-policy changes are checked on the next pointer event. Wheel input during a pointer drag is ignored.
+A read-only minimap lets the pointer through to the pane. An opted-in minimap captures pointer input only inside its own rectangle and suppresses wheel page scrolling there, including at zoom limits or when a main-flow gesture is disabled. A drag continues outside the minimap using pointer capture; pointer cancellation, lost capture, window blur, or disabling `pannable` ends it.
 
-Two-finger touchscreen pinch, minimap keyboard navigation, and viewport translation bounds are not included. Per-node presentation hooks are planned separately.
+Two-finger touchscreen pinch, minimap keyboard navigation, and viewport translation bounds are not included.
+
+## Panel
+
+`VflowPanelDirective`, selector `[vPanel]`, is part of the `Vflow` imports array. It places an element of the flow
+content against a corner or a side of the flow.
+
+| Input    | Default  | Description                                                                                                                              |
+| -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `vPanel` | required | `top-left`, `top-center`, `top-right`, `center-left`, `center-right`, `bottom-left`, `bottom-center` or `bottom-right` (`PanelPosition`) |
+
+- The directive sets `data-v-panel="<position>"`; the placement is CSS: `position: absolute`, a margin of `--v-panel-offset` (`10px`) and the sides of the position. The rules have no specificity.
+- The element is positioned against the flow when it is a direct child of `vflow` or inside wrappers without positioning of their own.
+- Panels at the same position overlap.
 
 ## Portal
 
@@ -162,4 +203,5 @@ declares it, which may be anywhere inside `vflow`.
 - [Gestures](/docs/viewport/viewport-gestures)
 - [Controlling the viewport](/docs/viewport/viewport-control)
 - [Minimap](/docs/viewport/minimap)
+- [Panels](/docs/viewport/panel)
 - [Content on the canvas](/docs/viewport/portal)

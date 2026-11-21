@@ -22,6 +22,7 @@ import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node
 import { VflowResizableComponent } from './public-components/resizable/resizable.component';
 import { VflowHandleDirective } from './public-directives/handle.directive';
 import { VflowPortalDirective } from './public-directives/portal.directive';
+import { VflowPanelDirective } from './public-directives/panel.directive';
 
 export const Vflow = [
   VflowNoKeyboardDirective,
@@ -43,4 +44,5 @@ export const Vflow = [
   VflowConnectionTemplateDirective,
   VflowMarkerTemplateDirective,
   VflowPortalDirective,
+  VflowPanelDirective,
 ] as const;

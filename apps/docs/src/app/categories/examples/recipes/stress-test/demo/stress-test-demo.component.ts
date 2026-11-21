@@ -13,7 +13,7 @@ import { StressTestNodeComponent } from './stress-test-node.component';
     [minZoom]="0.1"
     (initialized)="flow.fitView({ maxZoom: 1 })">
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-    <vui-controls class="absolute bottom-2.5 left-2.5" />
+    <vui-controls vPanel="bottom-left" />
   </vflow>`,
   host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,

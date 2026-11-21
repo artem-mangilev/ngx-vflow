@@ -85,9 +85,6 @@
     </div>
   </div>
 
-  <!-- Minimap (fixed overlay), projected from the flow content -->
-  <ng-content select="v-minimap" />
-
-  <!-- Every other element of the flow content, such as viewport controls: above the pane, positioned against the flow -->
+  <!-- Every element of the flow content, such as a minimap or viewport controls: above the pane, positioned against the flow -->
   <div class="v-content-layer"><ng-content /></div>
 </div>

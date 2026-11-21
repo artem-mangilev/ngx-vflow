@@ -109,6 +109,8 @@ export { withShortcuts } from './lib/vflow/features/with-shortcuts';
 export { withCurves } from './lib/vflow/features/with-curves';
 export type { BuiltInCurve, CurveKey, VflowCurves } from './lib/vflow/interfaces/curves.interface';
 export { withEdgeComponents, withNodeComponents } from './lib/vflow/features/with-entity-components';
+export { withMinimapSettings } from './lib/vflow/features/with-minimap-settings';
+export type { MinimapNodeStyle, MinimapSettings } from './lib/vflow/interfaces/minimap.interface';
 export type {
   EdgeComponentKey,
   NodeComponentKey,
@@ -133,6 +135,7 @@ export * from './lib/vflow/public-directives/drag-handle.directive';
 export * from './lib/vflow/public-directives/gesture-exclusions.directive';
 export * from './lib/vflow/public-directives/portal.directive';
 export type { PortalLayer } from './lib/vflow/services/portal.service';
+export * from './lib/vflow/public-directives/panel.directive';
 
 // Host directive of `vflow` (`@internal`): the compiler requires it in the entry point.
 export { ViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';

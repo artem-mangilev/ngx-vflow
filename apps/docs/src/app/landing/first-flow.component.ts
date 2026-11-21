@@ -35,7 +35,7 @@ import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
           [attr.d]="ctx.path()" />
       </svg:g>
 
-      <vui-controls class="absolute bottom-2.5 left-2.5" />
+      <vui-controls vPanel="bottom-left" />
     </vflow>
   `,
 })

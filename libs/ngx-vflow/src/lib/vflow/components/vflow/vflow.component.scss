@@ -49,18 +49,24 @@
   initial-value: rgb(177, 177, 183);
 }
 
-// Minimap: the mask outside the viewport (at 35%), which also outlines nodes, groups and the frame, and the outline
-// of selected nodes. Nodes are filled with the flow background.
+// Minimap, drawn on a canvas: the fill of nodes (and the outline of groups), the mask over the part of the graph
+// outside the viewport, and the outline of the viewport. The block itself is styled with CSS on `v-minimap`.
+@property --v-minimap-node {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(226, 226, 226);
+}
+
 @property --v-minimap-mask {
   syntax: '<color>';
   inherits: true;
-  initial-value: rgb(177, 177, 183);
+  initial-value: rgb(240 240 240 / 0.6);
 }
 
-@property --v-minimap-selected {
+@property --v-minimap-viewport {
   syntax: '<color>';
   inherits: true;
-  initial-value: #0f4c75;
+  initial-value: transparent;
 }
 
 // Focus of nodes and edges: a translucent halo of this color around nodes and along edges.
@@ -88,7 +94,7 @@
 :host {
   display: block;
   position: relative;
-  // The flow is one stacking context: the z-index of its layers, entities and minimap orders them against each other
+  // The flow is one stacking context: the z-index of its layers, entities and content orders them against each other
   // only, never against the page. Dialogs, menus and other overlays of the application stay above the flow.
   isolation: isolate;
 
@@ -129,8 +135,9 @@
     --v-resize-control-border: Canvas;
     --v-alignment-guides: CanvasText;
     --v-connection: GrayText;
-    --v-minimap-mask: GrayText;
-    --v-minimap-selected: Highlight;
+    --v-minimap-node: CanvasText;
+    --v-minimap-mask: transparent;
+    --v-minimap-viewport: Highlight;
     --v-focus: Highlight;
   }
 }
@@ -183,6 +190,42 @@
   ::ng-deep > * {
     pointer-events: auto;
   }
+}
+
+// `vPanel`: an element of the flow content against a corner or a side of the flow. Without specificity, so the CSS of
+// the application always wins.
+::ng-deep :where([data-v-panel]) {
+  position: absolute;
+  margin: var(--v-panel-offset, 10px);
+}
+
+::ng-deep :where([data-v-panel^='top']) {
+  top: 0;
+}
+
+::ng-deep :where([data-v-panel^='bottom']) {
+  bottom: 0;
+}
+
+::ng-deep :where([data-v-panel$='left']) {
+  left: 0;
+}
+
+::ng-deep :where([data-v-panel$='right']) {
+  right: 0;
+}
+
+// A centered panel is moved by half its own size, so the margin of that axis must not shift it.
+::ng-deep :where([data-v-panel$='-center']) {
+  left: 50%;
+  margin-inline: 0;
+  translate: -50% 0;
+}
+
+::ng-deep :where([data-v-panel^='center-']) {
+  top: 50%;
+  margin-block: 0;
+  translate: 0 -50%;
 }
 
 .v-pane {

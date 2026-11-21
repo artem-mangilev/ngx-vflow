@@ -56,8 +56,8 @@ import { FlowStoreService } from './services/flow-store.service';
       <app-note *vPortal="note.point" [note]="note" />
     }
 
-    <v-minimap [pannable]="true" [zoomable]="true" />
-    <vui-controls class="absolute bottom-2.5 left-2.5" />
+    <v-minimap vPanel="bottom-right" [pannable]="true" [zoomable]="true" />
+    <vui-controls vPanel="bottom-left" />
   </vflow>`,
   // The page that shows the demo draws the frame; the demo brings its height: the scene at full size, with its lower
   // corners left free for the controls and the minimap.

@@ -149,7 +149,7 @@ const KIND_COLOR: Record<StepKind, string> = {
               }}</span>
             }
           </ng-template>
-          <vui-controls class="absolute bottom-2.5 left-2.5" />
+          <vui-controls vPanel="bottom-left" />
         </vflow>
       </div>
     </docs-demo>

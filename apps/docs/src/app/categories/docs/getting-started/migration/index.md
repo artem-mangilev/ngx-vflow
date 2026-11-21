@@ -82,7 +82,8 @@ For path B, copy the parts and their tokens with `ng g @vflow/cli:ui` (Tailwind 
 
 Colors are CSS. Core has one token per part it draws, each with a built-in default: `--v-background`,
 `--v-background-pattern`, `--v-selection-box`, `--v-resize-control`, `--v-resize-control-border`,
-`--v-alignment-guides`, `--v-connection`, `--v-minimap-mask`, `--v-minimap-selected` and `--v-focus`.
+`--v-alignment-guides`, `--v-connection`, `--v-minimap-node`, `--v-minimap-mask`, `--v-minimap-viewport` and
+`--v-focus`.
 The focus geometry is `--v-focus-halo` and `--v-focus-radius`.
 Set them on the `vflow` element or any ancestor; the `@vflow/ui` theme sets them from its `--vui-*` roles on every scope.
 Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
@@ -92,7 +93,7 @@ Under `forced-colors: active` core maps its tokens to system colors and keeps th
 | `[background]="'#fff'"` / `{ type: 'solid', color }` | `--v-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns       |
 | Dots/grid `color`, `backgroundColor`                 | `--v-background-pattern` and `--v-background`; the `data-v-background-pattern` attribute       |
 | `resizerColor`, resize control `color`               | `--v-resize-control`, `--v-resize-control-border`; `data-v-resize-control` (`handle` / `line`) |
-| `mini-map` `maskColor`, `strokeColor`                | `--v-minimap-mask` (mask and outlines), `--v-minimap-selected`; sampled from CSS               |
+| `mini-map` `maskColor`, `strokeColor`                | `--v-minimap-mask`, `--v-minimap-viewport`, and node styles, see [Minimap](#minimap)           |
 | `lineColor` in `alignmentHelper` settings            | `--v-alignment-guides`; `[data-v-alignment-guides]`. `tolerance` stays                         |
 | `color` in `selectionBox` settings                   | `--v-selection-box`; `[data-v-selection-box]`. `mode` became the `selectionBoxMode` input      |
 
@@ -121,7 +122,7 @@ Old names have no aliases.
 | `[dragHandle]`, `DragHandleDirective`                                                                                                                            | `[vDragHandle]`, `VflowDragHandleDirective`                                                                                                                                                                       |
 | `g[edgeInteraction]`, `EdgeInteractionDirective`                                                                                                                 | `g[vEdgeInteractionArea]`, `VflowEdgeInteractionAreaDirective`                                                                                                                                                    |
 | `[resizable]`, `ResizableComponent`                                                                                                                              | `[vResizable]`, `VflowResizableComponent`                                                                                                                                                                         |
-| `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                              | `<v-minimap>`, `VflowMinimapComponent`, `MinimapPosition`                                                                                                                                                         |
+| `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                              | `<v-minimap>`, `VflowMinimapComponent`; `vPanel` and `PanelPosition` for the place                                                                                                                                |
 | `<node-toolbar>`, `NodeToolbarComponent`                                                                                                                         | `<v-node-toolbar>`, `VflowNodeToolbarComponent`                                                                                                                                                                   |
 | `@vflow/ui`: `[vflowNode]`, `<vflow-controls>`, `VflowNode`, `VflowUi` …                                                                                         | `[vuiNode]`, `<vui-controls>`, `VuiNode`, `Vui` …                                                                                                                                                                 |
 | `.vflow-*` classes, for example `.vflow-node`, `.vflow-handle`, `.vflow-root`                                                                                    | Data attributes: `data-v-root`, `data-v-selection-box`, `data-v-resize-control`… for the parts core draws, `data-v-node`, `data-v-edge` and `data-v-handle` for the entity hosts; no public `.v-*` classes remain |
@@ -649,7 +650,16 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 
 The `vflow` element is now its own stacking context. The minimap no longer paints above application overlays, and positioned elements placed after the flow no longer need a `z-index` to appear above its pane. To keep the flow above or below other page elements, set `z-index` on the `vflow` element or its container.
 
-`<v-minimap>` is projected into the flow by its selector, and the `v-minimap` element is now the overlay layer itself. A minimap inside a wrapper component, `@if` or `@for` keeps working: the flow renders every other element of its content above the pane too.
+### Minimap
+
+The `v-minimap` element is now the minimap block itself, an ordinary element of the flow content:
+
+- It has no `position` input and no place of its own. Add `vPanel="bottom-right"` (or another position) for the place it had, or position it with your own CSS. `vPanel` places any element of the flow content, see [Panels](/docs/viewport/panel).
+- It has no frame. Add `border`, `border-radius` or `box-shadow` on `v-minimap` if you want one, and set its size the same way: by default it is `clamp(120px, 20%, 240px)` wide at 4:3 instead of a fifth of each side of the flow.
+- Its bounds include the viewport, so the part in view cannot leave the minimap; the minimap zooms out while the viewport is away from the nodes.
+- Nodes are filled with `--v-minimap-node` and have no outline. Style them with `withMinimapSettings()` and `Node.minimap`, see [Minimap](/docs/viewport/minimap#style-the-nodes).
+- `--v-minimap-mask` is now the whole color of the mask, alpha included (it was an opaque color drawn at 35%), and the mask lies above the nodes outside the viewport. `--v-minimap-viewport` outlines the viewport.
+- Selection is no longer shown and `--v-minimap-selected` is removed.
 
 ### Gesture exclusions
 

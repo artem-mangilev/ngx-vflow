@@ -96,12 +96,12 @@ native buttons.
 `<vui-controls>` inside `vflow` renders zoom in, zoom out and fit view for that flow, clamped to its
 `minZoom`/`maxZoom`, and projects your own buttons: every button child, built-in or projected, is a square icon
 button without a fill at rest, so give a projected one an accessible name. The flow renders it above the pane, in a
-layer the size of the flow, so position it with a class such as `absolute bottom-2.5 left-2.5`.
+layer the size of the flow, so place it with core's [`vPanel`](/docs/viewport/panel) or with your own CSS.
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
   <!-- node and edge templates -->
-  <vui-controls class="absolute bottom-2.5 left-2.5" />
+  <vui-controls vPanel="bottom-left" />
 </vflow>
 ```
 
@@ -191,13 +191,13 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 
 | Core token                                        | Part                                                           | Theme sets              |
 | ------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
-| `--v-background`                                  | Flow canvas (`[data-v-root]`); also fills nodes in the minimap | `--vui-background`      |
+| `--v-background`                                  | Flow canvas (`[data-v-root]`); also the minimap background     | `--vui-background`      |
 | `--v-background-pattern`                          | Dots and grid lines (`[data-v-background-pattern]`)            | `--vui-border`          |
 | `--v-selection-box`                               | `[data-v-selection-box]` stroke; its fill is the color at 12%  | `--vui-accent`          |
 | `--v-resize-control`, `--v-resize-control-border` | `[data-v-resize-control]` handles and lines; the handle border | accent, surface         |
 | `--v-alignment-guides`                            | `[data-v-alignment-guides]`, at 50%                            | `--vui-foreground`      |
 | `--v-connection`                                  | The line of a connection in progress without a template        | `--vui-muted`           |
-| `--v-minimap-mask`, `--v-minimap-selected`        | Minimap mask (35%) and outlines; selected node outline         | muted, accent           |
+| `--v-minimap-node`, `--v-minimap-mask`            | Fill of minimap nodes; the mask outside the viewport           | mixes of muted          |
 | `--v-focus`                                       | Focus halo of nodes and edges                                  | `--vui-accent`          |
 | `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                      | radius = surface radius |
 | `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px                | —                       |

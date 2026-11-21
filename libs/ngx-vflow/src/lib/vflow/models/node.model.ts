@@ -227,6 +227,9 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
   public readonly children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
+  /** The node's own minimap style, laid over the style of its component and of the minimap. */
+  public readonly minimapStyle = computed(() => this.raw().minimap?.());
+
   public readonly resizing = signal(false);
 
   /**

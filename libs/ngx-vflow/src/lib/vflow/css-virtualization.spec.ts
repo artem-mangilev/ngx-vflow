@@ -12,6 +12,7 @@ import { ConnectionService } from './services/connection.service';
 import { DraggableService } from './services/draggable.service';
 import { VflowHandleDirective } from './public-directives/handle.directive';
 import { VflowMinimapComponent } from './public-components/minimap/minimap.component';
+import { VflowPanelDirective } from './public-directives/panel.directive';
 import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { VflowEdgeLabelTemplateDirective } from './public-directives/template.directive';
 import { dispatchPointer, mouseAsPointer } from './gestures/pointer-events.testing';
@@ -59,9 +60,9 @@ class PlainNodeComponent {}
 
 @Component({
   template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" [virtualization]="true"
-    ><v-minimap [position]="position()"
+    ><v-minimap [vPanel]="position()"
   /></vflow>`,
-  imports: [VflowComponent, VflowMinimapComponent],
+  imports: [VflowComponent, VflowMinimapComponent, VflowPanelDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class MinimapHostComponent {
@@ -69,7 +70,7 @@ class MinimapHostComponent {
   nodes = [
     createNode({ id: 'node', component: PlainNodeComponent, point: { x: 0, y: 0 } }),
     createNode({ id: 'group', point: { x: 1000, y: 0 }, width: 200, height: 100 }),
-    // A member makes 'group' a parent, which the minimap draws with the group style.
+    // A member makes 'group' a parent, which the minimap draws as an outline.
     createNode({ id: 'member', parentId: 'group', point: { x: 20, y: 20 }, width: 40, height: 20 }),
   ];
 }
@@ -277,7 +278,7 @@ describe('CSS viewport virtualization', () => {
 
   it('draws the minimap on canvas, reuses previews during pan/zoom, and refreshes node changes', async () => {
     const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
-    const drawPreview = vi.spyOn(CanvasRenderingContext2D.prototype, 'roundRect');
+    const drawPreview = vi.spyOn(Path2D.prototype, 'roundRect');
     const fixture = TestBed.createComponent(MinimapHostComponent);
     await settle(fixture);
     const flow = fixture.debugElement.query(By.directive(VflowComponent));
@@ -286,10 +287,15 @@ describe('CSS viewport virtualization', () => {
     const canvas = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
     expect(canvas).not.toBeNull();
     if (!canvas) return;
-    expect(canvas.width).toBe(Math.round(80 * window.devicePixelRatio));
-    expect(canvas.height).toBe(Math.round(60 * window.devicePixelRatio));
-    expect(canvas.style.left).toBe('310px');
-    expect(canvas.style.top).toBe('230px');
+    // clamp(120px, 20%, 240px) of a 400px flow, 4:3.
+    expect(canvas.width).toBe(Math.round(120 * window.devicePixelRatio));
+    expect(canvas.height).toBe(Math.round(90 * window.devicePixelRatio));
+    const place = () => {
+      const flowRect = flow.nativeElement.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
+      return [rect.left - flowRect.left, rect.top - flowRect.top];
+    };
+    expect(place()).toEqual([270, 200]);
     expect(drawPreview).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('.node-preview')).toBeNull();
     const initialImage = canvas.toDataURL();
@@ -306,19 +312,20 @@ describe('CSS viewport virtualization', () => {
     group.width.set(300);
     await fixture.whenStable();
     expect(drawPreview).toHaveBeenCalledWith(50, 20, node.width(), node.height(), 2);
-    expect(drawPreview).toHaveBeenCalledWith(2000, 100, 300, group.height(), 5);
+    expect(drawPreview).toHaveBeenCalledWith(2000, 100, 300, group.height(), 2);
     expect(canvas.toDataURL()).not.toBe(pannedImage);
     expect(trackNodes).not.toHaveBeenCalled();
-    // A selection change reconciles the lists (host binding by decision, 2026-11-01); the minimap follows it.
+    // The minimap does not show selection: a selection change repaints nothing.
     const movedImage = canvas.toDataURL();
+    drawPreview.mockClear();
     node.selected.set(true);
     group.selected.set(true);
     await fixture.whenStable();
-    expect(canvas.toDataURL()).not.toBe(movedImage);
+    expect(drawPreview).not.toHaveBeenCalled();
+    expect(canvas.toDataURL()).toBe(movedImage);
     fixture.componentInstance.position.set('top-left');
     await fixture.whenStable();
-    expect(canvas.style.left).toBe('10px');
-    expect(canvas.style.top).toBe('10px');
+    expect(place()).toEqual([10, 10]);
     fixture.componentInstance.nodes = [];
     fixture.changeDetectorRef.markForCheck();
     await fixture.whenStable();

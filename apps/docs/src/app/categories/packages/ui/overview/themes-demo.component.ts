@@ -49,7 +49,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
                 <svg:g *vEdge="let ctx" vEdgeInteractionArea>
                   <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
                 </svg:g>
-                <v-minimap position="top-right" />
+                <v-minimap vPanel="top-right" />
               </vflow>
             </div>
           </div>
