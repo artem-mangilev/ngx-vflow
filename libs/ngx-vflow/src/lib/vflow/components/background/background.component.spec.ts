@@ -41,4 +41,17 @@ describe('Background pattern', () => {
     expect(style.fill).toBe('rgb(1, 2, 3)');
     expect(style.stroke).toBe('none');
   });
+
+  it('draws nothing for an image that does not load, and keeps following the viewport', async () => {
+    const fixture = TestBed.createComponent(BackgroundHostComponent);
+    fixture.componentInstance.background.set({ type: 'image', src: 'data:image/png;base64,broken' });
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await fixture.whenStable();
+
+    const flow = fixture.debugElement.children[0].componentInstance as VflowComponent;
+    await flow.setViewport({ x: 30, y: 20, zoom: 2 });
+    expect(() => fixture.detectChanges()).not.toThrow();
+    expect(fixture.nativeElement.querySelector('[data-v-background-pattern]')).toBeNull();
+  });
 });

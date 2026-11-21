@@ -40,13 +40,15 @@ export function dagreLayout({ padding = 20, ...options }: DagreLayoutOptions = {
     for (const node of graph.nodes) {
       if (node.parentId) dagreGraph.setParent(node.id, node.parentId);
     }
+    const parents = new Set(graph.nodes.map((node) => node.parentId));
     for (const edge of graph.edges) {
-      if (edge.source !== edge.target) dagreGraph.setEdge(edge.source, edge.target);
+      // dagre cannot rank an edge that touches a compound node: it throws, so such an edge does not shape the layout.
+      if (edge.source === edge.target || parents.has(edge.source) || parents.has(edge.target)) continue;
+      dagreGraph.setEdge(edge.source, edge.target);
     }
 
     layout(dagreGraph);
 
-    const parents = new Set(graph.nodes.map((node) => node.parentId));
     const positions = new Map<string, Point>();
     const sizes = new Map<string, { width: number; height: number }>();
     for (const node of graph.nodes) {

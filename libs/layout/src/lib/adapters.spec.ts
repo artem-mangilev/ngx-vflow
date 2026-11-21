@@ -64,6 +64,17 @@ describe('layout adapters', () => {
     expect(tb.positions.get('e')!.y).toBeGreaterThan(tb.positions.get('d')!.y + 50);
   });
 
+  it('dagre lays out a graph with edges to and from a parent', async () => {
+    const withGroupEdges = graph();
+    withGroupEdges.edges.push(
+      { id: 'a-group', source: 'a', target: 'group' },
+      { id: 'd-group', source: 'd', target: 'group' },
+    );
+    const result = await once(dagreLayout(), withGroupEdges);
+    expect(result.positions.size).toBe(6);
+    expect(inside(result, 'd', 'group')).toBe(true);
+  });
+
   it('elk lays the graph out in the main thread with absolute positions for nested nodes', async () => {
     const result = await once(elkLayout({ direction: 'right', nodeSpacing: 30, padding: 24 }), graph());
     expect(result.positions.size).toBe(6);

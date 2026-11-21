@@ -110,6 +110,23 @@ describe('public auto-pan settings', () => {
     expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
   });
 
+  it('reports the viewport change of an auto-pan once, when the drag ends', async () => {
+    await setup(true);
+    const ends: unknown[] = [];
+    const subscription = fixture.componentInstance.flow.viewportChangeEnd.subscribe((end) => ends.push(end));
+    drag();
+    await frame();
+    await frame();
+    await frame();
+    expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
+    expect(ends).toEqual([]);
+
+    mouse(window, 'mouseup', 0, 150);
+    await frame();
+    expect(ends).toEqual([fixture.componentInstance.flow.viewport()]);
+    subscription.unsubscribe();
+  });
+
   it('can disable node dragging auto-pan independently', async () => {
     await setup({ nodeDrag: false });
     drag();

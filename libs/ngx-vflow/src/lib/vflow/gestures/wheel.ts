@@ -2,6 +2,9 @@ import { Point } from '../interfaces/point.interface';
 
 type WheelDelta = Pick<WheelEvent, 'deltaX' | 'deltaY' | 'deltaMode' | 'ctrlKey'>;
 
+/** A wheel gesture ends when no wheel event arrives for this long (and, on the pane, the zoom has settled). */
+export const WHEEL_IDLE_MS = 150;
+
 /**
  * Multiplicative zoom change of one wheel event. Pixel deltas scale by 0.002, line deltas by 0.05 and page deltas
  * by 1; pinch, which browsers report as a wheel event with `ctrlKey`, is ten times more sensitive.

@@ -14,7 +14,7 @@ import { fromEvent, map } from 'rxjs';
 import { bindEntityAccessibility } from '../../directives/entity-accessibility.directive';
 import { VFLOW_MINIMAP_SETTINGS } from '../../features/with-minimap-settings';
 import { createPointerDrag, PointerDragContext } from '../../gestures/pointer-drag';
-import { wheelPanDelta } from '../../gestures/wheel';
+import { WHEEL_IDLE_MS, wheelPanDelta } from '../../gestures/wheel';
 import { Point } from '../../interfaces/point.interface';
 import { Rect } from '../../interfaces/rect';
 import { ViewportState } from '../../interfaces/viewport.interface';
@@ -199,6 +199,9 @@ export class VflowMinimapComponent {
   /** Where the last event of a drag was, to move the viewport by what the pointer moved since. */
   private dragged: Point = { x: 0, y: 0 };
 
+  /** Ends the wheel gesture once the wheel events stop, as on the pane. */
+  private wheelTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor() {
     bindEntityAccessibility(() => ({ role: 'img', label: this.settings.ariaLabels().minimapLabel }));
 
@@ -207,6 +210,8 @@ export class VflowMinimapComponent {
       threshold: () => this.settings.paneClickDistance(),
       capture: true,
       onStart: (context) => {
+        // The whole drag is one viewport gesture: the flow reports its end once, on the release.
+        this.viewport.beginGesture();
         this.dragged = context.start;
         // A drag that starts outside the viewport brings the viewport under the pointer first.
         const pressed = this.canPan() && this.flowPoint(context.press);
@@ -214,8 +219,16 @@ export class VflowMinimapComponent {
         this.panBy(context);
       },
       onMove: (context) => this.panBy(context),
+      onEnd: () => this.viewport.endGesture(),
+      onCancel: () => this.viewport.endGesture(),
     });
-    inject(DestroyRef).onDestroy(() => drag.destroy());
+    inject(DestroyRef).onDestroy(() => {
+      drag.destroy();
+      if (this.wheelTimer !== null) {
+        clearTimeout(this.wheelTimer);
+        this.viewport.endGesture();
+      }
+    });
 
     // The listener is not passive: an opted-in minimap keeps the wheel from scrolling the page.
     fromEvent<WheelEvent>(this.host, 'wheel', { passive: false })
@@ -290,6 +303,7 @@ export class VflowMinimapComponent {
       if (!this.pannable() || this.keyboard.isActiveModifier('selection')) return;
       const delta = wheelPanDelta(event, this.size().height);
       const scale = viewport.zoom / this.transform().zoom;
+      this.continueWheel();
       this.viewport.change({ ...viewport, x: viewport.x + delta.x * scale, y: viewport.y + delta.y * scale });
       return;
     }
@@ -304,7 +318,18 @@ export class VflowMinimapComponent {
     );
     // Around the middle of the pane.
     const visible = this.visible();
+    this.continueWheel();
     this.centerOn({ x: visible.x + visible.width / 2, y: visible.y + visible.height / 2 }, zoom);
+  }
+
+  /** A series of wheel events is one viewport gesture, which ends once the events stop. */
+  private continueWheel() {
+    if (this.wheelTimer === null) this.viewport.beginGesture();
+    else clearTimeout(this.wheelTimer);
+    this.wheelTimer = setTimeout(() => {
+      this.wheelTimer = null;
+      this.viewport.endGesture();
+    }, WHEEL_IDLE_MS);
   }
 
   /** The flow point the minimap shows under the pointer. */

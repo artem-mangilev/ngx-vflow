@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { computed, DestroyRef, Directive, ElementRef, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
+import { EMPTY, defer, merge, fromEvent, Observable } from 'rxjs';
 import {
   switchMap,
   tap,
@@ -12,6 +12,7 @@ import {
   distinctUntilChanged,
   startWith,
   pairwise,
+  finalize,
 } from 'rxjs/operators';
 import { ViewportService } from '../services/viewport.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -68,24 +69,41 @@ export class AutoPanDirective implements OnInit {
 
     return toObservable(active, { injector: this.injector }).pipe(
       distinctUntilChanged(),
-      switchMap((panning) =>
-        panning
-          ? this.documentPoint$.pipe(
-              take(1),
-              switchMap(() =>
-                animationFrames().pipe(
-                  startWith({ timestamp: 0, elapsed: 0 }),
-                  pairwise(),
-                  withLatestFrom(this.documentPoint$),
-                  tap(([[previous, current], point]) =>
-                    this.pan(point, (speed * (current.elapsed - previous.elapsed)) / 1000, margin),
-                  ),
-                ),
-              ),
-            )
-          : EMPTY,
-      ),
+      switchMap((panning) => (panning ? this.panFrames(speed, margin) : EMPTY)),
     );
+  }
+
+  /**
+   * Pans every frame while the pointer is near an edge. The steps from the first one to the end of the drag are one
+   * viewport gesture, so the flow reports one `viewportChangeEnd` for them, not one per frame.
+   */
+  private panFrames(speed: number, margin: number): Observable<unknown> {
+    return defer(() => {
+      let started = false;
+      return this.documentPoint$.pipe(
+        take(1),
+        switchMap(() =>
+          animationFrames().pipe(
+            startWith({ timestamp: 0, elapsed: 0 }),
+            pairwise(),
+            withLatestFrom(this.documentPoint$),
+          ),
+        ),
+        tap(([[previous, current], point]) => {
+          const delta = this.panDelta(point, (speed * (current.elapsed - previous.elapsed)) / 1000, margin);
+          if (!delta) return;
+          if (!started) {
+            started = true;
+            this.viewportService.beginGesture();
+          }
+          const { x, y, zoom } = this.viewportService.readableViewport();
+          this.viewportService.change({ x: x + delta.x, y: y + delta.y, zoom });
+        }),
+        finalize(() => {
+          if (started) this.viewportService.endGesture();
+        }),
+      );
+    });
   }
 
   private toViewportPoint(event: Point): Point {
@@ -96,19 +114,15 @@ export class AutoPanDirective implements OnInit {
     };
   }
 
-  private pan(point: Point, distance: number, margin: number): void {
-    const viewport = this.viewportService.readableViewport();
-    const { x, y, zoom } = viewport;
-
+  /** How far the viewport moves this frame; `null` while the pointer is away from the edges. */
+  private panDelta(point: Point, distance: number, margin: number): Point | null {
     const width = this.flowSettingsService.computedFlowWidth();
     const height = this.flowSettingsService.computedFlowHeight();
 
-    const deltaX = distance * (edgeFactor(point.x, margin) - edgeFactor(width - point.x, margin));
-    const deltaY = distance * (edgeFactor(point.y, margin) - edgeFactor(height - point.y, margin));
+    const x = distance * (edgeFactor(point.x, margin) - edgeFactor(width - point.x, margin));
+    const y = distance * (edgeFactor(point.y, margin) - edgeFactor(height - point.y, margin));
 
-    if (deltaX !== 0 || deltaY !== 0) {
-      this.viewportService.change({ x: x + deltaX, y: y + deltaY, zoom });
-    }
+    return x !== 0 || y !== 0 ? { x, y } : null;
   }
 }
 

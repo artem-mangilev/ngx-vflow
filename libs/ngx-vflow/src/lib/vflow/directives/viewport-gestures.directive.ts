@@ -8,12 +8,10 @@ import { allowRootZoomForNodeTarget } from '../utils/allow-root-zoom-for-node-ta
 import { Point } from '../interfaces/point.interface';
 import { PointerDrag, createPointerDrag } from '../gestures/pointer-drag';
 import { clampZoom, panePointFromClient, toFlowPoint, translateBy, zoomAround } from '../gestures/viewport-transform';
-import { wheelPanDelta, wheelZoomFactor } from '../gestures/wheel';
+import { WHEEL_IDLE_MS, wheelPanDelta, wheelZoomFactor } from '../gestures/wheel';
 import { TouchAnchor, touchCenter, touchViewport } from '../gestures/pinch';
 import { listen } from '../utils/listen';
 
-/** A wheel gesture ends when no wheel event arrives for this long and the zoom has settled. */
-const WHEEL_IDLE_MS = 150;
 /** Time constant of the wheel zoom easing: the remaining distance to the target shrinks by e every this many ms. */
 const WHEEL_ZOOM_TAU_MS = 60;
 /** Nominal age of the first easing step, so that a wheel event moves the viewport within its own frame. */

@@ -95,11 +95,12 @@ export class BackgroundComponent {
   protected patternUrl = `url(#${this.patternId})`;
 }
 
-function loadImageSize(src: string): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
+/** `null` when the image does not load: a rejected resource would throw from every read of its value. */
+function loadImageSize(src: string): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
     const image = new Image();
     image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
-    image.onerror = () => reject(new Error(`The background image ${src} did not load`));
+    image.onerror = () => resolve(null);
     image.src = src;
   });
 }

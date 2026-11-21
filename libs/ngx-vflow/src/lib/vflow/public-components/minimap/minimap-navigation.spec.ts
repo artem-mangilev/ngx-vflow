@@ -302,6 +302,31 @@ describe('minimap navigation through the public viewport API', () => {
     expect(flow.viewport()).toEqual(before);
   });
 
+  it('reports the end of a viewport change once per drag and once per series of wheel events', async () => {
+    host.pannable.set(true);
+    host.zoomable.set(true);
+    await settle();
+    const ends: unknown[] = [];
+    const subscription = flow.viewportChangeEnd.subscribe((end) => ends.push(end));
+
+    const [x, y] = viewportOnCanvas();
+    pointer('pointerdown', x, y);
+    for (let step = 1; step <= 5; step++) {
+      pointer('pointermove', x - step * 10, y);
+      await settle();
+    }
+    expect(ends).toEqual([]);
+    pointer('pointerup', x - 50, y);
+    await settle();
+    expect(ends).toEqual([flow.viewport()]);
+
+    for (let i = 0; i < 3; i++) await wheel();
+    expect(ends.length).toBe(1);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(ends).toEqual([ends[0], flow.viewport()]);
+    subscription.unsubscribe();
+  });
+
   it('gates pan by buttons, selection and activation keys, and supports single-pointer touch', async () => {
     host.pannable.set(true);
     host.panOnDrag.set([1]);

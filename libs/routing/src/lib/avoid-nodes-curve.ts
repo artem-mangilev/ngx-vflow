@@ -184,7 +184,7 @@ interface ObstacleNode {
  */
 function collectObstacleNodes(params: CurveFactoryParams, settings: Required<AvoidNodesCurveOptions>): ObstacleNode[] {
   const geometries = params.nodeGeometries;
-  const byId = new Map(geometries.map((node) => [node.id, node]));
+  const byId = geometriesById(geometries);
   const ends = { source: params.sourceNode.id, target: params.targetNode?.id };
   const ancestors = new Set<string>();
   for (const id of [ends.source, ends.target]) {
@@ -194,9 +194,35 @@ function collectObstacleNodes(params: CurveFactoryParams, settings: Required<Avo
     }
   }
 
-  return geometries
-    .filter((node) => !ancestors.has(node.id) && settings.isObstacle(node))
-    .map((node) => ({ node, end: node.id === ends.source ? 'source' : node.id === ends.target ? 'target' : null }));
+  // Only a node near the edge can shorten an approach or reach the obstacles of the route, so the per-node work below
+  // skips the rest of the graph: every edge routes again whenever any node moves.
+  const reach =
+    settings.nodePadding + Math.max(settings.obstacleMargin, settings.approachDistance + APPROACH_CLEARANCE);
+  const { sourcePoint, targetPoint } = params;
+  const minX = Math.min(sourcePoint.x, targetPoint.x) - reach;
+  const maxX = Math.max(sourcePoint.x, targetPoint.x) + reach;
+  const minY = Math.min(sourcePoint.y, targetPoint.y) - reach;
+  const maxY = Math.max(sourcePoint.y, targetPoint.y) + reach;
+
+  const result: ObstacleNode[] = [];
+  for (const node of geometries) {
+    const end = node.id === ends.source ? 'source' : node.id === ends.target ? 'target' : null;
+    const near = node.x <= maxX && node.x + node.width >= minX && node.y <= maxY && node.y + node.height >= minY;
+    if ((end || near) && !ancestors.has(node.id) && settings.isObstacle(node)) result.push({ node, end });
+  }
+
+  return result;
+}
+
+/** The geometries by id; every edge of a frame reads the same array, so the map is built once per frame. */
+const geometryMaps = new WeakMap<readonly NodeGeometry[], ReadonlyMap<string, NodeGeometry>>();
+function geometriesById(geometries: readonly NodeGeometry[]): ReadonlyMap<string, NodeGeometry> {
+  let map = geometryMaps.get(geometries);
+  if (!map) {
+    map = new Map(geometries.map((node) => [node.id, node]));
+    geometryMaps.set(geometries, map);
+  }
+  return map;
 }
 
 /**

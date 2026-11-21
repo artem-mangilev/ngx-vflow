@@ -1,4 +1,4 @@
-import { createEdge, CurveFactoryParams, getSmoothStepPath, NodeGeometry, Point, Position, Rect } from 'ngx-vflow';
+import { createEdge, EdgeCurveFactoryParams, getSmoothStepPath, NodeGeometry, Point, Position, Rect } from 'ngx-vflow';
 import { avoidNodesCurve, createAvoidNodesCurve } from './avoid-nodes-curve';
 import type { CurveFactory } from 'ngx-vflow';
 
@@ -19,7 +19,7 @@ function edgeParams(
   target: NodeGeometry,
   nodeGeometries: NodeGeometry[],
   positions: [Position, Position] = ['right', 'left'],
-): CurveFactoryParams {
+): EdgeCurveFactoryParams {
   return {
     mode: 'edge',
     edge: createEdge({ id: `${source.id}-${target.id}`, source: source.id, target: target.id }),
@@ -120,6 +120,17 @@ describe('avoidNodesCurve', () => {
     const curve = createAvoidNodesCurve({ isObstacle: (node) => node.id !== 'between' });
 
     expect(curve(edgeParams(source, target, [source, between, target])).path).toBe('M 100 125 L 500 125');
+  });
+
+  it('works only on the nodes near the edge, however large the graph', () => {
+    const far = Array.from({ length: 1000 }, (_, index) => geometry(`far-${index}`, 5000 + index * 150, 5000));
+    const asked: string[] = [];
+    const curve = createAvoidNodesCurve({ isObstacle: (node) => (asked.push(node.id), true) });
+
+    expect(curve(edgeParams(source, target, [source, between, target, ...far])).path).toBe(
+      avoidNodesCurve(edgeParams(source, target, [source, between, target])).path,
+    );
+    expect(asked.sort()).toEqual(['between', 'source', 'target']);
   });
 
   it('routes a connection preview without a target node', () => {

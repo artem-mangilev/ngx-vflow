@@ -65,7 +65,8 @@ export function startResize(options: ResizeOptions, sourceEvent: PointerEvent, p
   // keeps the real size so the first move always writes the clamped result.
   const width = clamp(prev.width, bounds.minWidth, bounds.maxWidth);
   const height = clamp(prev.height, bounds.minHeight, bounds.maxHeight);
-  const start = { ...prev, width, height, pointer, aspectRatio: width / height };
+  // A side of 0 has no ratio to keep: the resize then keeps the box square instead of dividing by 0.
+  const start = { ...prev, width, height, pointer, aspectRatio: width > 0 && height > 0 ? width / height : 1 };
 
   const parent = node.parent();
   const parentExtent: CoordinateExtent | undefined =
