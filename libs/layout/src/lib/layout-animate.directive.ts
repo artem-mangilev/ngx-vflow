@@ -1,5 +1,5 @@
 import { DestroyRef, Directive, computed, inject, input } from '@angular/core';
-import { NodeAnimatorOptions, createNodeAnimator } from './node-animator';
+import { NodeAnimator, NodeAnimatorOptions, createNodeAnimator } from './node-animator';
 import { LayoutPositionWriter, NodeTargets, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
 
 /**
@@ -26,6 +26,9 @@ export class VxLayoutAnimate implements LayoutPositionWriter {
   /** One animator per set of options; an animation in progress finishes with the animator it started with. */
   private readonly animator = computed(() => createNodeAnimator(this.vxLayoutAnimate()));
 
+  /** The animator of the last write, which `cancel` stops even when the options changed since. */
+  private running: NodeAnimator | null = null;
+
   constructor() {
     inject(DestroyRef).onDestroy(() => this.cancel());
   }
@@ -35,10 +38,11 @@ export class VxLayoutAnimate implements LayoutPositionWriter {
       placeNodes(targets);
       return Promise.resolve();
     }
-    return this.animator().animate(targets);
+    this.running = this.animator();
+    return this.running.animate(targets);
   }
 
   public cancel(): void {
-    this.animator().cancel();
+    this.running?.cancel();
   }
 }

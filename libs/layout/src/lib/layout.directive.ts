@@ -63,15 +63,18 @@ export class VxLayout implements VflowInitializationGate {
     () => this.measured() && this.flow.nodes().every((node) => this.flow.getNodeRect(node.id)),
   );
 
-  /** The ids of the nodes and edges: a new array with the same graph, a move or a resize is not a change. */
-  private readonly graphIds = computed(
+  /**
+   * The structure of the graph: the nodes with their parents and the edges with their ends. A new array with the
+   * same graph, a move or a resize is not a change; a reconnected edge or a reparented node keeps its id and is one.
+   */
+  private readonly structure = computed(
     () =>
       `${this.flow
         .nodes()
-        .map((node) => node.id)
+        .map((node) => `${node.id}\u0001${node.parentId?.() ?? ''}`)
         .join('\u0000')}|${this.flow
         .edges()
-        .map((edge) => edge.id)
+        .map((edge) => `${edge.id}\u0001${edge.source}\u0001${edge.target}`)
         .join('\u0000')}`,
   );
 
@@ -112,7 +115,7 @@ export class VxLayout implements VflowInitializationGate {
     // A run for every algorithm and every set of nodes and edges, once every node is measured; a newer run replaces
     // the one before it.
     const ready = toObservable(this.ready);
-    combineLatest([toObservable(this.vxLayout), toObservable(this.graphIds)])
+    combineLatest([toObservable(this.vxLayout), toObservable(this.structure)])
       .pipe(
         switchMap(([algorithm]) =>
           ready.pipe(

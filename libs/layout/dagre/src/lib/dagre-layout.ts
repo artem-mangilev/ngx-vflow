@@ -19,9 +19,16 @@ export interface DagreLayoutOptions {
   marginy?: number;
   acyclicer?: 'greedy';
   ranker?: 'network-simplex' | 'tight-tree' | 'longest-path';
-  /** Space a parent keeps around its children, which dagre itself places at the very edge of a compound node. */
+  /**
+   * Space a parent keeps around its children, which dagre itself places at the very edge of a compound node. In a
+   * graph with parents, `edgesep` and `ranksep` grow by twice the padding, so neighbouring parents keep apart.
+   */
   padding?: number;
 }
+
+/** The defaults of dagre. */
+const DAGRE_EDGESEP = 20;
+const DAGRE_RANKSEP = 50;
 
 /**
  * Lays out a directed graph in ranks with [dagre](https://github.com/dagrejs/dagre). Nested nodes become compound
@@ -34,7 +41,15 @@ export interface DagreLayoutOptions {
 export function dagreLayout({ padding = 20, ...options }: DagreLayoutOptions = {}): LayoutAlgorithm {
   return (graph) => {
     const dagreGraph = new graphlib.Graph({ compound: true });
-    dagreGraph.setGraph({ ...options });
+    // dagre keeps no room around a compound node for the padding added below, so the spacing between compound nodes,
+    // `edgesep` beside them and `ranksep` across ranks, grows by the padding of both neighbours.
+    const spacing = graph.nodes.some((node) => node.parentId)
+      ? {
+          edgesep: (options.edgesep ?? DAGRE_EDGESEP) + padding * 2,
+          ranksep: (options.ranksep ?? DAGRE_RANKSEP) + padding * 2,
+        }
+      : {};
+    dagreGraph.setGraph({ ...options, ...spacing });
     dagreGraph.setDefaultEdgeLabel(() => ({}));
     for (const node of graph.nodes) dagreGraph.setNode(node.id, { width: node.width, height: node.height });
     for (const node of graph.nodes) {

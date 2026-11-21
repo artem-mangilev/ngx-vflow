@@ -174,8 +174,9 @@ function fallback(params: CurveFactoryParams, settings: Required<AvoidNodesCurve
 
 interface ObstacleNode {
   node: NodeGeometry;
-  /** Which end of the edge the node is, if any. */
-  end: 'source' | 'target' | null;
+  /** Whether the node is the source or the target of the edge: both for a self-loop, neither for another node. */
+  source: boolean;
+  target: boolean;
 }
 
 /**
@@ -206,9 +207,12 @@ function collectObstacleNodes(params: CurveFactoryParams, settings: Required<Avo
 
   const result: ObstacleNode[] = [];
   for (const node of geometries) {
-    const end = node.id === ends.source ? 'source' : node.id === ends.target ? 'target' : null;
+    const source = node.id === ends.source;
+    const target = node.id === ends.target;
     const near = node.x <= maxX && node.x + node.width >= minX && node.y <= maxY && node.y + node.height >= minY;
-    if ((end || near) && !ancestors.has(node.id) && settings.isObstacle(node)) result.push({ node, end });
+    if ((source || target || near) && !ancestors.has(node.id) && settings.isObstacle(node)) {
+      result.push({ node, source, target });
+    }
   }
 
   return result;
@@ -237,10 +241,10 @@ function inflateObstacles(
   points: { source: Point[]; target: Point[] },
 ): Obstacle[] {
   const obstacles: Obstacle[] = [];
-  for (const { node, end } of candidates) {
+  for (const { node, source, target } of candidates) {
     const keepOutside = [
-      ...(end === 'source' ? points.source.slice(1) : points.source),
-      ...(end === 'target' ? points.target.slice(1) : points.target),
+      ...(source ? points.source.slice(1) : points.source),
+      ...(target ? points.target.slice(1) : points.target),
     ];
     const rect = inflateKeepingOutside(node, padding, keepOutside);
     if (rect) obstacles.push({ ...rect, id: node.id });
@@ -290,10 +294,11 @@ function findApproachPoint(
 ): Point | null {
   // A node under the point that is not an end of the edge, such as the one a connection pointer touches, does not
   // count; an end node under the other handle, as with overlapping nodes, leaves no exit and the curve falls back.
+  // The node of this end, the other end's node too for a self-loop, is the one the handle sits on.
   const others = candidates
-    .filter(({ end }) => end !== own)
-    .map(({ node, end }) => ({ rect: inflateRect(node, APPROACH_CLEARANCE), end }))
-    .filter(({ rect, end }) => end !== null || !pointInsideRect(point, rect))
+    .filter((candidate) => !candidate[own])
+    .map(({ node, source, target }) => ({ rect: inflateRect(node, APPROACH_CLEARANCE), end: source || target }))
+    .filter(({ rect, end }) => end || !pointInsideRect(point, rect))
     .map(({ rect }) => rect);
   for (let d = distance; d >= 2; d -= 2) {
     const candidate = getApproachPoint(point, side, d);

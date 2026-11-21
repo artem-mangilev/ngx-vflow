@@ -256,6 +256,14 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBe(3);
   });
 
+  it('keeps a trackpad pinch at the zoom limit from zooming the page', async () => {
+    flow.zoomTo(3);
+    await settle();
+    expect(wheel(pane, true).defaultPrevented).toBe(true);
+    expect(flow.viewport().zoom).toBe(3);
+    await pause(300);
+  });
+
   it('uses the configured pane click tolerance to clear selection', async () => {
     const { createNode } = await import('../../interfaces/node.interface');
     const node = createNode({ id: 'node', point: { x: 200, y: 200 }, selected: true });

@@ -511,6 +511,17 @@ describe('DraggableService', () => {
     expect(getPaneRect).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps the node under a still pointer when the viewport zooms during the drag', () => {
+    dragFromThePress();
+    const { model } = startNodeDrag(new DOMRect(100, 50, 800, 600));
+
+    // The press is at flow (50, 50), 40 and 30 flow units from the node origin; at zoom 2 it is over flow (25, 25).
+    viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
+    TestBed.flushEffects();
+    expect(model.point()).toEqual({ x: -15, y: -5 });
+    dispatchMouse(window, 'mouseup', 150, 100);
+  });
+
   describe('with the alignment helper', () => {
     let alignment: AlignmentService;
 

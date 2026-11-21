@@ -181,8 +181,9 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     const zoom = this.clamp(from * wheelZoomFactor(event));
 
     if (this.wheelTimer === null) {
-      // A new gesture that cannot zoom leaves the event to the page, which can scroll at a zoom limit.
-      if (zoom === from) return;
+      // A new gesture that cannot zoom leaves the event to the page, which can scroll at a zoom limit. A pinch is
+      // kept: its default action zooms the whole page.
+      if (zoom === from && !event.ctrlKey) return;
       this.interrupt();
     }
 

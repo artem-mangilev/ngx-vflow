@@ -159,6 +159,28 @@ describe('avoidNodesCurve', () => {
     expect(layout.path).toMatch(/^M 100 125 L 10[2-9](\.\d+)? 125 Q /);
   });
 
+  it('routes a self-loop around its node', () => {
+    const fallback = getSmoothStepPath({
+      sourcePoint: { x: 100, y: 125 },
+      targetPoint: { x: 0, y: 125 },
+      sourcePosition: 'right',
+      targetPosition: 'left',
+      borderRadius: 8,
+    }).path;
+
+    for (const positions of [
+      ['right', 'left'],
+      ['right', 'top'],
+    ] as [Position, Position][]) {
+      const layout = avoidNodesCurve(edgeParams(source, source, [source, target], positions));
+      // The node less a pixel on each side: a path that runs along its border does not cross it.
+      const inside = { x: source.x + 1, y: source.y + 1, width: source.width - 2, height: source.height - 2 };
+
+      expect(layout.path).not.toBe(fallback);
+      expect(crosses(layout.path, inside)).toBe(false);
+    }
+  });
+
   it('falls back to a smooth step between overlapping nodes', () => {
     const overlapping = geometry('overlapping', 60, 120);
     const layout = avoidNodesCurve(edgeParams(source, overlapping, [source, overlapping]));

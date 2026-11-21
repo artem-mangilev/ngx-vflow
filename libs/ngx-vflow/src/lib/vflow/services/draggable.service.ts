@@ -1,4 +1,4 @@
-import { Injectable, Injector, inject, signal } from '@angular/core';
+import { Injectable, Injector, inject, signal, untracked } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { round } from '../utils/round';
 import { FlowEntitiesService } from './flow-entities.service';
@@ -8,7 +8,7 @@ import { align } from '../utils/align-number';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Subject, type Subscription } from 'rxjs';
-import { pairwise, filter, skip } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
 import { ResizeObserverService } from './resize-observer.service';
@@ -240,8 +240,8 @@ export class DraggableService {
           return { x: x - flow.x, y: y - flow.y };
         });
 
-        // Auto-pan moves the flow under a still pointer, so the nodes follow the pointer again
-        moveNodesOnAutoPanSub = this.onViewportPan(() => moveTo(lastClient));
+        // Auto-pan and a wheel zoom move the flow under a still pointer, so the nodes follow the pointer again.
+        moveNodesOnAutoPanSub = this.onViewportChange(() => moveTo(lastClient));
 
         // A drag that starts past the threshold moves the nodes right away.
         if (point.x !== start.x || point.y !== start.y) moveTo(point);
@@ -350,15 +350,11 @@ export class DraggableService {
     return point;
   }
 
-  private onViewportPan(callback: () => void) {
+  private onViewportChange(callback: () => void) {
+    // The first value comes when the effect first runs, which may already be a viewport the drag has not seen.
+    const start = untracked(this.viewportService.readableViewport);
     return toObservable(this.viewportService.readableViewport, { injector: this.injector })
-      .pipe(
-        skip(1), // Skip initial value
-        pairwise(),
-        filter(
-          ([prev, next]) => prev.zoom === next.zoom && (prev.x !== next.x || prev.y !== next.y), // Pan only, not wheel zoom (x/y+k change together)
-        ),
-      )
+      .pipe(filter((viewport) => viewport !== start))
       .subscribe(callback);
   }
 }

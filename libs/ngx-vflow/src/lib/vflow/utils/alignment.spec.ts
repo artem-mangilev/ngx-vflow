@@ -108,6 +108,48 @@ describe('alignment', () => {
         [b, c],
       ]);
     });
+
+    it('finds exactly the gaps of its definition, also where the search ends early', () => {
+      // The definition, pair by pair: `end` starts after `start` ends, both overlap across, and no other target
+      // starting in between crosses their common band.
+      const reference = (rects: Rect[]) =>
+        (['x', 'y'] as const).flatMap((axis) => {
+          const along = (r: Rect) => (axis === 'x' ? [r.x, r.x + r.width] : [r.y, r.y + r.height]);
+          const across = (r: Rect) => (axis === 'x' ? [r.y, r.y + r.height] : [r.x, r.x + r.width]);
+          const overlap = ([a0, a1]: number[], [b0, b1]: number[]) => a0 < b1 && b0 < a1;
+          return rects.flatMap((start) =>
+            rects
+              .filter((end) => along(end)[0] > along(start)[1] && overlap(across(start), across(end)))
+              .filter((end) => {
+                const band = [Math.max(across(start)[0], across(end)[0]), Math.min(across(start)[1], across(end)[1])];
+                return !rects.some(
+                  (other) =>
+                    along(other)[0] > along(start)[1] &&
+                    along(other)[0] < along(end)[0] &&
+                    overlap(across(other), band),
+                );
+              })
+              .map((end) => `${axis} ${rects.indexOf(start)} ${rects.indexOf(end)}`),
+          );
+        });
+
+      // Coarse values make shared starts and touching sides common.
+      let seed = 7;
+      const random = (max: number) => ((seed = (seed * 16807) % 2147483647) % max) * 10;
+      for (let run = 0; run < 300; run++) {
+        const rects = Array.from({ length: 2 + (run % 20) }, () => ({
+          x: random(40),
+          y: random(40),
+          width: 10 + random(15),
+          height: 10 + random(15),
+        }));
+        const found = findAlignmentGaps(rects).map(
+          (gap) => `${gap.axis} ${rects.indexOf(gap.start)} ${rects.indexOf(gap.end)}`,
+        );
+
+        expect(found.sort()).toEqual(reference(rects).sort());
+      }
+    });
   });
 
   describe('alignmentGuides', () => {

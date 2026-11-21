@@ -102,32 +102,50 @@ export function findAlignmentGaps(rects: Rect[]): AlignmentGap[] {
 
 function axisGaps(rects: Rect[], axis: AlignmentAxis): AlignmentGap[] {
   const sorted = [...rects].sort((a, b) => span(a, axis).start - span(b, axis).start);
+  // Read once: the inner loop visits every later target of every target.
+  const along = sorted.map((rect) => span(rect, axis));
+  const across = sorted.map((rect) => span(rect, cross(axis)));
   const gaps: AlignmentGap[] = [];
 
   for (let i = 0; i < sorted.length; i++) {
-    const start = sorted[i];
-    const startSpan = span(start, axis);
-    const startBreadth = span(start, cross(axis));
-    // Targets after `start` that overlap its breadth: only these can stand in a gap of `start`.
-    const passed: Rect[] = [];
+    const startSpan = along[i];
+    const startBreadth = across[i];
+    // Indexes of the targets after `start` that overlap its breadth: only these can stand in a gap of `start`.
+    const passed: number[] = [];
+    // The parts of the breadth no passed target covers yet. Once none is left, every target that starts later than
+    // the ones that covered it is blocked, so the search for `start` ends there instead of at the last target.
+    let uncovered: Span[] = [startBreadth];
+    let coveredAt = Infinity;
 
     for (let j = i + 1; j < sorted.length; j++) {
-      const end = sorted[j];
-      const endSpan = span(end, axis);
-      const endBreadth = span(end, cross(axis));
+      const endSpan = along[j];
+      if (endSpan.start > coveredAt) break;
+      const endBreadth = across[j];
       if (endSpan.start <= startSpan.end || !overlaps(startBreadth, endBreadth)) continue;
 
       const band = intersection(startBreadth, endBreadth);
-      const blocked = passed.some(
-        (other) => span(other, axis).start < endSpan.start && overlaps(span(other, cross(axis)), band),
-      );
-      passed.push(end);
+      const blocked = passed.some((k) => along[k].start < endSpan.start && overlaps(across[k], band));
+      passed.push(j);
+      uncovered = subtract(uncovered, endBreadth);
+      if (!uncovered.length && coveredAt === Infinity) coveredAt = endSpan.start;
 
-      if (!blocked) gaps.push({ axis, start, end, length: endSpan.start - startSpan.end });
+      if (!blocked) gaps.push({ axis, start: sorted[i], end: sorted[j], length: endSpan.start - startSpan.end });
     }
   }
 
   return gaps;
+}
+
+/** The parts of `spans` outside `cut`. */
+function subtract(spans: Span[], cut: Span): Span[] {
+  return spans.flatMap((part) =>
+    overlaps(part, cut)
+      ? [
+          { start: part.start, end: cut.start },
+          { start: cut.end, end: part.end },
+        ].filter((rest) => rest.end > rest.start)
+      : [part],
+  );
 }
 
 /** Every way `rect` can align on `axis` by moving at most `tolerance`. */

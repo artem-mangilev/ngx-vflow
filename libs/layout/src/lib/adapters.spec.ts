@@ -75,6 +75,30 @@ describe('layout adapters', () => {
     expect(inside(result, 'd', 'group')).toBe(true);
   });
 
+  it('dagre keeps the padding of sibling and stacked parents from overlapping', async () => {
+    const box = (result: LayoutResult, id: string) => ({ ...result.positions.get(id)!, ...result.sizes!.get(id)! });
+    const apart = (a: { x: number; y: number; width: number; height: number }, b: typeof a) =>
+      a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y;
+    const node = (id: string, parentId: string | null = null) => ({ id, parentId, width: 100, height: 50, x: 0, y: 0 });
+
+    for (const padding of [20, 40, 80]) {
+      const siblings = await once(dagreLayout({ padding }), {
+        nodes: [node('root'), node('g1'), node('g2'), node('a', 'g1'), node('b', 'g2')],
+        edges: [
+          { id: 'root-a', source: 'root', target: 'a' },
+          { id: 'root-b', source: 'root', target: 'b' },
+        ],
+      });
+      expect(apart(box(siblings, 'g1'), box(siblings, 'g2'))).toBe(true);
+
+      const stacked = await once(dagreLayout({ padding }), {
+        nodes: [node('g1'), node('g2'), node('a', 'g1'), node('b', 'g2')],
+        edges: [{ id: 'a-b', source: 'a', target: 'b' }],
+      });
+      expect(apart(box(stacked, 'g1'), box(stacked, 'g2'))).toBe(true);
+    }
+  });
+
   it('elk lays the graph out in the main thread with absolute positions for nested nodes', async () => {
     const result = await once(elkLayout({ direction: 'right', nodeSpacing: 30, padding: 24 }), graph());
     expect(result.positions.size).toBe(6);

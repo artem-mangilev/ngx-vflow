@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Directive, ErrorHandler, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes, reconnectEdges, reparentNodes } from 'ngx-vflow';
 import { Subject, of, throwError } from 'rxjs';
 import { dispatchMouse } from '../../../ngx-vflow/src/lib/vflow/gestures/pointer-events.testing';
 import { VxLayoutAnimate } from './layout-animate.directive';
@@ -16,7 +16,7 @@ const template = (animate: string) => `
     (vxLayoutEnd)="ended.push($event)"
     (initialized)="initializedAt.push(nodes()[0].point())" style="width: 1200px; height: 800px"
     [nodes]="nodes()"
-    [edges]="edges"
+    [edges]="edges()"
     [nodeDragThreshold]="0"
     [autoPan]="false">
     <ng-template let-ctx vNode>
@@ -48,7 +48,7 @@ class LayoutHost {
       { id: 'c', point: { x: 20, y: 20 }, parentId: 'group', extent: null, data: {} },
     ]),
   );
-  public readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b' }]);
+  public readonly edges = signal(createEdges([{ id: 'a-b', source: 'a', target: 'b' }]));
 }
 
 @Component({
@@ -165,6 +165,23 @@ describe('VxLayout', () => {
     await settle(fixture);
     expect(host.graphs).toHaveLength(4);
     expect(host.graphs[3].nodes.map((node) => node.id)).toContain('d');
+  });
+
+  it('runs again when an edge is reconnected or a node changes its parent, which keeps every id', async () => {
+    const fixture = await createFixture();
+    const host = fixture.componentInstance;
+
+    host.edges.update((edges) =>
+      reconnectEdges([{ edge: edges[0], connection: { source: 'b', target: 'a' } }], { nodes: host.nodes(), edges }),
+    );
+    await settle(fixture);
+    expect(host.graphs).toHaveLength(2);
+    expect(host.graphs[1].edges).toEqual([expect.objectContaining({ id: 'a-b', source: 'b', target: 'a' })]);
+
+    reparentNodes([{ id: 'c', parentId: null }], host.nodes());
+    await settle(fixture);
+    expect(host.graphs).toHaveLength(3);
+    expect(host.graphs[2].nodes.find((node) => node.id === 'c')?.parentId).toBeNull();
   });
 
   it('drops a run that a newer one replaced', async () => {
@@ -288,5 +305,26 @@ describe('VxLayout with VxLayoutAnimate', () => {
     expect(node(fixture, 'group').width!()).toBe(500);
     expect(node(fixture, 'group').height!()).toBe(400);
     expect(host.ended).toHaveLength(2);
+  });
+
+  it('stops the running animation when new options and a new layout come in the same change', async () => {
+    TestBed.configureTestingModule({ imports: [AnimatedLayoutHostComponent] });
+    const fixture = TestBed.createComponent(AnimatedLayoutHostComponent);
+    const host = fixture.componentInstance;
+    await settle(fixture);
+    const to = (x: number) => () => of({ positions: new Map([['a', { x, y: 0 }]]) });
+
+    host.animate.set({ duration: 1000 });
+    host.algorithm.set(to(0));
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
+    host.animate.set({ duration: 100 });
+    host.algorithm.set(to(900));
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    // The slow animation towards the first layout must not finish last and pull the node back.
+    expect(node(fixture, 'a').point()).toEqual({ x: 900, y: 0 });
   });
 });

@@ -49,7 +49,7 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## Dagre
 
-`dagreLayout(options)` ranks a directed graph with [dagre](https://github.com/dagrejs/dagre): `rankdir`, `nodesep`, `ranksep`, `align`, `ranker` and the other graph options. Nested nodes become compound nodes, sized around their children with `padding` (20 by default) between them and the sides. The cards of the layout demos carry one floating handle, `position="auto"`, so an edge meets a card on the side that faces the other end, whichever direction the layout takes.
+`dagreLayout(options)` ranks a directed graph with [dagre](https://github.com/dagrejs/dagre): `rankdir`, `nodesep`, `ranksep`, `align`, `ranker` and the other graph options. Nested nodes become compound nodes, sized around their children with `padding` (20 by default) between them and the sides; in a graph with parents, `edgesep` and `ranksep` grow by twice the padding, so neighbouring parents keep apart. The cards of the layout demos carry one floating handle, `position="auto"`, so an edge meets a card on the side that faces the other end, whichever direction the layout takes.
 
 {{ NgDocActions.demoPane("LayoutDagreDemoComponent") }}
 
