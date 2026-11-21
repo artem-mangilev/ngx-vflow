@@ -82,7 +82,8 @@ For path B, copy the parts and their tokens with `ng g @vflow/cli:ui` (Tailwind 
 
 Colors are CSS. Core has one token per part it draws, each with a built-in default: `--v-background`,
 `--v-background-pattern`, `--v-selection-box`, `--v-resize-control`, `--v-resize-control-border`,
-`--v-alignment-guides`, `--v-connection`, `--v-minimap-node`, `--v-minimap-mask`, `--v-minimap-viewport` and
+`--v-alignment-guides`, `--v-connection`, the `--v-minimap-*` tokens of nodes and groups, `--v-minimap-mask`,
+`--v-minimap-viewport` and
 `--v-focus`.
 The focus geometry is `--v-focus-halo` and `--v-focus-radius`.
 Set them on the `vflow` element or any ancestor; the `@vflow/ui` theme sets them from its `--vui-*` roles on every scope.
@@ -657,7 +658,7 @@ The `v-minimap` element is now the minimap block itself, an ordinary element of 
 - It has no `position` input and no place of its own. Add `vPanel="bottom-right"` (or another position) for the place it had, or position it with your own CSS. `vPanel` places any element of the flow content, see [Panels](/docs/viewport/panel).
 - It has no frame. Add `border`, `border-radius` or `box-shadow` on `v-minimap` if you want one, and set its size the same way: by default it is `clamp(120px, 20%, 240px)` wide at 4:3 instead of a fifth of each side of the flow.
 - Its bounds include the viewport, so the part in view cannot leave the minimap; the minimap zooms out while the viewport is away from the nodes.
-- Nodes are filled with `--v-minimap-node` and have no outline. Style them with `withMinimapSettings()` and `Node.minimap`, see [Minimap](/docs/viewport/minimap#style-the-nodes).
+- Nodes are filled with `--v-minimap-node` and have no outline; tokens set their outline and radius and the look of groups. Style the nodes of a component, also by their data, with `withMinimapSettings()`, see [Minimap](/docs/viewport/minimap#style-the-nodes).
 - `--v-minimap-mask` is now the whole color of the mask, alpha included (it was an opaque color drawn at 35%), and the mask lies above the nodes outside the viewport. `--v-minimap-viewport` outlines the viewport.
 - Selection is no longer shown and `--v-minimap-selected` is removed.
 

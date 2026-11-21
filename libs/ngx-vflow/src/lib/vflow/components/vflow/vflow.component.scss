@@ -49,12 +49,33 @@
   initial-value: rgb(177, 177, 183);
 }
 
-// Minimap, drawn on a canvas: the fill of nodes (and the outline of groups), the mask over the part of the graph
-// outside the viewport, and the outline of the viewport. The block itself is styled with CSS on `v-minimap`.
+// Minimap, drawn with SVG. Nodes: a fill, an outline of one pixel of the minimap where its color is set, and a
+// corner radius in flow pixels, the unit of the node's own `border-radius`. Groups have a fill and an outline of their
+// own and the radius of nodes; `--v-minimap-group-border` is not registered, so that it defaults to the node fill.
+// Then the mask over the part of the graph outside the viewport, and the outline of the viewport. The block itself
+// is styled with CSS on `v-minimap`.
 @property --v-minimap-node {
   syntax: '<color>';
   inherits: true;
   initial-value: rgb(226, 226, 226);
+}
+
+@property --v-minimap-node-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --v-minimap-node-radius {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 2px;
+}
+
+@property --v-minimap-group {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
 }
 
 @property --v-minimap-mask {
@@ -124,8 +145,7 @@
   visibility: hidden;
 }
 
-// High contrast: the feedback parts keep their meaning through system colors. The minimap canvas paints the
-// same sampled tokens, so it follows too.
+// High contrast: the feedback parts keep their meaning through system colors, the minimap included.
 @media (forced-colors: active) {
   :host {
     --v-background: Canvas;

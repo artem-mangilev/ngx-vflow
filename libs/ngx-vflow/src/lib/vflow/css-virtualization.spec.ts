@@ -276,60 +276,53 @@ describe('CSS viewport virtualization', () => {
     expect(getComputedStyle(edgeHost).visibility).toBe('visible');
   });
 
-  it('draws the minimap on canvas, reuses previews during pan/zoom, and refreshes node changes', async () => {
+  it('draws the minimap with SVG, keeps the paths during pan/zoom, and refreshes node changes', async () => {
     const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
-    const drawPreview = vi.spyOn(Path2D.prototype, 'roundRect');
     const fixture = TestBed.createComponent(MinimapHostComponent);
     await settle(fixture);
     const flow = fixture.debugElement.query(By.directive(VflowComponent));
     const component = flow.componentInstance as VflowComponent;
     const [node, group] = flow.injector.get(FlowEntitiesService).nodes();
-    const canvas = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
-    expect(canvas).not.toBeNull();
-    if (!canvas) return;
+    const minimap = fixture.nativeElement.querySelector('v-minimap') as HTMLElement;
+    const svg = minimap.querySelector('svg')!;
+    const rect = () => svg.getBoundingClientRect();
     // clamp(120px, 20%, 240px) of a 400px flow, 4:3.
-    expect(canvas.width).toBe(Math.round(120 * window.devicePixelRatio));
-    expect(canvas.height).toBe(Math.round(90 * window.devicePixelRatio));
+    expect([rect().width, rect().height]).toEqual([120, 90]);
     const place = () => {
       const flowRect = flow.nativeElement.getBoundingClientRect();
-      const rect = canvas.getBoundingClientRect();
-      return [rect.left - flowRect.left, rect.top - flowRect.top];
+      return [rect().left - flowRect.left, rect().top - flowRect.top];
     };
     expect(place()).toEqual([270, 200]);
-    expect(drawPreview).toHaveBeenCalled();
+    const paths = () => Array.from(svg.querySelectorAll('path'), (path) => path.getAttribute('d')).join('');
+    const marked = () => minimap.querySelector('.v-minimap-viewport')!.getAttribute('style');
+    expect(paths()).not.toBe('');
     expect(fixture.nativeElement.querySelector('.node-preview')).toBeNull();
-    const initialImage = canvas.toDataURL();
+    const initialPaths = paths();
+    const initialMark = marked();
     trackNodes.mockClear();
-    drawPreview.mockClear();
     component.setViewport({ ...component.viewport(), x: -200, y: 0 });
     component.zoomTo(0.8);
     await fixture.whenStable();
-    expect(canvas.toDataURL()).not.toBe(initialImage);
-    expect(drawPreview).not.toHaveBeenCalled();
-    const pannedImage = canvas.toDataURL();
+    // The paths are in flow space: the camera moves the mark, not the nodes.
+    expect(marked()).not.toBe(initialMark);
+    expect(paths()).toBe(initialPaths);
     node.point.set({ x: 50, y: 20 });
     group.point.set({ x: 2000, y: 100 });
     group.width.set(300);
     await fixture.whenStable();
-    expect(drawPreview).toHaveBeenCalledWith(50, 20, node.width(), node.height(), 2);
-    expect(drawPreview).toHaveBeenCalledWith(2000, 100, 300, group.height(), 2);
-    expect(canvas.toDataURL()).not.toBe(pannedImage);
+    // Rounded by the default radius of 2 flow pixels, so a path starts 2 pixels right of the corner.
+    expect(paths()).toContain('M52,20h');
+    expect(paths()).toContain('M2002,100h296');
     expect(trackNodes).not.toHaveBeenCalled();
-    // The minimap does not show selection: a selection change repaints nothing.
-    const movedImage = canvas.toDataURL();
-    drawPreview.mockClear();
+    // The minimap does not show selection: a selection change draws nothing again.
+    const moved = paths();
     node.selected.set(true);
     group.selected.set(true);
     await fixture.whenStable();
-    expect(drawPreview).not.toHaveBeenCalled();
-    expect(canvas.toDataURL()).toBe(movedImage);
+    expect(paths()).toBe(moved);
     fixture.componentInstance.position.set('top-left');
     await fixture.whenStable();
     expect(place()).toEqual([10, 10]);
-    fixture.componentInstance.nodes = [];
-    fixture.changeDetectorRef.markForCheck();
-    await fixture.whenStable();
-    expect(canvas.toDataURL()).not.toBe(pannedImage);
   });
 
   it('measures initially offscreen custom nodes and renders their crossing edge at every zoom', async () => {

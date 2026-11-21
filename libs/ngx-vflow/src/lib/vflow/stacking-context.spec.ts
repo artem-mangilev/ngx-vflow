@@ -40,14 +40,14 @@ describe('Flow stacking context', () => {
 
   it('keeps the minimap under an overlay of the page', () => {
     const dialog = root.querySelector('[data-testid="dialog"]')!;
-    const canvas = root.querySelector('canvas')!;
+    const minimap = root.querySelector('v-minimap')!;
 
     // Without the overlay the minimap is the topmost element at its own center.
     dialog.remove();
-    expect(hit(canvas)).toBe(canvas);
+    expect(minimap.contains(hit(minimap))).toBe(true);
 
     root.prepend(dialog);
-    expect(hit(canvas)).toBe(dialog);
+    expect(hit(minimap)).toBe(dialog);
   });
 
   it('lets a positioned element after the flow paint above the pane without a z-index', () => {

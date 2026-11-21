@@ -124,9 +124,8 @@ may change.
 ## Minimap
 
 `VflowMinimapComponent`, selector `v-minimap`, is part of the `Vflow` imports array and goes inside `vflow`. The
-element is the block: it has no frame and no position of its own. It draws on a canvas that fills it, caches the
-nodes during pan and zoom, updates them when node geometry or a style changes, and keeps the image sharp on
-high-DPI displays.
+element is the block: it has no frame and no position of its own. It draws with SVG that fills it: the nodes
+stay in place during pan and zoom, and are drawn again when node geometry or a style changes.
 
 | Input      | Default | Description                    |
 | ---------- | ------- | ------------------------------ |
@@ -144,20 +143,21 @@ What it shows:
 - A mask of `--v-minimap-mask` covers everything outside the viewport, above the nodes. The viewport is marked at least 8 by 8 pixels large, and outlined with `--v-minimap-viewport`.
 - Selection is not shown.
 
-`MinimapNodeStyle`:
+Nodes are drawn by the `--v-minimap-node`, `--v-minimap-node-border` and `--v-minimap-node-radius` tokens, and a node with children by `--v-minimap-group`, `--v-minimap-group-border` and the same radius, see [Tokens and attributes](/docs/reference/styling#core-tokens).
 
-| Key            | Default                 | Description                                                                   |
-| -------------- | ----------------------- | ----------------------------------------------------------------------------- |
-| `background`   | `var(--v-minimap-node)` | Fill; any CSS color, `var()` included                                         |
-| `borderColor`  | `transparent`           | Color of the outline                                                          |
-| `borderWidth`  | `0`                     | Width of the outline in CSS pixels of the minimap, drawn inside the rectangle |
-| `borderRadius` | `2`                     | Corner radius in flow units, limited to half the shorter side                 |
+`nodeStyles` of `withMinimapSettings()` maps the key a node component is registered under with `withNodeComponents()` onto a `MinimapNodeStyleRule`: a `MinimapNodeStyle`, or a function `(node: Node) => MinimapNodeStyle | undefined`.
 
-- The style of a node is the defaults, under `nodeStyles[key]` of `withMinimapSettings()` for a node whose `component` is that key, under `Node.minimap`. Each level overrides only the keys it sets.
-- The defaults of a node with children are an outline: no fill, `borderColor` of `var(--v-minimap-node)`, `borderWidth` of 1. Parents are painted before their members.
-- The outline is centered on the edge of the rectangle.
-- Colors are resolved on the `v-minimap` element, once per distinct value, and again when one of them computes to another color, see [Tokens and attributes](/docs/reference/styling#core-tokens).
-- While the viewport stays within the bounds of the nodes, a pan or a zoom repaints only the mask. When the viewport reaches beyond them, every frame paints the nodes again, as one path per style.
+| `MinimapNodeStyle` key | Over token                                              | Description                                                      |
+| ---------------------- | ------------------------------------------------------- | ---------------------------------------------------------------- |
+| `background`           | `--v-minimap-node` or `--v-minimap-group`               | Fill; any CSS color, `var()` included                            |
+| `borderColor`          | `--v-minimap-node-border` or `--v-minimap-group-border` | Outline, one CSS pixel of the minimap wide, centered on the edge |
+| `borderRadius`         | `--v-minimap-node-radius`                               | Corner radius in flow pixels, limited to half the shorter side   |
+
+- A style overrides only the keys it sets. Nodes without a key, drawn by a template or by a component named by its class, take the tokens. A node carries no minimap style of its own.
+- A rule that is a function is called again when a signal it read changes, or when nodes are added or removed; moving nodes calls no function. Nodes with the same fill and outline are drawn as one path; parents are drawn before their members.
+- A `withMinimapSettings()` closer to the flow adds its keys to one further up; a key it sets replaces the rule of that key above.
+- Colors are CSS: tokens and `var()` resolve on the `v-minimap` element and follow the theme, see [Tokens and attributes](/docs/reference/styling#core-tokens).
+- While the viewport stays within the bounds of the nodes, a pan or a zoom moves only the mask. When the viewport reaches beyond them, every frame draws the nodes again, as one path per style.
 
 Gestures:
 

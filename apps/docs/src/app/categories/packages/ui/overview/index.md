@@ -198,6 +198,7 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--v-alignment-guides`                            | `[data-v-alignment-guides]`, at 50%                            | `--vui-foreground`      |
 | `--v-connection`                                  | The line of a connection in progress without a template        | `--vui-muted`           |
 | `--v-minimap-node`, `--v-minimap-mask`            | Fill of minimap nodes; the mask outside the viewport           | mixes of muted          |
+| `--v-minimap-node-radius`                         | Corner radius of minimap nodes, in flow pixels                 | surface radius          |
 | `--v-focus`                                       | Focus halo of nodes and edges                                  | `--vui-accent`          |
 | `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                      | radius = surface radius |
 | `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px                | —                       |
@@ -209,9 +210,7 @@ maps its tokens to system colors regardless of the theme. Core also sets the rea
 so scaled content can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a
 viewport change ends, not on every frame of a gesture, because a change recomputes the style of every
 element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
-the node's border. The canvas minimap samples the resolved tokens and repaints when an
-attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
-`prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
+the node's border. The minimap is drawn with SVG, so its color tokens follow the theme like any other CSS.
 
 Keep the interaction stroke of custom edges inside the presentation with core `vEdgeInteractionArea`; use core gesture
 exclusions such as `vNoDrag` and `vNoSelect` for embedded controls. Do not shrink a hit area just to make

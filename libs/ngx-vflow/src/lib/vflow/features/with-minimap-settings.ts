@@ -1,5 +1,6 @@
 import { InjectionToken, Signal } from '@angular/core';
-import { MinimapNodeStyle, MinimapSettings } from '../interfaces/minimap.interface';
+import { MinimapSettings } from '../interfaces/minimap.interface';
+import type { Node } from '../interfaces/node.interface';
 import { withDefaults } from '../utils/with-defaults';
 import { VflowFeature, vflowFeature } from './feature';
 import { FeatureValue, provideMergedFeatureValue } from './merged-feature-value';
@@ -9,29 +10,33 @@ export const VFLOW_MINIMAP_SETTINGS = new InjectionToken<Signal<Partial<MinimapS
 
 /**
  * Sets how the minimaps of the flows below the injector draw the nodes of a component, by the key the component is
- * registered under with `withNodeComponents()`. A node overrides its component with `Node.minimap`. A
- * `withMinimapSettings()` closer to the flow adds its keys, and the keys of a style, to one further up.
+ * registered under with `withNodeComponents()`: a style, or a function that derives one from the node. Every node is
+ * drawn by the `--v-minimap-*` tokens below that, so the graph holds nothing about the minimap.
  *
  * ```ts
  * provideVflow(
  *   withNodeComponents({ task: TaskNode, decision: DecisionNode }),
- *   withMinimapSettings({
+ *   withMinimapSettings<Node<Task>>({
  *     nodeStyles: {
- *       task: { background: 'var(--task)' },
+ *       task: (node) => (node.data?.().failed ? FAILED : undefined),
  *       decision: { background: 'var(--decision)', borderRadius: 999 },
  *     },
  *   }),
  * );
  * ```
+ *
+ * A `withMinimapSettings()` closer to the flow adds its keys to one further up; a key it sets replaces the style of
+ * that key above.
  */
-export function withMinimapSettings(settings: FeatureValue<MinimapSettings>): VflowFeature<'minimap'> {
-  return vflowFeature('minimap', [provideMergedFeatureValue(VFLOW_MINIMAP_SETTINGS, settings, mergeSettings)]);
+export function withMinimapSettings<N extends Node = Node>(
+  settings: FeatureValue<MinimapSettings<N>>,
+): VflowFeature<'minimap'> {
+  return vflowFeature('minimap', [
+    // The token is not generic: a rule takes the node of the application, whatever its data.
+    provideMergedFeatureValue(VFLOW_MINIMAP_SETTINGS, settings as FeatureValue<MinimapSettings>, mergeSettings),
+  ]);
 }
 
 function mergeSettings(below: Partial<MinimapSettings>, own: Partial<MinimapSettings>): Partial<MinimapSettings> {
-  const nodeStyles: Partial<Record<string, MinimapNodeStyle>> = { ...below.nodeStyles };
-  for (const [key, style] of Object.entries(own.nodeStyles ?? {})) {
-    if (style) nodeStyles[key] = withDefaults(nodeStyles[key] ?? {}, style);
-  }
-  return { ...withDefaults(below, own), nodeStyles };
+  return { ...withDefaults(below, own), nodeStyles: withDefaults(below.nodeStyles ?? {}, own.nodeStyles) };
 }

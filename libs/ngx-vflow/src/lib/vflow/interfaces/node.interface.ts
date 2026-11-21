@@ -5,7 +5,6 @@ import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 import { StaticData } from '../types/static-data.type';
 import { NodeComponentKey } from './entity-components.interface';
-import { MinimapNodeStyle } from './minimap.interface';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -51,23 +50,13 @@ export interface Node<T = unknown> {
   ariaLabel?: WritableSignal<string>;
   ariaDescription?: WritableSignal<string>;
   domAttributes?: WritableSignal<DomAttributes>;
-  /** How the minimap draws this node, over the style of its component and of the minimap. */
-  minimap?: WritableSignal<MinimapNodeStyle>;
 }
 
 export type StaticNode<T = unknown> = UnwrapSignal<Node<T>>;
 
 /** Properties that stay optional even with defaults; `width`/`height` decide the size mode. */
 type OptionalProperty =
-  | 'component'
-  | 'width'
-  | 'height'
-  | 'selectable'
-  | 'focusable'
-  | 'ariaLabel'
-  | 'ariaDescription'
-  | 'domAttributes'
-  | 'minimap';
+  'component' | 'width' | 'height' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
 export type NodeWithDefaults<T = unknown> = Omit<Required<Node<T>>, OptionalProperty> & Pick<Node<T>, OptionalProperty>;
 
@@ -90,7 +79,6 @@ export function createNode<T = unknown>(node: StaticNode<T>): NodeWithDefaults<T
     ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
     ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
     ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
-    ...(isDefined(node.minimap) ? { minimap: signal(node.minimap) } : {}),
   };
 }
 
@@ -135,7 +123,6 @@ export function toStaticNode<T>(node: Node<T>): StaticNode<T> {
     ...read('ariaLabel', node.ariaLabel),
     ...read('ariaDescription', node.ariaDescription),
     ...read('domAttributes', node.domAttributes),
-    ...read('minimap', node.minimap),
     ...warnUnserializable(node),
   }));
 }

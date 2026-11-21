@@ -74,6 +74,8 @@
     /* Minimap nodes are quieter than text and clearly above the canvas; the mask dims what is out of view. */
     --v-minimap-node: color-mix(in oklab, var(--vui-muted) 40%, var(--vui-background));
     --v-minimap-mask: color-mix(in oklab, var(--vui-muted) 14%, transparent);
+    /* Nodes in the minimap have the corners of the nodes they stand for. */
+    --v-minimap-node-radius: --theme(--radius-vui-surface);
     --v-focus: var(--vui-accent);
     /* Node parts are rounded with the surface radius, so the core focus halo follows the same corners. */
     --v-focus-radius: --theme(--radius-vui-surface);

@@ -66,54 +66,73 @@ background of the flow. The defaults have no specificity, so any rule of yours w
 
 ## Style the nodes
 
-The minimap draws each node as a rectangle filled with the `--v-minimap-node` token. To change the color of every
-node, set the token, on the minimap or on any ancestor:
+The minimap draws each node as a rectangle. Every node is drawn by tokens, which you set on the minimap or on any
+ancestor, so they follow your theme:
 
 ```css
 v-minimap {
   --v-minimap-node: var(--muted);
+  --v-minimap-node-border: var(--border);
+  --v-minimap-node-radius: 8px;
 }
 ```
 
-To draw some nodes differently, give them a style, an object of four optional keys:
+| Token                      | Default              | Part                                                                    |
+| -------------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `--v-minimap-node`         | `rgb(226, 226, 226)` | Fill of a node                                                          |
+| `--v-minimap-node-border`  | `transparent`        | Outline of a node, one pixel of the minimap wide; `transparent` is none |
+| `--v-minimap-node-radius`  | `2px`                | Corner radius of nodes and groups in flow pixels, as the node's own CSS |
+| `--v-minimap-group`        | `transparent`        | Fill of a node with children                                            |
+| `--v-minimap-group-border` | `--v-minimap-node`   | Outline of a node with children                                         |
 
-| Key            | Meaning                                                                          |
-| -------------- | -------------------------------------------------------------------------------- |
-| `background`   | Fill                                                                             |
-| `borderColor`  | Color of the outline                                                             |
-| `borderWidth`  | Width of the outline in pixels of the minimap; it does not shrink with the graph |
-| `borderRadius` | Corner radius in flow units, the number of the node's own `border-radius`        |
+By default a group is an outline without a fill, so its members stay visible inside it.
 
-A color is any CSS color, `var(--token)` included, so the minimap follows your theme. A large `borderRadius` draws
-a pill or a circle.
+### Style the nodes of a component
 
-Set a style at two levels. Each one overrides only the keys it names:
+To draw the nodes of a component differently, give a style to the key the component is registered under, for every
+flow below the injector. The graph itself holds nothing about the minimap:
 
-1. Every node of a component, by the key the component is registered under, for all flows of the application:
+```ts
+provideVflow(
+  withNodeComponents({ task: TaskNode, decision: DecisionNode }),
+  withMinimapSettings({
+    nodeStyles: {
+      task: { background: 'var(--task)' },
+      decision: { background: 'var(--decision)', borderRadius: 999 },
+    },
+  }),
+);
+```
 
-   ```ts
-   provideVflow(
-     withNodeComponents({ task: TaskNode, decision: DecisionNode }),
-     withMinimapSettings({
-       nodeStyles: {
-         task: { background: 'var(--task)' },
-         decision: { background: 'var(--decision)', borderRadius: 999 },
-       },
-     }),
-   );
-   ```
+A style has three optional keys; the ones it leaves out keep the tokens:
 
-2. One node, with its `minimap` field. Like the other fields of a node it is a signal, so it can change later:
+| Key            | Meaning                                                                       |
+| -------------- | ----------------------------------------------------------------------------- |
+| `background`   | Fill                                                                          |
+| `borderColor`  | Color of the outline, one pixel of the minimap wide; `transparent` draws none |
+| `borderRadius` | Corner radius in flow pixels, the number of the node's own `border-radius`    |
 
-   ```ts
-   createNodes([
-     { id: 'draft', component: 'task', point: { x: 0, y: 0 } },
-     { id: 'failed', component: 'task', point: { x: 240, y: 0 }, minimap: { background: 'var(--danger)' } },
-   ]);
-   ```
+A color is any CSS color, `var(--token)` included. A large `borderRadius` draws a pill or a circle.
 
-A node with children is drawn as an outline of the node color without a fill, so its members stay visible. To fill
-a group, give its component or the node itself a `background`.
+Nodes drawn by a template, or by a component named by its class, have no key: they take the tokens.
+
+### Style a node by its data
+
+A value of `nodeStyles` may be a function of the node instead of an object:
+
+```ts
+const FAILED: MinimapNodeStyle = { background: 'var(--danger)' };
+
+withMinimapSettings<Node<Job>>({
+  nodeStyles: {
+    job: (node) => (node.data?.().failed ? FAILED : undefined),
+  },
+});
+```
+
+The function reads the signals of the node, and the minimap follows them: it runs again when the data of a node
+changes, not while nodes move. Return one of a few shared objects, as above, rather than a new color for every node:
+nodes with the same colors are painted together.
 
 The minimap does not show which nodes are selected.
 

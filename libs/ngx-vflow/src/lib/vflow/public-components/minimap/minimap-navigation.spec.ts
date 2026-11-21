@@ -56,7 +56,8 @@ describe('minimap navigation through the public viewport API', () => {
   let fixture: ComponentFixture<MinimapHostComponent>;
   let host: MinimapHostComponent;
   let flow: VflowComponent;
-  let canvas: HTMLCanvasElement;
+  let minimap: HTMLElement;
+  let svg: SVGSVGElement;
 
   async function settle() {
     fixture.detectChanges();
@@ -70,14 +71,19 @@ describe('minimap navigation through the public viewport API', () => {
     host = fixture.componentInstance;
     await settle();
     flow = host.flow();
-    canvas = fixture.nativeElement.querySelector('canvas');
+    find();
     // Synthetic pointer events cannot acquire native capture; real capture is covered by Playwright.
-    vi.spyOn(canvas, 'setPointerCapture').mockImplementation(() => {});
-    vi.spyOn(canvas, 'hasPointerCapture').mockReturnValue(true);
-    vi.spyOn(canvas, 'releasePointerCapture').mockImplementation(() => {});
+    vi.spyOn(minimap, 'setPointerCapture').mockImplementation(() => {});
+    vi.spyOn(minimap, 'hasPointerCapture').mockReturnValue(true);
+    vi.spyOn(minimap, 'releasePointerCapture').mockImplementation(() => {});
   });
 
   afterEach(() => window.dispatchEvent(new Event('blur')));
+
+  function find() {
+    minimap = fixture.nativeElement.querySelector('v-minimap');
+    svg = minimap?.querySelector('svg') as SVGSVGElement;
+  }
 
   /** The visible flow area, from the viewport of the flow and the size of the host. */
   function view() {
@@ -86,9 +92,9 @@ describe('minimap navigation through the public viewport API', () => {
     return { x: -x / zoom, y: -y / zoom, width: width / zoom, height: height / zoom };
   }
 
-  /** Flow space to canvas pixels, derived here from the nodes united with the viewport, not read from the directive. */
+  /** Flow space to CSS pixels of the drawing, derived here from the nodes united with the viewport, not read from the directive. */
   function transform() {
-    const { width, height } = canvas.getBoundingClientRect();
+    const { width, height } = svg.getBoundingClientRect();
     const visible = view();
     const left = Math.min(NODES.x, visible.x);
     const top = Math.min(NODES.y, visible.y);
@@ -98,7 +104,7 @@ describe('minimap navigation through the public viewport API', () => {
     return { x: width / 2 - ((left + right) / 2) * zoom, y: height / 2 - ((top + bottom) / 2) * zoom, zoom };
   }
 
-  /** The viewport that centers the flow on the flow point under a point of the canvas. */
+  /** The viewport that centers the flow on the flow point under a point of the minimap. */
   function centeredOn(x: number, y: number) {
     const map = transform();
     const [width, height] = host.size();
@@ -110,7 +116,7 @@ describe('minimap navigation through the public viewport API', () => {
     };
   }
 
-  /** Where the middle of the viewport is on the canvas: a press there is a press on the viewport. */
+  /** Where the middle of the viewport is on the minimap: a press there is a press on the viewport. */
   function viewportOnCanvas(): [number, number] {
     const map = transform();
     const visible = view();
@@ -123,25 +129,15 @@ describe('minimap navigation through the public viewport API', () => {
     expect(flow.viewport().zoom).toBeCloseTo(expected.zoom, 6);
   }
 
-  /** The part of the canvas the mask leaves open, in CSS pixels: the viewport as the minimap marks it. */
+  /** The part of the drawing the mask leaves open, in CSS pixels: the viewport as the minimap marks it. */
   function hole() {
-    const { data, width, height } = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height);
-    const ratio = width / canvas.getBoundingClientRect().width;
-    let [left, top, right, bottom] = [Infinity, Infinity, -Infinity, -Infinity];
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        if (data[(y * width + x) * 4 + 3] !== 0) continue;
-        left = Math.min(left, x);
-        top = Math.min(top, y);
-        right = Math.max(right, x + 1);
-        bottom = Math.max(bottom, y + 1);
-      }
-    }
-    return { x: left / ratio, y: top / ratio, width: (right - left) / ratio, height: (bottom - top) / ratio };
+    const box = svg.getBoundingClientRect();
+    const marked = minimap.querySelector('.v-minimap-viewport')!.getBoundingClientRect();
+    return { x: marked.x - box.x, y: marked.y - box.y, width: marked.width, height: marked.height };
   }
 
   function pointer(type: string, x: number, y: number, options: PointerEventInit = {}) {
-    const rect = canvas.getBoundingClientRect();
+    const rect = svg.getBoundingClientRect();
     const event = new PointerEvent(type, {
       bubbles: true,
       cancelable: true,
@@ -156,7 +152,7 @@ describe('minimap navigation through the public viewport API', () => {
       clientY: rect.top + y,
       ...options,
     });
-    canvas.dispatchEvent(event);
+    svg.dispatchEvent(event);
     return event;
   }
 
@@ -170,34 +166,30 @@ describe('minimap navigation through the public viewport API', () => {
 
   async function wheel(deltaY = -10, options: WheelEventInit = {}) {
     const event = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY, ...options });
-    canvas.dispatchEvent(event);
+    svg.dispatchEvent(event);
     await settle();
     return event;
   }
 
-  it('is a block sized by CSS, with a bitmap in device pixels and no geometry of its own on the canvas', () => {
-    const minimap = canvas.parentElement!.getBoundingClientRect();
+  it('is a block sized by CSS, with a drawing that fills it', () => {
+    const block = minimap.getBoundingClientRect();
     const root = fixture.nativeElement.querySelector('[data-v-root]').getBoundingClientRect();
 
     // clamp(120px, 20%, 240px) of a 400px flow, 4:3; placed by vPanel with the default offset.
-    expect([minimap.width, minimap.height]).toEqual([120, 90]);
-    expect([root.right - minimap.right, root.bottom - minimap.bottom]).toEqual([10, 10]);
-    expect([canvas.width, canvas.height]).toEqual([
-      Math.round(120 * window.devicePixelRatio),
-      Math.round(90 * window.devicePixelRatio),
-    ]);
-    expect(canvas.style.width + canvas.style.height + canvas.style.left + canvas.style.top).toBe('');
-    expect(getComputedStyle(canvas.parentElement!).borderTopWidth).toBe('0px');
+    expect([block.width, block.height]).toEqual([120, 90]);
+    expect([root.right - block.right, root.bottom - block.bottom]).toEqual([10, 10]);
+    expect([svg.getBoundingClientRect().width, svg.getBoundingClientRect().height]).toEqual([120, 90]);
+    expect(getComputedStyle(minimap).borderTopWidth).toBe('0px');
   });
 
   it('retains the read-only default and lets the pointer through to the pane', async () => {
-    expect(getComputedStyle(canvas).pointerEvents).toBe('none');
-    expect(getComputedStyle(canvas.parentElement!).pointerEvents).toBe('none');
+    expect(getComputedStyle(svg).pointerEvents).toBe('none');
+    expect(getComputedStyle(minimap).pointerEvents).toBe('none');
     await click();
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     host.pannable.set(true);
     await settle();
-    expect(getComputedStyle(canvas).pointerEvents).toBe('auto');
+    expect(getComputedStyle(svg).pointerEvents).toBe('auto');
     const expected = centeredOn(40, 30);
     await click();
     expectViewport(expected);
@@ -255,7 +247,8 @@ describe('minimap navigation through the public viewport API', () => {
     host.pannable.set(true);
     flow.setViewport({ x: 0, y: 0, zoom: 1.5 });
     await settle();
-    const build = vi.spyOn(Path2D.prototype, 'roundRect');
+    const paths = () => Array.from(svg.querySelectorAll('path'), (path) => path.getAttribute('d'));
+    const built = paths();
     let expected = centeredOn(60, 40);
     await click(60, 40);
     expectViewport(expected);
@@ -264,18 +257,18 @@ describe('minimap navigation through the public viewport API', () => {
       await settle();
     }
     // The paths are in flow space: the camera changes how they are painted, not what they are.
-    expect(build).not.toHaveBeenCalled();
+    expect(paths()).toEqual(built);
 
     host.size.set([800, 600]);
     await settle();
-    expect(canvas.getBoundingClientRect().width).toBe(160);
-    expect(build).not.toHaveBeenCalled();
+    expect(svg.getBoundingClientRect().width).toBe(160);
+    expect(paths()).toEqual(built);
     expected = centeredOn(80, 60);
     await click(80, 60);
     expectViewport(expected);
   });
 
-  it('drags the viewport by the pointer movement, captures drags outside the canvas and cancels without a click', async () => {
+  it('drags the viewport by the pointer movement, captures drags outside the minimap and cancels without a click', async () => {
     host.pannable.set(true);
     await settle();
     await click(100, 20);
@@ -289,17 +282,17 @@ describe('minimap navigation through the public viewport API', () => {
     pointer('pointermove', x + 3, y);
     await settle();
     expectViewport(start);
-    // Beyond it the viewport follows the whole movement since the press, also outside the canvas.
+    // Beyond it the viewport follows the whole movement since the press, also outside the minimap.
     pointer('pointermove', x - 30, y - 100);
     await settle();
     expectViewport({ x: start.x + 30 / zoom, y: start.y + 100 / zoom, zoom: 1 });
-    expect(canvas.setPointerCapture).toHaveBeenCalledWith(1);
+    expect(minimap.setPointerCapture).toHaveBeenCalledWith(1);
     const dragged = flow.viewport();
     pointer('pointercancel', x - 30, y - 100);
     pointer('pointerup', x, y);
     await settle();
     expect(flow.viewport()).toEqual(dragged);
-    expect(canvas.releasePointerCapture).toHaveBeenCalledWith(1);
+    expect(minimap.releasePointerCapture).toHaveBeenCalledWith(1);
     pointer('pointerdown', 40, 30);
     host.pannable.set(false);
     await settle();
@@ -390,18 +383,17 @@ describe('minimap navigation through the public viewport API', () => {
     host.pannable.set(true);
     host.zoomable.set(true);
     await settle();
-    expect(fixture.nativeElement.querySelector('.v-minimap canvas')).toBe(canvas);
+    expect(fixture.nativeElement.querySelector('.v-minimap svg')).toBe(svg);
     host.show.set(false);
     await settle();
     expect(fixture.nativeElement.querySelector('.v-minimap')).toBeNull();
-    expect(fixture.nativeElement.querySelector('canvas')).toBeNull();
-    // The detached canvas no longer owns wheel input.
+    // The detached minimap no longer owns wheel input.
     expect((await wheel()).defaultPrevented).toBe(false);
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     host.show.set(true);
     await settle();
-    canvas = fixture.nativeElement.querySelector('.v-minimap canvas');
-    expect(canvas).not.toBeNull();
+    find();
+    expect(svg).not.toBeNull();
     const expected = centeredOn(100, 20);
     await click(100, 20);
     expectViewport(expected);
@@ -456,14 +448,14 @@ describe('minimap block', () => {
 
   it('renders a minimap inside a wrapper with the rest of the flow content, above the pane', async () => {
     const root = await render(true);
-    expect(root.querySelector('[data-v-root] .v-content-layer .v-minimap canvas')).not.toBeNull();
+    expect(root.querySelector('[data-v-root] .v-content-layer .v-minimap svg')).not.toBeNull();
   });
 
   it('takes its size, frame, background and place from the styles of the application', async () => {
     const root = await render(false);
     const flow = root.querySelector('[data-v-root]')!.getBoundingClientRect();
     const minimap = root.querySelector<HTMLElement>('v-minimap')!;
-    const canvas = root.querySelector('canvas')!;
+    const svg = minimap.querySelector('svg')!;
     const rect = minimap.getBoundingClientRect();
     const style = getComputedStyle(minimap);
 
@@ -473,10 +465,8 @@ describe('minimap block', () => {
     expect(style.borderTopWidth).toBe('2px');
     expect(style.borderTopLeftRadius).toBe('8px');
     expect(style.backgroundColor).toBe('rgb(0, 0, 255)');
-    // The canvas fills the content box and paints no background of its own.
-    expect([canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height]).toEqual([196, 96]);
-    expect(canvas.width).toBe(Math.round(196 * window.devicePixelRatio));
-    const corner = canvas.getContext('2d')!.getImageData(1, 1, 1, 1).data;
-    expect(corner[3]).toBeLessThan(255);
+    // The drawing fills the content box and paints no background of its own.
+    expect([svg.getBoundingClientRect().width, svg.getBoundingClientRect().height]).toEqual([196, 96]);
+    expect(getComputedStyle(svg).backgroundColor).toBe('rgba(0, 0, 0, 0)');
   });
 });

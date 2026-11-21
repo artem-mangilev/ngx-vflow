@@ -26,7 +26,11 @@ element of the application. The values of the handle attributes are in the
 | `--v-resize-control-border` | `#fff`                   | The border that separates a resize handle from the node            |
 | `--v-alignment-guides`      | `#1b262c`                | Alignment guides, drawn at 50%                                     |
 | `--v-connection`            | `rgb(177, 177, 183)`     | The line of a connection in progress without a template            |
-| `--v-minimap-node`          | `rgb(226, 226, 226)`     | Fill of nodes in the minimap, and the outline of groups            |
+| `--v-minimap-node`          | `rgb(226, 226, 226)`     | Fill of nodes in the minimap                                       |
+| `--v-minimap-node-border`   | `transparent`            | Outline of nodes in the minimap, 1px; `transparent` is none        |
+| `--v-minimap-node-radius`   | `2px`                    | Corner radius of nodes and groups in the minimap, in flow pixels   |
+| `--v-minimap-group`         | `transparent`            | Fill of nodes with children in the minimap                         |
+| `--v-minimap-group-border`  | `--v-minimap-node`       | Outline of nodes with children in the minimap, 1px; not registered |
 | `--v-minimap-mask`          | `rgb(240 240 240 / 0.6)` | The minimap mask over the graph outside the viewport               |
 | `--v-minimap-viewport`      | `transparent`            | Outline of the viewport in the minimap, 1px                        |
 | `--v-focus`                 | `#005fcc`                | Focus halo of nodes and edges                                      |
@@ -39,9 +43,9 @@ element of the application. The values of the handle attributes are in the
   subtree.
 - Under `forced-colors: active` core maps its color tokens to system colors (`Canvas`, `GrayText`, `Highlight`,
   `CanvasText`), whatever the theme sets.
-- The minimap is a canvas. It resolves its tokens and the colors of node styles on the `v-minimap` element and
-  repaints when one of them computes to another color, whatever changed it: a class, an attribute, a stylesheet or a
-  media query.
+- The minimap is drawn with SVG, so its tokens and the colors of node styles are plain CSS: they resolve on the
+  `v-minimap` element and follow a theme by themselves. `--v-minimap-node-radius` is read when the paths are built,
+  so a change of it alone shows with the next change of the graph.
 
 ## `--v-zoom`
 

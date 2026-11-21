@@ -1,72 +1,65 @@
-import { MinimapNodeStyle } from '../../interfaces/minimap.interface';
+import { MinimapNodeStyle, MinimapNodeStyleRule } from '../../interfaces/minimap.interface';
 import { NodeModel } from '../../models/node.model';
 import { isGroupNode } from '../../utils/is-group-node';
 import { clamp } from '../../utils/viewport';
 import { withDefaults } from '../../utils/with-defaults';
 
-export type ResolvedNodeStyle = Required<MinimapNodeStyle>;
+type NodeStyle = Required<Pick<MinimapNodeStyle, 'background' | 'borderColor'>> & MinimapNodeStyle;
 
-/** The nodes painted with one style, as one path in flow space: a repaint costs per style, not per node. */
-export interface MinimapNodeBatch {
-  style: ResolvedNodeStyle;
-  path: Path2D;
+const NODE_TOKENS: NodeStyle = { background: 'var(--v-minimap-node)', borderColor: 'var(--v-minimap-node-border)' };
+
+/** Not registered, the outline of a group falls back to the fill of nodes, so that it follows a theme that sets only that. */
+const GROUP_TOKENS: NodeStyle = {
+  background: 'var(--v-minimap-group)',
+  borderColor: 'var(--v-minimap-group-border, var(--v-minimap-node))',
+};
+
+export interface StyledNode {
+  node: NodeModel;
+  style: NodeStyle;
 }
 
-const DEFAULT_NODE_STYLE: ResolvedNodeStyle = {
-  background: 'var(--v-minimap-node)',
-  borderColor: 'transparent',
-  borderWidth: 0,
-  borderRadius: 2,
-};
+/** The nodes painted with one style, as one SVG path in flow space: the browser paints per style, not per node. */
+export interface MinimapNodeBatch {
+  background: string;
+  borderColor: string;
+  d: string;
+}
 
-/** A group is the outline of the color it would be filled with, so its members stay visible inside it. */
-const DEFAULT_GROUP_STYLE: ResolvedNodeStyle = {
-  ...DEFAULT_NODE_STYLE,
-  background: 'transparent',
-  borderColor: DEFAULT_NODE_STYLE.background,
-  borderWidth: 1,
-};
+/** The style the minimap draws a node with: the tokens, for a node or for a group, under the rule of its component. */
+export function minimapNodeStyle(node: NodeModel, rules: Partial<Record<string, MinimapNodeStyleRule>>): NodeStyle {
+  const component = node.rawNode.component;
+  const rule = typeof component === 'string' && Object.hasOwn(rules, component) ? rules[component] : undefined;
+  const tokens = isGroupNode(node) ? GROUP_TOKENS : NODE_TOKENS;
+  return withDefaults(tokens, typeof rule === 'function' ? rule(node.rawNode) : rule);
+}
 
 /**
  * The nodes as paths in flow space, in painting order: parents before their members, and within a depth one path
- * per style. The style of a node is the default, for a node or for a group, under the style of its component in
- * `componentStyles`, under its own.
+ * per style. A node whose style sets no radius takes `radius`, the token.
  */
-export function minimapNodeBatches(
-  nodes: readonly NodeModel[],
-  componentStyles: Partial<Record<string, MinimapNodeStyle>>,
-): MinimapNodeBatch[] {
-  // A DOM without a canvas, such as a server or jsdom, has no paths: nothing is drawn there.
-  if (typeof Path2D === 'undefined') return [];
-
+export function minimapNodeBatches(nodes: readonly StyledNode[], radius: number): MinimapNodeBatch[] {
   const layers: Map<string, MinimapNodeBatch>[] = [];
-  // The style shared by the nodes of one component, as a node or as a group: merged once, not per node.
-  const shared = new Map<string, ResolvedNodeStyle>();
-
-  for (const node of nodes) {
-    const group = isGroupNode(node);
-    const component = typeof node.rawNode.component === 'string' ? node.rawNode.component : '';
-    const sharedKey = (group ? 'group ' : 'node ') + component;
-    let style = shared.get(sharedKey);
-    if (!style) {
-      style = withDefaults(group ? DEFAULT_GROUP_STYLE : DEFAULT_NODE_STYLE, componentStyles[component]);
-      shared.set(sharedKey, style);
-    }
-    const own = node.minimapStyle();
-    if (own) style = withDefaults(style, own);
-
+  for (const { node, style } of nodes) {
+    const { background, borderColor, borderRadius } = style;
     const layer = (layers[depthOf(node)] ??= new Map());
-    const key = `${style.background}\n${style.borderColor}\n${style.borderWidth}`;
+    const key = `${background}\n${borderColor}`;
     let batch = layer.get(key);
-    if (!batch) layer.set(key, (batch = { style, path: new Path2D() }));
+    if (!batch) layer.set(key, (batch = { background, borderColor, d: '' }));
 
     const { x, y } = node.globalPoint();
     const [width, height] = [node.width(), node.height()];
-    batch.path.roundRect(x, y, width, height, clamp(style.borderRadius, 0, Math.min(width, height) / 2));
+    batch.d += roundRect(x, y, width, height, clamp(borderRadius ?? radius, 0, Math.min(width, height) / 2));
   }
 
   // A depth without nodes of its own is a hole in the array.
   return layers.filter(Boolean).flatMap((layer) => [...layer.values()]);
+}
+
+function roundRect(x: number, y: number, width: number, height: number, r: number): string {
+  const [w, h] = [width - 2 * r, height - 2 * r];
+  if (!r) return `M${x},${y}h${width}v${height}h${-width}z`;
+  return `M${x + r},${y}h${w}a${r},${r} 0 0 1 ${r},${r}v${h}a${r},${r} 0 0 1 ${-r},${r}h${-w}a${r},${r} 0 0 1 ${-r},${-r}v${-h}a${r},${r} 0 0 1 ${r},${-r}z`;
 }
 
 function depthOf(node: NodeModel): number {

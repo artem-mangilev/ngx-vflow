@@ -14,6 +14,29 @@
 6. Умолчания цветов из раздела 5.3 приняты. **Выделение миникарта пока не показывает вообще:** ключа `selected` в `MinimapNodeStyle` нет, токен `--v-minimap-selected` удаляется (в том числе из `forced-colors` и из отображения `@vflow/ui`), кэш нод перестаёт зависеть от `node.selected()`. Раздел 10.2 и все упоминания `selected` в разделах 5.3, 5.4 и 10.1 этим отменены.
 7. **Входа `position` у миникарты нет.** Вместо него — общий механизм ядра, который кладёт любой элемент в угол или к стороне flow; через него же ставятся контролы. API — раздел 10.3; имя **`vPanel`** подтверждено автором. **Умолчания угла у миникарты нет** (вариант (б) раздела 10.3): без `vPanel` миникарта — обычный блок, который приложение размещает своим CSS; host-директивы у `v-minimap` нет. **`null` у `vPanel` не допускается:** вход — `input.required<PanelPosition>()`, снять размещение значит убрать атрибут. Открытых вопросов не осталось.
 
+## После коммита `a16f14f4`
+
+2026-11-21, после разбора слабых мест стилизации нод, автор решил убрать внешний вид из графа: **поля `Node.minimap` нет** (интерфейс, `createNode`, `toStaticNode`, `NodeModel.minimapStyle`, тесты, документация, демо). Уровень стиля один — `withMinimapSettings().nodeStyles[ключ компонента]` над умолчанием. Сделано в рабочем дереве, не закоммичено; тесты библиотеки 526 + 64 + 7, `ngc`, e2e миникарты 4 из 4.
+
+Затем (2026-11-21) форма настроек дважды менялась; итог:
+
+- **Общий вид — токены CSS**, задаются на миникарте или любом предке: `--v-minimap-node` (заливка), `--v-minimap-node-border` (контур, `transparent` = нет), `--v-minimap-node-radius` (радиус в пикселях flow, как `border-radius` самой ноды, для нод и групп), `--v-minimap-group` (заливка группы, по умолчанию прозрачная), `--v-minimap-group-border` (контур группы; не зарегистрирован, поэтому по умолчанию берёт `--v-minimap-node`). Тема `@vflow/ui` ставит радиусу радиус поверхности.
+- **Толщины контура нет**: контур либо задан цветом, либо его нет; ширина всегда один пиксель миникарты (решение автора, убирает смешение единиц).
+- **`nodeStyles` — только ключи компонентов**, значение — объект `{ background, borderColor, borderRadius }` или функция от ноды (запоминается в `computed` на ноду). Символов «все ноды / все группы» нет: их роль играют токены. Ближний уровень `withMinimapSettings()` заменяет правило ключа целиком.
+- **Шаблонные ноды** и ноды с компонентом-классом оформляются только токенами; стиля по данным для них нет (автор согласился).
+- Палитра переименована в `utils/css-values.ts`: кроме цветов читает длины (радиус) через `border-top-left-radius` пробы с переходом.
+
+Тесты библиотеки 530 + 64 + 7, `ngc`, eslint. E2E: при прогоне всего набора тесты миникарты падали вперемешку, пока dev-сервер NgDoc каждые 30 секунд пересобирал страницы («files kept changing»); по отдельности `minimap-navigation.spec.ts` проходит (два упавших теста — дважды подряд). Не закоммичено.
+
+## SVG вместо canvas (2026-11-21)
+
+Автор счёл код разрешения CSS слишком тяжёлым и выбрал SVG. Замер в headless Chromium (240×180, DPR 2, мс на кадр): узлы одним `<path>` на стиль в SVG с `will-change: transform`, маска отдельным элементом — 0,16–0,17 при 500…20 000 нод (кэш-bitmap canvas 0,20); полная перерисовка нод — 1,5 у SVG и 2,0 у canvas при 5000; перетаскивание ноды при 5000 — 3,7 и 3,0. Маска в том же SVG стоила O(n) на кадр, поэтому она — `div` с `box-shadow` поверх.
+
+- **Удалены**: `utils/css-values.ts` (пробы с переходами), `minimap-canvas.directive.ts` (логика перенесена в `minimap.component.ts`), `minimap-node-styles.ts` (кэш `computed` на ноду и планы). Цвета, `var()`, `color-mix()`, тема, `forced-colors` — обычный CSS на `<path>`; контур — `vector-effect: non-scaling-stroke`; маска — `.v-minimap-viewport` с `box-shadow` и `outline`, хост с `contain: paint` (блок для маски и её обрезка без `position`, который спорил бы с `vPanel`).
+- **Стиль ноды** — одна функция `minimapNodeStyle()` в `minimap-nodes.ts`; правило-функция вызывается для всех нод при изменении любого прочитанного сигнала или набора нод, но не при движении (стили и геометрия — разные `computed`).
+- **Радиус-токен** читается `getComputedStyle` при сборке путей (`shortcut:`): смена одного радиуса без изменения графа не видна до следующего изменения графа.
+- Тесты: стили проверяются вычисленными `fill`/`stroke` пути под точкой (`elementFromPoint`), а не пикселями; тесты проб, переходов, скрытия и hex-литералов удалены. Библиотека 524 + 64 + 7, `ngc` документации, eslint. E2E миникарты на production-копии документации проходят, но нестабильно: демо-компонент страницы пересоздаётся примерно через 350 мс после загрузки, и тест иногда держит старый элемент («not attached to the DOM»); каждый из 4 тестов проходил.
+
 ## Реализация
 
 Сделано 2026-11-20 в рабочем дереве ветки `3.0`, не закоммичено.
@@ -660,6 +683,73 @@ export class VflowPanelDirective {
 **Тикеты.** В плане раздела 7 перед тикетом 1 появляется тикет 0 «`vPanel`»: директива, стили, токен `--v-panel-offset`, экспорт, страница документации, замена `absolute …` в демо. В тикете 1 у миникарты убираются `position`, `data-v-position` и слот проекции.
 
 **Не проверено:** `::ng-deep :where(…)` в стилях `vflow` через компилятор не прогоняли (проверен только `:where(:host)`); правило `.v-content-layer > * { pointer-events: auto }` сильнее `pointer-events: none` из `:where(:host)` миникарты — для миникарты только для чтения это надо развести при реализации.
+
+## 11. Предложение: стиль по данным и для шаблонных нод
+
+Оба случая закрывает одно добавление в `withMinimapSettings()`. Два варианта.
+
+### Вариант Б (рекомендую): именованные стили и функция, которая их выбирает
+
+```ts
+export interface MinimapSettings<N extends Node = Node> {
+  /** Styles by name: the key of a node component, or a name the application returns from `nodeStyleKeys`. */
+  nodeStyles?: Partial<Record<string, MinimapNodeStyle>>;
+  /**
+   * The names of the styles of a node besides the one of its component, later over earlier. Signals read here are
+   * followed: the minimap repaints when they change.
+   */
+  nodeStyleKeys?: (node: N) => string | readonly string[] | undefined;
+}
+```
+
+```ts
+withMinimapSettings<Node<StepData>>({
+  nodeStyles: {
+    task: { background: 'var(--task)' }, // a component key, as today
+    input: { background: 'var(--input)' }, // names of the application
+    output: { background: 'var(--output)' },
+    failed: { borderColor: 'var(--danger)', borderWidth: 2 },
+  },
+  // Template nodes by their kind; any node by its state.
+  nodeStyleKeys: (node) => [node.data?.().kind, node.data?.().failed ? 'failed' : undefined].filter(Boolean),
+});
+```
+
+Порядок: умолчание (нода или группа) → стиль ключа компонента → стили возвращённых имён по порядку. Это аналог CSS-классов (и `nodeClassName` у React Flow): стили остаются статичными объектами в конфигурации, функция только называет их.
+
+- Набор стилей конечен по построению: число проб цветов и путей ограничено числом имён, слабое место 4 не открывается.
+- Дёшево: строка на ноду при перестройке путей, слитый стиль запоминается на сочетание имён.
+- Ограничение: стиль нельзя вычислить из непрерывного значения (тепловая карта) — только выбрать из названных.
+- Предупреждение dev-режима меняется: не «ключ не зарегистрирован как компонент», а «функция вернула имя, которого нет в `nodeStyles`».
+
+### Вариант А: правило-функция, возвращающая стиль
+
+```ts
+type MinimapNodeStyleRule<N> = MinimapNodeStyle | ((node: N) => MinimapNodeStyle | undefined);
+
+export interface MinimapSettings<N extends Node = Node> {
+  /** Every node, under the styles by component. */
+  nodeStyle?: MinimapNodeStyleRule<N>;
+  nodeStyles?: Partial<Record<NodeComponentKey, MinimapNodeStyleRule<N>>>;
+}
+```
+
+```ts
+withMinimapSettings<Node<StepData>>({
+  nodeStyle: (node) => KIND_STYLES[node.data?.().kind],
+  nodeStyles: {
+    job: (node) => ({ background: node.data?.().failed ? 'var(--danger)' : 'var(--job)' }),
+  },
+});
+```
+
+Гибче (любой стиль из любых данных, включая общий стиль всех нод объектом), но: объект на ноду при каждой перестройке путей, число различных цветов ничем не ограничено, два почти одинаковых имени `nodeStyle` / `nodeStyles`, а функции разных уровней инжектора нельзя слить по ключам, только заменить.
+
+### Общее для обоих
+
+- Функция получает объект `Node` приложения (как концы в валидаторе соединений), тип данных задаётся параметром `withMinimapSettings<N>()`.
+- Любой сигнал, прочитанный в функции, становится зависимостью всех путей: изменение `data` одной ноды перестраивает пути всех (около 0,8 мс на 5000 нод по синтетике).
+- Выделение снова можно показать, если приложение держит сигнал `selected` на ноде: функция читает его сама.
 
 [xy-commit]: https://github.com/xyflow/xyflow/tree/29ab9e001c2ba320c9d84b00c729c745132d9145
 [xy-css-panel-all]: https://github.com/xyflow/xyflow/blob/29ab9e001c2ba320c9d84b00c729c745132d9145/packages/system/src/styles/init.css#L289-L325

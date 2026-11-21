@@ -83,8 +83,9 @@ data. A key that no `provideVflow()` on the path registers is an error when the 
 
 ### `withMinimapSettings(settings)`
 
-Sets how the minimap draws the nodes of a component, by the key the component is registered under:
-`nodeStyles: { task: { background: 'var(--task)' } }`. `Node.minimap` lies over it. See [Minimap](/docs/viewport/minimap#style-the-nodes).
+Sets how the minimap draws the nodes of a component, by the key it is registered under: a style, or a function that
+derives one from the node, `nodeStyles: { task: { background: 'var(--task)' } }`. Every other node takes the
+`--v-minimap-*` tokens. See [Minimap](/docs/viewport/minimap#style-the-nodes).
 
 ## Scope
 

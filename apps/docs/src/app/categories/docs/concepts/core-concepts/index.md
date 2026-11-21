@@ -37,7 +37,7 @@ Most signals of a `Node` are optional, and they are of three kinds:
   the node, the flow writes into it. Without `selected` or a size signal, the flow holds the value itself, and the
   [change](/docs/interactions/handling-changes) is the way to learn it.
 - **The flow only reads them**: `draggable`, `extent`, `parentId`, `data`, `selectable`, `focusable`, `ariaLabel`,
-  `ariaDescription`, `domAttributes`, `minimap`. A missing signal means the default or the setting of the flow.
+  `ariaDescription`, `domAttributes`. A missing signal means the default or the setting of the flow.
 - **`width` / `height` also choose the size mode**: an axis with the signal has a fixed size, an axis without it
   follows the content. See [Resizing](/docs/nodes/resizer).
 

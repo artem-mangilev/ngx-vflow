@@ -110,7 +110,7 @@ export { withCurves } from './lib/vflow/features/with-curves';
 export type { BuiltInCurve, CurveKey, VflowCurves } from './lib/vflow/interfaces/curves.interface';
 export { withEdgeComponents, withNodeComponents } from './lib/vflow/features/with-entity-components';
 export { withMinimapSettings } from './lib/vflow/features/with-minimap-settings';
-export type { MinimapNodeStyle, MinimapSettings } from './lib/vflow/interfaces/minimap.interface';
+export type { MinimapNodeStyle, MinimapNodeStyleRule, MinimapSettings } from './lib/vflow/interfaces/minimap.interface';
 export type {
   EdgeComponentKey,
   NodeComponentKey,
