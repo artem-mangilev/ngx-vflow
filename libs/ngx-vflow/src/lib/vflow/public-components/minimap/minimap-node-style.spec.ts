@@ -217,19 +217,6 @@ describe('minimap node styles', () => {
   });
 });
 
-@Component({
-  imports: [Vflow],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    provideVflow(
-      withNodeComponents({ task: TaskNodeComponent }),
-      withMinimapSettings({ nodeStyles: { task: { borderRadius: 4 }, tsak: { background: 'red' } } }),
-    ),
-  ],
-  template: `<vflow style="width: 400px; height: 300px" [nodes]="[]"><v-minimap /></vflow>`,
-})
-class UnknownKeyHostComponent {}
-
 describe('withMinimapSettings()', () => {
   it('adds the keys of a closer level to the level above, a key it sets replacing the style above', () => {
     const byData = (node: Node) => (node.id === 'a' ? { background: 'red' } : undefined);
@@ -246,15 +233,5 @@ describe('withMinimapSettings()', () => {
     const styles = closer.get(VFLOW_MINIMAP_SETTINGS)().nodeStyles!;
     expect(styles['task']).toEqual({ background: 'blue' });
     expect(styles['alert']).toBe(byData);
-  });
-
-  it('warns once about a key no node component is registered under', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const fixture = TestBed.createComponent(UnknownKeyHostComponent);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('"tsak"');
   });
 });

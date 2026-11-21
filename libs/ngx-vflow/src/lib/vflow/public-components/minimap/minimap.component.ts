@@ -6,14 +6,12 @@ import {
   ElementRef,
   NgZone,
   computed,
-  effect,
   inject,
   input,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, map } from 'rxjs';
 import { bindEntityAccessibility } from '../../directives/entity-accessibility.directive';
-import { VFLOW_NODE_COMPONENTS } from '../../features/with-entity-components';
 import { VFLOW_MINIMAP_SETTINGS } from '../../features/with-minimap-settings';
 import { createPointerDrag, PointerDragContext } from '../../gestures/pointer-drag';
 import { wheelPanDelta } from '../../gestures/wheel';
@@ -39,9 +37,6 @@ const MINIMAP_WHEEL_ZOOM = Math.sqrt(ZOOM_STEP);
 
 /** Gap in CSS pixels between the content of the minimap and its edges. */
 const PADDING = 5;
-
-/** The smallest side, in CSS pixels, of the viewport as the minimap marks it, so a deep zoom into a large graph stays findable. */
-const MIN_VIEWPORT_SIZE = 8;
 
 /**
  * An overview of the whole graph with the part in view marked, drawn with SVG. The element is the block: size it,
@@ -98,6 +93,10 @@ const MIN_VIEWPORT_SIZE = 8;
         box-shadow: 0 0 0 9999px var(--v-minimap-mask);
         outline: 1px solid var(--v-minimap-viewport);
         outline-offset: -1px;
+        /* Placed by its center and grown around it, so a deep zoom into a large graph stays findable. */
+        min-width: 8px;
+        min-height: 8px;
+        translate: -50% -50%;
         /* The pointer is on the drawing under it. */
         pointer-events: none;
       }
@@ -165,14 +164,11 @@ export class VflowMinimapComponent {
    * Flow space to the CSS pixels of the minimap: the bounds of the nodes united with the viewport, so the viewport is
    * inside the minimap wherever the camera is.
    */
-  private transform = computed(
-    () => {
-      const nodes = this.nodesBounds();
-      const bounds = nodes ? getBoundsOfRects([nodes, this.visible()]) : this.visible();
-      return fit(bounds, this.size());
-    },
-    { equal: (a, b) => a.x === b.x && a.y === b.y && a.zoom === b.zoom },
-  );
+  private transform = computed(() => {
+    const nodes = this.nodesBounds();
+    const bounds = nodes ? getBoundsOfRects([nodes, this.visible()]) : this.visible();
+    return fit(bounds, this.size());
+  });
 
   protected matrix = computed(() => {
     const { x, y, zoom } = this.transform();
@@ -188,17 +184,16 @@ export class VflowMinimapComponent {
   /** The nodes as paths, one per style and depth. Colors stay as written: the browser resolves them. */
   protected batches = computed(() => minimapNodeBatches(this.styled(), this.radius()));
 
-  /** The viewport as the minimap marks it, in CSS pixels of the minimap. */
+  /** The viewport as the minimap marks it, by its center, in CSS pixels of the minimap. */
   protected marked = computed(() => {
     const { x, y, zoom } = this.transform();
-    const visible = this.visible();
-    const rect = {
-      x: x + visible.x * zoom,
-      y: y + visible.y * zoom,
-      width: visible.width * zoom,
-      height: visible.height * zoom,
+    const { x: left, y: top, width, height } = this.visible();
+    return {
+      x: x + (left + width / 2) * zoom,
+      y: y + (top + height / 2) * zoom,
+      width: width * zoom,
+      height: height * zoom,
     };
-    return atLeast(rect, MIN_VIEWPORT_SIZE);
   });
 
   /** Where the last event of a drag was, to move the viewport by what the pointer moved since. */
@@ -226,8 +221,6 @@ export class VflowMinimapComponent {
     fromEvent<WheelEvent>(this.host, 'wheel', { passive: false })
       .pipe(takeUntilDestroyed())
       .subscribe((event) => this.onWheel(event));
-
-    if (typeof ngDevMode === 'undefined' || ngDevMode) this.warnAboutUnknownComponents();
   }
 
   /**
@@ -310,13 +303,8 @@ export class VflowMinimapComponent {
       this.settings.maxZoom(),
     );
     // Around the middle of the pane.
-    this.centerOn(
-      {
-        x: (this.settings.computedFlowWidth() / 2 - viewport.x) / viewport.zoom,
-        y: (this.settings.computedFlowHeight() / 2 - viewport.y) / viewport.zoom,
-      },
-      zoom,
-    );
+    const visible = this.visible();
+    this.centerOn({ x: visible.x + visible.width / 2, y: visible.y + visible.height / 2 }, zoom);
   }
 
   /** The flow point the minimap shows under the pointer. */
@@ -343,21 +331,6 @@ export class VflowMinimapComponent {
       zoom,
     });
   }
-
-  private warnAboutUnknownComponents() {
-    const components = inject(VFLOW_NODE_COMPONENTS, { optional: true });
-    const warned = new Set<string>();
-    effect(() => {
-      const registered = components?.() ?? {};
-      for (const key of Object.keys(this.minimapSettings?.().nodeStyles ?? {})) {
-        if (key in registered || warned.has(key)) continue;
-        warned.add(key);
-        console.warn(
-          `[ngx-vflow] withMinimapSettings() styles the nodes of "${key}", but no node component is registered under that key with withNodeComponents().`,
-        );
-      }
-    });
-  }
 }
 
 /** The transform that centers `bounds` in a box, inside its padding. Bounds without a size keep 1:1. */
@@ -372,11 +345,4 @@ function fit(bounds: Rect, { width, height }: { width: number; height: number })
     y: height / 2 - (bounds.y + bounds.height / 2) * zoom,
     zoom,
   };
-}
-
-/** `rect` grown around its center until no side is shorter than `size`. */
-function atLeast(rect: Rect, size: number): Rect {
-  const width = Math.max(rect.width, size);
-  const height = Math.max(rect.height, size);
-  return { x: rect.x - (width - rect.width) / 2, y: rect.y - (height - rect.height) / 2, width, height };
 }

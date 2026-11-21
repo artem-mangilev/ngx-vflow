@@ -58,7 +58,6 @@ export function minimapNodeBatches(nodes: readonly StyledNode[], radius: number)
 
 function roundRect(x: number, y: number, width: number, height: number, r: number): string {
   const [w, h] = [width - 2 * r, height - 2 * r];
-  if (!r) return `M${x},${y}h${width}v${height}h${-width}z`;
   return `M${x + r},${y}h${w}a${r},${r} 0 0 1 ${r},${r}v${h}a${r},${r} 0 0 1 ${-r},${r}h${-w}a${r},${r} 0 0 1 ${-r},${-r}v${-h}a${r},${r} 0 0 1 ${r},${-r}z`;
 }
 
