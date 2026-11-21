@@ -119,10 +119,14 @@ test('traverses nodes, controls and edges, selects, moves, announces, deletes an
   await expect(edit.locator('.v-focus-indicator')).toHaveCSS('display', 'block');
   await page.keyboard.press('Escape');
   await expect(live).toHaveText('Selection cleared.');
-  // Deleting the focused unselected edge removes only it, and focus recovers on a neighbor.
+  // Deleting the focused unselected edge removes only it, and focus goes back to the page instead of moving to an
+  // entity the user did not choose.
   await page.keyboard.press('Delete');
   await expect(edit).toHaveCount(0);
-  await expect(next).toBeFocused();
+  await expect(next).toHaveCount(1);
+  await expect(graph.locator(':focus')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => document.activeElement === document.body)).toBe(true);
+  await next.focus();
   await page.keyboard.press('Shift+Tab');
   await expect(later).toBeFocused();
   // Tab leaves the graph normally; there is no focus trap.
@@ -134,14 +138,15 @@ test('traverses nodes, controls and edges, selects, moves, announces, deletes an
   );
 });
 
-test('recovers focus when an embedded control removes its node', async ({ page }) => {
-  const { demo } = await open(page);
+test('returns focus to the page when an embedded control removes its node', async ({ page }) => {
+  const { demo, graph } = await open(page);
   await demo.getByRole('button', { name: 'Switch graph language' }).focus();
   for (let i = 0; i < 5; i++) await page.keyboard.press('Tab');
   await expect(demo.getByRole('button', { name: 'Remove editor' })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(demo.getByRole('group', { name: 'Editor', exact: true })).toHaveCount(0);
-  await expect(demo.getByRole('group', { name: 'Later', exact: true })).toBeFocused();
+  await expect(graph.locator(':focus')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => document.activeElement === document.body)).toBe(true);
 });
 
 test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => {

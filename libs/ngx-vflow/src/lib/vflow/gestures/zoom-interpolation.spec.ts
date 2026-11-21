@@ -1,6 +1,6 @@
 import { easeCubicInOut, interpolateViewport } from './zoom-interpolation';
 import { wheelPanDelta, wheelZoomFactor } from './wheel';
-import { clampZoom, toFlowPoint, toPanePoint, translateBy, zoomAround } from './viewport-transform';
+import { clampZoom, toFlowPoint, translateBy, zoomAround } from './viewport-transform';
 
 /** Values recorded from d3-zoom 3.0 (`interpolateZoom`, `easeCubicInOut`, `defaultWheelDelta`) before its removal. */
 const D3_TRANSITIONS = [
@@ -77,17 +77,17 @@ const D3_TRANSITIONS = [
 ];
 
 describe('viewport math', () => {
-  it('converts between pane and flow points', () => {
+  it('converts pane points to flow points', () => {
     const state = { x: 30, y: -20, zoom: 2 };
     expect(toFlowPoint(state, { x: 130, y: 80 })).toEqual({ x: 50, y: 50 });
-    expect(toPanePoint(state, { x: 50, y: 50 })).toEqual({ x: 130, y: 80 });
   });
 
   it('zooms around a pane point that stays in place', () => {
     const state = { x: 10, y: 20, zoom: 1 };
     const next = zoomAround(state, 2, { x: 110, y: 70 });
     expect(next).toEqual({ x: -90, y: -30, zoom: 2 });
-    expect(toPanePoint(next, toFlowPoint(state, { x: 110, y: 70 }))).toEqual({ x: 110, y: 70 });
+    // The flow point under the anchor stays there.
+    expect(toFlowPoint(next, { x: 110, y: 70 })).toEqual(toFlowPoint(state, { x: 110, y: 70 }));
     expect(zoomAround(state, 1, { x: 5, y: 5 })).toBe(state);
   });
 

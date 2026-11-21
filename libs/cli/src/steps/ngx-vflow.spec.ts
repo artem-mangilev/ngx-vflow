@@ -39,18 +39,4 @@ describe('ngx-vflow step', () => {
     ensureNgxVflow(tree);
     expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBe('latest');
   });
-
-  it('adds @angular/cdk in the major of the application Angular, and keeps an existing one', () => {
-    updateJson(tree, 'package.json', (json) => ({ ...json, dependencies: { '@angular/core': '~20.3.0' } }));
-
-    ensureNgxVflow(tree);
-    expect(readJson(tree, 'package.json').dependencies['@angular/cdk']).toBe('^20.0.0');
-
-    updateJson(tree, 'package.json', (json) => ({
-      ...json,
-      dependencies: { ...json.dependencies, '@angular/cdk': '~20.2.0' },
-    }));
-    ensureNgxVflow(tree);
-    expect(readJson(tree, 'package.json').dependencies['@angular/cdk']).toBe('~20.2.0');
-  });
 });

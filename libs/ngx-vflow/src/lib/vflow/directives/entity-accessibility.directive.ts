@@ -1,7 +1,7 @@
 import { Directive, ElementRef, effect, inject, input, Signal } from '@angular/core';
-import { AriaDescriber } from '@angular/cdk/a11y';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { KeyboardEntityDirective } from './keyboard-entity.directive';
+import { DescriptionService } from '../services/description.service';
 
 /** Shared semantics for the library-owned HTML and SVG entity wrappers. */
 export type EntityAccessibility = {
@@ -40,7 +40,7 @@ export function bindDomAttributes(source: () => DomAttributes | undefined): void
 /** Applies role, name, description and allowed DOM attributes to the element of the current injection context. */
 export function bindEntityAccessibility(source: () => EntityAccessibility): void {
   const element = inject<ElementRef<Element>>(ElementRef).nativeElement;
-  const describer = inject(AriaDescriber);
+  const describer = inject(DescriptionService);
   const keyboard = inject(KeyboardEntityDirective, { self: true, optional: true });
 
   effect((onCleanup) => {
@@ -50,11 +50,11 @@ export function bindEntityAccessibility(source: () => EntityAccessibility): void
     else element.removeAttribute('aria-roledescription');
     const description = [entityDescription, keyboard?.description()].filter(Boolean).join(' ');
     element.setAttribute('aria-label', label);
-    describer.describe(element, description);
+    const undescribe = describer.describe(element, description);
     const attributes = safeDomAttributes(domAttributes);
     for (const [name, value] of attributes) element.setAttribute(name, value);
     onCleanup(() => {
-      describer.removeDescription(element, description);
+      undescribe();
       for (const [name] of attributes) element.removeAttribute(name);
     });
   });

@@ -22,9 +22,6 @@
     "stripInternal": true,
     "skipLibCheck": true,
     "paths": {
-      "@vflow/ui": ["libs/ui/src/public-api"],
-      "@vflow/routing": ["libs/routing/src/public-api"],
-      "@vflow/auto-size": ["libs/auto-size/src/public-api"],
       "@vflow/layout": ["libs/layout/src/public-api"],
       "@vflow/layout/d3-hierarchy": ["libs/layout/d3-hierarchy/src/public-api"],
       "@vflow/layout/dagre": ["libs/layout/dagre/src/public-api"],

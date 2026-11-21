@@ -287,6 +287,19 @@ describe('ui in Angular CLI', () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
   });
 
+  it('refuses a directory outside the workspace and takes one with backslashes as the same folder', async () => {
+    for (const directory of ['../outside/ui', '/abs/ui', 'C:\\ui', 'libs/../../ui']) {
+      await expect(uiGenerator(tree, { angularCli: true, directory })).rejects.toThrow('inside the workspace');
+    }
+
+    await uiGenerator(tree, { angularCli: true, directory: 'libs\\flow-ui' });
+
+    expect(readJson(tree, 'tsconfig.json').compilerOptions.paths['@vflow/ui']).toEqual(['./libs/flow-ui/src/index.ts']);
+    expect(readJson(tree, 'tsconfig.app.json').include).toContain('libs/flow-ui/src/**/*.ts');
+    // A second run with the same folder finds the installed set.
+    await uiGenerator(tree, { angularCli: true, directory: 'libs\\flow-ui' });
+  });
+
   it('asks without the Nx question and maps the alias in the root tsconfig', async () => {
     await uiGenerator(tree, { angularCli: true });
 

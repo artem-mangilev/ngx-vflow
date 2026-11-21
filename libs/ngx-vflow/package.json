@@ -16,7 +16,6 @@
     "type": "git"
   },
   "peerDependencies": {
-    "@angular/cdk": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "@angular/common": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "rxjs": "^7.4.0"
@@ -27,7 +26,6 @@
   "sideEffects": false,
   "devDependencies": {
     "@angular/build": "catalog:libs",
-    "@angular/cdk": "catalog:libs",
     "@angular/common": "catalog:libs",
     "@angular/compiler": "catalog:libs",
     "@angular/compiler-cli": "catalog:libs",

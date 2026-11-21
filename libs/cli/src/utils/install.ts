@@ -69,7 +69,7 @@ export async function chooseUiInstall(options: { directory?: string; importAlias
   ];
   const answers = questions.length && isInteractive() ? await prompt<Partial<UiInstall>>(questions) : {};
   const install = {
-    componentsPath: normalizePath(options.directory ?? answers.componentsPath ?? DEFAULTS.componentsPath),
+    componentsPath: workspaceDirectory(options.directory ?? answers.componentsPath ?? DEFAULTS.componentsPath),
     importAlias: options.importAlias ?? answers.importAlias ?? DEFAULTS.importAlias,
   };
   if (install.importAlias.endsWith('/')) throw new Error('The import alias of the parts should not end with a slash.');
@@ -82,6 +82,21 @@ export function isInteractive(): boolean {
   return nx === undefined ? !!process.stdin.isTTY : nx === 'true';
 }
 
+/** A path with forward slashes, without a leading `./` or a trailing slash; Nx writes files with `/` on every OS. */
 export function normalizePath(path: string): string {
-  return posix.normalize(path).replace(/^\.\//, '').replace(/\/$/, '');
+  return posix.normalize(path.replace(/\\/g, '/')).replace(/^\.\//, '').replace(/\/$/, '');
+}
+
+/** A directory the parts may be written to: inside the workspace, relative to its root. */
+export function workspaceDirectory(path: string): string {
+  const directory = normalizePath(path);
+  if (
+    posix.isAbsolute(directory) ||
+    /^[A-Za-z]:/.test(directory) ||
+    directory === '..' ||
+    directory.startsWith('../')
+  ) {
+    throw new Error(`The directory of the parts must be inside the workspace, relative to its root: ${path}`);
+  }
+  return directory;
 }

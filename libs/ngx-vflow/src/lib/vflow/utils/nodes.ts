@@ -4,10 +4,6 @@ import { Rect } from '../interfaces/rect';
 import { NodeModel } from '../models/node.model';
 import { getBoundsOfRects, getOverlappingArea, isPointInRect } from './rect';
 
-export function getNodesBounds(nodes: NodeModel[]): Rect {
-  return getBoundsOfRects(nodes.map((node) => nodeToLocalRect(node)));
-}
-
 /**
  * Union of node rectangles in flow (world) space — same space as SVG transforms and viewport math.
  * Use for fitView, minimap, etc. For bounds relative to a parent (e.g. children inside a group during resize), use {@link getNodesBounds}.
@@ -42,15 +38,6 @@ export function getIntersectingNodes(
 
 export function getNodesAtPoint(point: Point, nodes: NodeModel[]): NodeModel[] {
   return nodes.filter((node) => isPointInRect(point, nodeToRect(node)));
-}
-
-function nodeToLocalRect(node: NodeModel): Rect {
-  return {
-    x: node.point().x,
-    y: node.point().y,
-    width: node.width(),
-    height: node.height(),
-  };
 }
 
 export function nodeToRect(node: NodeModel): Rect {

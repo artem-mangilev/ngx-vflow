@@ -5,10 +5,10 @@ handles that let the user connect the rest. It takes about ten minutes and ends 
 
 ## Install
 
-`ngx-vflow` needs Angular 20 or later and `@angular/cdk`:
+`ngx-vflow` needs Angular 20 or later:
 
 ```bash
-npm i ngx-vflow @angular/cdk
+npm i ngx-vflow
 ```
 
 The library needs no module, no global stylesheet and no `zone.js`.

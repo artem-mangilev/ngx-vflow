@@ -21,9 +21,6 @@ catalogs:
     '@angular/build':
       specifier: ^20.3.0
       version: 20.3.36
-    '@angular/cdk':
-      specifier: ^20.2.14
-      version: 20.2.14
     '@angular/common':
       specifier: ^20.3.0
       version: 20.3.30
@@ -492,9 +489,6 @@ importers:
       '@angular/build':
         specifier: catalog:libs
         version: 20.3.36(4c69c9d78219b1da813191521d9921d7)
-      '@angular/cdk':
-        specifier: catalog:libs
-        version: 20.2.14(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/common':
         specifier: catalog:libs
         version: 20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
@@ -853,13 +847,6 @@ packages:
         optional: true
       vitest:
         optional: true
-
-  '@angular/cdk@20.2.14':
-    resolution: {integrity: sha512-7bZxc01URbiPiIBWThQ69XwOxVduqEKN4PhpbF2AAyfMc/W8Hcr4VoIJOwL0O1Nkq5beS8pCAqoOeIgFyXd/kg==}
-    peerDependencies:
-      '@angular/common': ^20.0.0 || ^21.0.0
-      '@angular/core': ^20.0.0 || ^21.0.0
-      rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/cdk@22.2.7':
     resolution: {integrity: sha512-S9gJRQVGchy38Y0aYnEfKjFYY34c9sKbbLvwbef6wzGnYvesmsTqskQRbysWvg+F7mZuHuK0uZEDCvEfOZxYbw==}
@@ -8338,14 +8325,6 @@ snapshots:
       - terser
       - tsx
       - yaml
-
-  '@angular/cdk@20.2.14(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)':
-    dependencies:
-      '@angular/common': 20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)
-      parse5: 8.0.1
-      rxjs: 7.8.2
-      tslib: 2.8.1
 
   '@angular/cdk@22.2.7(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@22.2.6(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@22.2.6(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@angular/platform-browser@22.2.6(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)':
     dependencies:

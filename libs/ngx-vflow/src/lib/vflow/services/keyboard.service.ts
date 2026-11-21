@@ -211,11 +211,6 @@ export class KeyboardService {
     );
   }
 
-  /** Whether the command has any key. Reactive. */
-  public hasCommand(command: KeyboardCommandName): boolean {
-    return this.state().commands[command].length > 0;
-  }
-
   /** The keys of one command, for the instructions and the shortcut list. Reactive. */
   public commandBindings(command: KeyboardCommandName): readonly ParsedBinding[] {
     return this.state().commands[command];

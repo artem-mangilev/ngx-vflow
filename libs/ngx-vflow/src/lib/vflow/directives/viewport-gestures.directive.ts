@@ -472,10 +472,6 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private panePoint(event: MouseEvent): Point {
     return panePointFromClient(this.host, { x: event.clientX, y: event.clientY });
   }
-
-  private paneCenter(): Point {
-    return { x: this.host.clientWidth / 2, y: this.host.clientHeight / 2 };
-  }
   // #endregion
 }
 

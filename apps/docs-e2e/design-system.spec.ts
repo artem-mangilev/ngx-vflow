@@ -318,23 +318,16 @@ test('themes stay scoped per editor, reach every layer and leave geometry alone'
           element.getAttribute('d') ?? `${element.style.transform}|${element.style.top}|${element.style.left}`,
       ),
     );
-  const minimapPixel = () =>
-    a.locator('canvas').evaluate((canvas: HTMLCanvasElement) => {
-      const [r, g, b, alpha] = canvas.getContext('2d')!.getImageData(2, 2, 1, 1).data;
-      return `${r},${g},${b},${alpha}`;
-    });
   const before = await geometry();
-  const pixelBefore = await minimapPixel();
   await page.getByLabel('Editor A in the dark theme', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
   await expect(a.locator('[data-v-root]')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
-  await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   // The minimap sits in a corner the nodes leave free.
-  await expect(a.locator('canvas')).toBeVisible();
-  expect(await overlapping(a, 'canvas')).toBe(0);
+  await expect(a.locator('v-minimap')).toBeVisible();
+  expect(await overlapping(a, 'v-minimap')).toBe(0);
 });
 
 /** How many of the floating layers matching the selector cover a node of the demo. */

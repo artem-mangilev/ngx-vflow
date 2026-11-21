@@ -127,6 +127,15 @@ describe('public auto-pan settings', () => {
     subscription.unsubscribe();
   });
 
+  it('measures the edges from inside the border of the pane, as the pane gestures do', async () => {
+    await setup({ speed: 120, margin: 50 });
+    (fixture.nativeElement.querySelector('.v-pane') as HTMLElement).style.borderLeft = '30px solid';
+    // 60 px from the outer edge of the pane is 30 px inside its border: within the margin.
+    drag(60);
+    await frame(100);
+    expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
+  });
+
   it('can disable node dragging auto-pan independently', async () => {
     await setup({ nodeDrag: false });
     drag();

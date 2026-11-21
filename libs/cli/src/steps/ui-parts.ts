@@ -4,7 +4,7 @@ import { join, relative } from 'node:path';
 import {
   chooseUiInstall,
   findInstalledUi,
-  normalizePath,
+  workspaceDirectory,
   readTsConfigPaths,
   rootTsConfig,
   type UiInstall,
@@ -36,7 +36,7 @@ export interface UiPartsOptions {
 export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): Promise<GeneratorCallback | undefined> {
   const angularCli = options.angularCli ?? false;
   const installs = findInstalledUi(tree, PART_FILES);
-  const wanted = options.directory && normalizePath(options.directory);
+  const wanted = options.directory && workspaceDirectory(options.directory);
   let install = wanted ? installs.find(({ componentsPath }) => componentsPath === wanted) : installs[0];
   let task: GeneratorCallback | undefined;
 

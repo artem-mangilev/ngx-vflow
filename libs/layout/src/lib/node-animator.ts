@@ -9,23 +9,19 @@ export interface NodeAnimatorOptions {
   maxDuration?: number;
   /** Fixed duration in milliseconds, instead of one from the distance. */
   duration?: number;
-  /** Whether targets that arrive during an animation wait for it to end, instead of replacing it. */
-  queued?: boolean;
 }
 
 export interface NodeAnimator {
   /** Moves the nodes to the targets; resolves once they arrive, or once a later animation or `cancel` replaced it. */
   animate(targets: NodeTargets): Promise<void>;
-  /** Stops the animation where it is and drops the queue. */
+  /** Stops the animation where it is. */
   cancel(): void;
-  running(): boolean;
 }
 
 const DEFAULTS: Required<Omit<NodeAnimatorOptions, 'duration'>> = {
   speed: 1100,
   minDuration: 250,
   maxDuration: 750,
-  queued: false,
 };
 
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -38,7 +34,6 @@ const between = (from: number, to: number, t: number) => from + (to - from) * t;
  */
 export function createNodeAnimator(options: NodeAnimatorOptions = {}): NodeAnimator {
   const settings = { ...DEFAULTS, ...options };
-  const queue: { targets: NodeTargets; done: () => void }[] = [];
   let frame: number | null = null;
   let done: (() => void) | null = null;
 
@@ -88,8 +83,6 @@ export function createNodeAnimator(options: NodeAnimatorOptions = {}): NodeAnima
         frame = requestAnimationFrame(step);
       } else {
         stop();
-        const next = queue.shift();
-        if (next) start(next.targets, next.done);
       }
     };
     frame = requestAnimationFrame(step);
@@ -98,17 +91,9 @@ export function createNodeAnimator(options: NodeAnimatorOptions = {}): NodeAnima
   return {
     animate: (targets) =>
       new Promise((resolve) => {
-        if (done && settings.queued) {
-          queue.push({ targets, done: resolve });
-          return;
-        }
         stop();
         start(targets, resolve);
       }),
-    cancel: () => {
-      queue.splice(0).forEach((entry) => entry.done());
-      stop();
-    },
-    running: () => done !== null,
+    cancel: stop,
   };
 }

@@ -33,18 +33,14 @@ export class ResizeObserverService implements OnDestroy {
     }
   }
 
-  public removeObserver(element: Element, callback?: (resizeEntry: ResizeObserverEntry) => void) {
+  public removeObserver(element: Element, callback: (resizeEntry: ResizeObserverEntry) => void) {
     const callbacks = this.thingsToObserve.get(element);
 
     if (!callbacks) {
       return;
     }
 
-    if (callback) {
-      callbacks.delete(callback);
-    } else {
-      callbacks.clear();
-    }
+    callbacks.delete(callback);
 
     if (callbacks.size === 0) {
       this.thingsToObserve.delete(element);

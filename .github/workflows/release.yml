@@ -42,14 +42,19 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-      - name: Version, changelog and publish all release packages
+      # The release commit and tag reach the repository before the packages reach npm: a push that fails then leaves
+      # nothing published, and the next run computes the same version again.
+      - name: Version and changelog of all release packages
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ github.token }}
-        # A preview skips the publication: npm 11 refuses even a dry run of a version that is already published,
-        # and a dry run leaves the current version in the manifests.
-        run: pnpm nx release --dry-run="$DRY_RUN" $([ "$DRY_RUN" = "true" ] && echo --skip-publish || echo --yes)
+        run: pnpm nx release --skip-publish --dry-run="$DRY_RUN"
       - name: Push release commit and tag
         if: ${{ !inputs.dry_run }}
         run: git push --follow-tags origin HEAD:main
+      # A preview publishes nothing: npm 11 refuses even a dry run of a version that is already published, and a dry
+      # run leaves the current version in the manifests.
+      - name: Publish all release packages
+        if: ${{ !inputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm nx release publish

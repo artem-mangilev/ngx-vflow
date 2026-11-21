@@ -36,7 +36,7 @@ npm i -D @vflow/cli
 ng g @vflow/cli:ui # or: nx g @vflow/cli:ui
 ```
 
-See [CLI](/packages/cli) for the options of the generator. `ui` adds `ngx-vflow` and `@angular/cdk` when they are missing, copies `vflow-ui.css` next to the global stylesheet
+See [CLI](/packages/cli) for the options of the generator. `ui` adds `ngx-vflow` when it is missing, copies `vflow-ui.css` next to the global stylesheet
 and imports it after `@import 'tailwindcss'`, then copies the parts and maps them to the `@vflow/ui` import alias:
 an Nx library in Nx, a tsconfig path in Angular CLI. Your Tailwind pipeline generates their utilities. Run it again
 with `--project` to add the tokens to another application.

@@ -88,7 +88,7 @@ import { SelectionBoxComponent } from '../selection-box/selection-box.component'
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxMode } from '../../types/selection-box-mode.type';
 import { LazyLoadTrigger } from '../../types/lazy-load-trigger.type';
-import { AriaDescriber } from '@angular/cdk/a11y';
+import { DescriptionService } from '../../services/description.service';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
 import { LiveRegionDirective } from '../../directives/live-region.directive';
 import { AnnouncerService } from '../../services/announcer.service';
@@ -115,7 +115,7 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
   styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    AriaDescriber,
+    DescriptionService,
     DraggableService,
     ViewportService,
     ConnectionService,

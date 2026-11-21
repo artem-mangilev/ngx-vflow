@@ -215,18 +215,9 @@ export function getSmoothStepPath({
     return res;
   }, '');
 
-  // Performance optimization: Pre-calculate cumulative distances and use binary search
+  // Performance optimization: Pre-calculate cumulative distances and use binary search. `getPoints` returns at least
+  // the two ends and their two gap points.
   const n = points.length;
-  if (n < 2) {
-    return {
-      path,
-      labelPoints: {
-        start: { x: labelX, y: labelY },
-        center: { x: labelX, y: labelY },
-        end: { x: labelX, y: labelY },
-      },
-    };
-  }
 
   // Pre-calculate segment lengths and cumulative distances in a single loop
   const segmentLengths: number[] = new Array(n - 1);

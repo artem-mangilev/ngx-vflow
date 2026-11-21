@@ -24,7 +24,7 @@ nx g @vflow/cli:ui
 
 `ui` adds what is missing and never overwrites your files:
 
-- `ngx-vflow` and `@angular/cdk` in `package.json`;
+- `ngx-vflow` in `package.json`;
 - the tokens, `vflow-ui.css`, next to the global stylesheet of an application, imported after
   `@import 'tailwindcss'`;
 - the parts under the `@vflow/ui` import alias: an Nx library in Nx, a tsconfig path in Angular CLI.

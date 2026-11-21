@@ -21,6 +21,7 @@ import { ConnectionService } from '../services/connection.service';
 import { Point } from '../interfaces/point.interface';
 import { animationFrames } from '../utils/animation-frames';
 import { clamp } from '../utils/viewport';
+import { panePointFromClient } from '../gestures/viewport-transform';
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 
 @Directive({ selector: '[autoPan]', standalone: true })
@@ -40,7 +41,8 @@ export class AutoPanDirective implements OnInit {
     fromEvent<PointerEvent>(this.document, 'pointermove', { capture: true }),
   ).pipe(
     map((event) => ({ x: event.clientX, y: event.clientY })),
-    map((point) => this.toViewportPoint(point)),
+    // The pane gestures measure from the same box: inside its border.
+    map((point) => panePointFromClient(this.pane, point)),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -104,14 +106,6 @@ export class AutoPanDirective implements OnInit {
         }),
       );
     });
-  }
-
-  private toViewportPoint(event: Point): Point {
-    const rect = this.pane.getBoundingClientRect();
-    return {
-      x: event.x - rect.left,
-      y: event.y - rect.top,
-    };
   }
 
   /** How far the viewport moves this frame; `null` while the pointer is away from the edges. */

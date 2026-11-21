@@ -11,11 +11,6 @@ export function toFlowPoint(state: ViewportState, pane: Point): Point {
   return { x: (pane.x - state.x) / state.zoom, y: (pane.y - state.y) / state.zoom };
 }
 
-/** Converts a flow point to pane space. */
-export function toPanePoint(state: ViewportState, flow: Point): Point {
-  return { x: flow.x * state.zoom + state.x, y: flow.y * state.zoom + state.y };
-}
-
 export function clampZoom(zoom: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, zoom));
 }
