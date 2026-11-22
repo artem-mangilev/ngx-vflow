@@ -28,6 +28,7 @@ import { pressTarget } from '../utils/press-target';
     '[attr.data-v-handle-can-start]': 'canStart()',
     '[attr.data-v-handle-can-accept]': 'canAccept()',
     '[attr.data-v-pending]': "pending() ? '' : null",
+    '[attr.data-v-handle-clipped]': "clipped() ? '' : null",
     '[attr.data-v-handle-placed]': "placed() ? '' : null",
     '[style.top]': 'styles()?.top ?? null',
     '[style.left]': 'styles()?.left ?? null',
@@ -83,6 +84,9 @@ export class VflowHandleDirective {
 
   /** Rendered but not measured yet, so not placed: the flow stylesheet hides it until the next measurement. */
   protected readonly pending = computed(() => this.model.hasBox() && !this.model.isMeasured());
+
+  /** Scrolled out of view inside the node; the point waits on the border of the scroll container. */
+  protected readonly clipped = this.model.clipped;
 
   /** The flow stylesheet makes a placed element absolute and centers it on the `top` and `left` written here. */
   protected readonly placed = computed(() => this.layout() === 'auto' && !this.model.dynamic());

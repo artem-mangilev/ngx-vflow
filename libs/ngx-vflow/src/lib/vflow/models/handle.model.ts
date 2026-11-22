@@ -16,6 +16,8 @@ export type HandleGeometry = {
   /** `null`: nothing to write, for a handle the library does not place or has not measured yet. */
   layoutStyles: HandleLayoutStyles | null;
   localPoint: Point;
+  /** What the point follows is scrolled out of view inside the node, and the point waits on the border. */
+  clipped: boolean;
 };
 
 type Box = { left: number; top: number; width: number; height: number };
@@ -95,7 +97,7 @@ function clientRect(context: HandleMeasureContext, element: Element): DOMRect {
   return rect;
 }
 
-const UNMEASURED: HandleGeometry = { layoutStyles: null, localPoint: { x: 0, y: 0 } };
+const UNMEASURED: HandleGeometry = { layoutStyles: null, localPoint: { x: 0, y: 0 }, clipped: false };
 
 /**
  * A connection point of a node. The DOM is read in {@link measure}, a pure read of the element's boxes; the layout
@@ -135,26 +137,34 @@ export class HandleModel {
     const node = { width: this.parentNode.width(), height: this.parentNode.height() };
 
     if (position === 'auto' || position === 'center') {
-      return { layoutStyles: null, localPoint: { x: node.width / 2, y: node.height / 2 } };
+      return { layoutStyles: null, localPoint: { x: node.width / 2, y: node.height / 2 }, clipped: false };
     }
 
     const boxes = this.boxes();
     if (!boxes) return UNMEASURED;
 
     if (this.layout() === 'manual') {
-      return { layoutStyles: null, localPoint: clampTo(sidePoint(position, boxes.handle), boxes.handleClip) };
+      const point = sidePoint(position, boxes.handle);
+      const visible = clampTo(point, boxes.handleClip);
+
+      return { layoutStyles: null, localPoint: visible, clipped: visible !== point };
     }
 
     const { anchor } = boxes;
+    const center = { x: anchor.left + anchor.width / 2, y: anchor.top + anchor.height / 2 };
+    const visible = clampTo(center, boxes.anchorClip);
 
-    return computeAutoGeometry({
-      position,
-      node,
-      handle: boxes.handle,
-      anchor: clampTo({ x: anchor.left + anchor.width / 2, y: anchor.top + anchor.height / 2 }, boxes.anchorClip),
-      offset: { x: this.offsetX(), y: this.offsetY() },
-      origin: boxes.origin,
-    });
+    return {
+      ...computeAutoGeometry({
+        position,
+        node,
+        handle: boxes.handle,
+        anchor: visible,
+        offset: { x: this.offsetX(), y: this.offsetY() },
+        origin: boxes.origin,
+      }),
+      clipped: visible !== center,
+    };
   });
 
   /** Where the `auto` layout puts the element center, relative to the containing block of the element. */
@@ -162,6 +172,9 @@ export class HandleModel {
 
   /** Connection point relative to the node origin, in flow units; the node center for a dynamic position. */
   public readonly localPoint = computed(() => this.geometry().localPoint);
+
+  /** Scrolled out of view inside the node: the row of an `auto` handle, or the element of a `manual` one. */
+  public readonly clipped = computed(() => this.geometry().clipped);
 
   public readonly pointAbsolute = computed<Point>(() => ({
     x: this.parentNode.globalPoint().x + this.localPoint().x,
@@ -324,14 +337,17 @@ function visibleBox(element: HTMLElement, nodeElement: HTMLElement, context: Han
   return clip;
 }
 
-/** Moves a point into the visible box: a handle scrolled out of a list stays on the border it left through. */
+/**
+ * Moves a point into the visible box: a handle scrolled out of a list stays on the border it left through. A point
+ * inside the box is returned as it is, which is how a caller tells.
+ */
 function clampTo(point: Point, clip: Clip | null): Point {
   if (!clip) return point;
 
-  return {
-    x: Math.min(Math.max(point.x, clip.left), clip.right),
-    y: Math.min(Math.max(point.y, clip.top), clip.bottom),
-  };
+  const x = Math.min(Math.max(point.x, clip.left), clip.right);
+  const y = Math.min(Math.max(point.y, clip.top), clip.bottom);
+
+  return x === point.x && y === point.y ? point : { x, y };
 }
 
 function computeAutoGeometry({
@@ -349,7 +365,7 @@ function computeAutoGeometry({
   anchor: Point;
   offset: Point;
   origin: Point | null;
-}): HandleGeometry {
+}): Omit<HandleGeometry, 'clipped'> {
   const { x: anchorX, y: anchorY } = anchor;
   const dx = offset.x - (origin?.x ?? 0);
   const dy = offset.y - (origin?.y ?? 0);

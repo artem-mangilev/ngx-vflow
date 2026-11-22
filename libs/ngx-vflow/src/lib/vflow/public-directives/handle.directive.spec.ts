@@ -220,6 +220,8 @@ describe('VflowHandleDirective', () => {
     expect(auto.localPoint()).toEqual({ x: 125, y: 40 });
     expect(manual.localPoint()).toEqual({ x: 0, y: 40 });
     expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 40 });
+    expect(handleElement(fixture, 'right').hasAttribute('data-v-handle-clipped')).toBe(true);
+    expect(handleElement(fixture, 'left').hasAttribute('data-v-handle-clipped')).toBe(true);
 
     // In view: the middle of the row, and the middle of the manual element at the top of the row.
     list.scrollTop = 20;
@@ -227,6 +229,14 @@ describe('VflowHandleDirective', () => {
     expect(auto.localPoint()).toEqual({ x: 125, y: 30 });
     expect(manual.localPoint()).toEqual({ x: 0, y: 25 });
     expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 30 });
+    expect(handleElement(fixture, 'right').hasAttribute('data-v-handle-clipped')).toBe(false);
+    expect(handleElement(fixture, 'left').hasAttribute('data-v-handle-clipped')).toBe(false);
+    const connection = fixture.debugElement.injector.get(ConnectionService);
+    const magnets = () => fixture.nativeElement.querySelectorAll('.v-magnet').length;
+    connection.start(auto);
+    await settle(fixture);
+    expect(magnets()).toBe(2);
+    connection.end();
 
     // Scrolled out through the top.
     list.scrollTop = 80;
@@ -234,6 +244,12 @@ describe('VflowHandleDirective', () => {
     expect(auto.localPoint()).toEqual({ x: 125, y: 0 });
     expect(manual.localPoint()).toEqual({ x: 0, y: 0 });
     expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 0 });
+    expect(handleElement(fixture, 'right').hasAttribute('data-v-handle-clipped')).toBe(true);
+    // Out of view, a handle is no snap target: its magnet would wait on the border for connections meant elsewhere.
+    connection.start(auto);
+    await settle(fixture);
+    expect(magnets()).toBe(0);
+    connection.end();
   });
 
   it('shows the node without a display: none handle, hides its edges and measures a visibility: hidden handle', async () => {
