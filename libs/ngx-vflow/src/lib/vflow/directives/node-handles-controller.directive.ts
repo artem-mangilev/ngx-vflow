@@ -5,11 +5,12 @@ import { AfterRenderBatchService } from '../services/after-render-batch.service'
 import { createHandleMeasureContext, HandleModel } from '../models/handle.model';
 import { ViewportService } from '../services/viewport.service';
 import { FlowRenderingService } from '../services/flow-rendering.service';
+import { listen } from '../utils/listen';
 
 /**
  * Measures the handles of the node whenever their DOM may have changed: a handle is added, an observed element is
- * resized, or the content of the node is restructured. Everything else that moves a handle, such as a side, an
- * offset or the node size, is derived by the handle model without a measurement.
+ * resized, or the content of the node is restructured or scrolled. Everything else that moves a handle, such as a
+ * side, an offset or the node size, is derived by the handle model without a measurement.
  */
 @Directive({
   selector: '[nodeHandlesController]',
@@ -44,8 +45,13 @@ export class NodeHandlesControllerDirective {
     const structure = typeof created?.observe === 'function' ? created : undefined;
     structure?.observe(this.host, { childList: true, subtree: true });
 
+    // A list that scrolls inside the node moves its handles the same way. A scroll event does not bubble, so it is
+    // caught on its way down to the list.
+    const stopScroll = listen(this.host, 'scroll', this.resizeCallback, { capture: true, passive: true });
+
     inject(DestroyRef).onDestroy(() => {
       structure?.disconnect();
+      stopScroll();
       this.destroyed = true;
       this.observedElements.forEach((element) =>
         this.resizeObserverService.removeObserver(element, this.resizeCallback),

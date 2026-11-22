@@ -110,6 +110,30 @@ class PortComponent {
 })
 class PortNodeComponent {}
 
+/** A list that scrolls inside the node, with an auto and a manual port on its third row. */
+@Component({
+  template: `<div style="width: 120px">
+    <div class="list" style="height: 40px; overflow-y: auto">
+      @for (row of [0, 1, 2, 3, 4, 5]; track row) {
+        <div style="height: 20px">
+          @if (row === 2) {
+            <span vHandle handleType="source" position="right" style="display: block; width: 10px; height: 10px"></span>
+            <span
+              vHandle
+              handleType="target"
+              position="left"
+              layout="manual"
+              style="display: block; width: 10px; height: 10px"></span>
+          }
+        </div>
+      }
+    </div>
+  </div>`,
+  imports: [VflowHandleDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class ScrollingListNodeComponent {}
+
 describe('VflowHandleDirective', () => {
   function setup(component: Type<unknown>, ids = ['a'], edges: { source: string; target: string }[] = []) {
     const fixture = TestBed.createComponent(VflowComponent);
@@ -184,6 +208,32 @@ describe('VflowHandleDirective', () => {
     expect(getComputedStyle(left).translate).toBe('none');
     // Manual: the left side of the element as rendered, inside the 4px border.
     expect(target.localPoint()).toEqual({ x: 34, y: 24 });
+  });
+
+  it('follows a row that scrolls inside the node and stays on the border of the list the row left through', async () => {
+    const fixture = setup(ScrollingListNodeComponent);
+    await settle(fixture);
+    const [auto, manual] = nodes(fixture)[0].handles();
+    const list: HTMLElement = fixture.nativeElement.querySelector('.list');
+
+    // The row, 40 to 60px, is below the 40px list: both points wait on its bottom border.
+    expect(auto.localPoint()).toEqual({ x: 125, y: 40 });
+    expect(manual.localPoint()).toEqual({ x: 0, y: 40 });
+    expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 40 });
+
+    // In view: the middle of the row, and the middle of the manual element at the top of the row.
+    list.scrollTop = 20;
+    await settle(fixture);
+    expect(auto.localPoint()).toEqual({ x: 125, y: 30 });
+    expect(manual.localPoint()).toEqual({ x: 0, y: 25 });
+    expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 30 });
+
+    // Scrolled out through the top.
+    list.scrollTop = 80;
+    await settle(fixture);
+    expect(auto.localPoint()).toEqual({ x: 125, y: 0 });
+    expect(manual.localPoint()).toEqual({ x: 0, y: 0 });
+    expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 0 });
   });
 
   it('shows the node without a display: none handle, hides its edges and measures a visibility: hidden handle', async () => {

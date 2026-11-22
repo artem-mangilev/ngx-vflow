@@ -20,6 +20,9 @@ export type HandleGeometry = {
 
 type Box = { left: number; top: number; width: number; height: number };
 
+/** The part of the node an element can be seen in, in node units; an axis that nothing clips is unbounded. */
+type Clip = { left: number; top: number; right: number; bottom: number };
+
 /** What one measurement reads from the DOM, in node units: the geometry is derived from it and the inputs. */
 export interface HandleBoxes {
   /** The box of the element. */
@@ -28,6 +31,10 @@ export interface HandleBoxes {
   anchor: Box;
   /** Origin of the containing block of the element, when it is not the node; see {@link containingBlockOrigin}. */
   origin: Point | null;
+  /** What scroll containers leave visible of the parent element: the `auto` layout keeps its point inside. */
+  anchorClip: Clip | null;
+  /** The same for the element itself, for the `manual` layout. */
+  handleClip: Clip | null;
 }
 
 /** Measurement of an element that is rendered without a layout box, for example under `display: none`. */
@@ -56,6 +63,8 @@ export type HandleMeasureContext = {
   zoom: number;
   /** Client rectangles read in this pass, so handles that share an anchor or a containing block read it once. */
   rects: Map<Element, DOMRect>;
+  /** Visible boxes resolved in this pass, see {@link visibleBox}: handles of one list share its containers. */
+  clips: Map<Element, Clip | null>;
 };
 
 /**
@@ -72,7 +81,7 @@ export function createHandleMeasureContext(
   const rendered = viewport && typeof DOMMatrixReadOnly !== 'undefined';
   const zoom = (rendered ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;
 
-  return { nodeRect: nodeElement.getBoundingClientRect(), zoom, rects: new Map() };
+  return { nodeRect: nodeElement.getBoundingClientRect(), zoom, rects: new Map(), clips: new Map() };
 }
 
 function clientRect(context: HandleMeasureContext, element: Element): DOMRect {
@@ -133,14 +142,16 @@ export class HandleModel {
     if (!boxes) return UNMEASURED;
 
     if (this.layout() === 'manual') {
-      return { layoutStyles: null, localPoint: sidePoint(position, boxes.handle) };
+      return { layoutStyles: null, localPoint: clampTo(sidePoint(position, boxes.handle), boxes.handleClip) };
     }
+
+    const { anchor } = boxes;
 
     return computeAutoGeometry({
       position,
       node,
       handle: boxes.handle,
-      anchor: boxes.anchor,
+      anchor: clampTo({ x: anchor.left + anchor.width / 2, y: anchor.top + anchor.height / 2 }, boxes.anchorClip),
       offset: { x: this.offsetX(), y: this.offsetY() },
       origin: boxes.origin,
     });
@@ -199,6 +210,8 @@ export class HandleModel {
       handle: toLocal(element.getBoundingClientRect()),
       anchor: toLocal(clientRect(context, parent)),
       origin: containingBlockOrigin(element, nodeElement, context),
+      anchorClip: visibleBox(parent, nodeElement, context),
+      handleClip: visibleBox(element, nodeElement, context),
     };
   }
 
@@ -274,6 +287,53 @@ function containingBlockOrigin(
   };
 }
 
+/**
+ * What the scroll containers between an element and the node leave visible of it, in node units: the padding boxes
+ * of the containers that clip, intersected. Clipping follows containing blocks, so an absolutely positioned element
+ * is not clipped by the ancestors it escapes. `null` when nothing clips it.
+ */
+function visibleBox(element: HTMLElement, nodeElement: HTMLElement, context: HandleMeasureContext): Clip | null {
+  const cached = context.clips.get(element);
+  if (cached !== undefined) return cached;
+
+  const { position } = getComputedStyle(element);
+  const container =
+    position === 'fixed' ? null : position === 'absolute' ? element.offsetParent : element.parentElement;
+  let clip: Clip | null = null;
+
+  if (container instanceof HTMLElement && container !== nodeElement && nodeElement.contains(container)) {
+    clip = visibleBox(container, nodeElement, context);
+    const { overflowX, overflowY } = getComputedStyle(container);
+
+    if (overflowX !== 'visible' || overflowY !== 'visible') {
+      const { nodeRect, zoom } = context;
+      const rect = clientRect(context, container);
+      const left = (rect.left - nodeRect.left) / zoom + container.clientLeft;
+      const top = (rect.top - nodeRect.top) / zoom + container.clientTop;
+
+      clip = {
+        left: Math.max(clip?.left ?? -Infinity, overflowX === 'visible' ? -Infinity : left),
+        top: Math.max(clip?.top ?? -Infinity, overflowY === 'visible' ? -Infinity : top),
+        right: Math.min(clip?.right ?? Infinity, overflowX === 'visible' ? Infinity : left + container.clientWidth),
+        bottom: Math.min(clip?.bottom ?? Infinity, overflowY === 'visible' ? Infinity : top + container.clientHeight),
+      };
+    }
+  }
+
+  context.clips.set(element, clip);
+  return clip;
+}
+
+/** Moves a point into the visible box: a handle scrolled out of a list stays on the border it left through. */
+function clampTo(point: Point, clip: Clip | null): Point {
+  if (!clip) return point;
+
+  return {
+    x: Math.min(Math.max(point.x, clip.left), clip.right),
+    y: Math.min(Math.max(point.y, clip.top), clip.bottom),
+  };
+}
+
 function computeAutoGeometry({
   position,
   node,
@@ -285,12 +345,12 @@ function computeAutoGeometry({
   position: Position;
   node: { width: number; height: number };
   handle: Box;
-  anchor: Box;
+  /** The center of the parent element, inside its visible box. */
+  anchor: Point;
   offset: Point;
   origin: Point | null;
 }): HandleGeometry {
-  const anchorX = anchor.left + anchor.width / 2;
-  const anchorY = anchor.top + anchor.height / 2;
+  const { x: anchorX, y: anchorY } = anchor;
   const dx = offset.x - (origin?.x ?? 0);
   const dy = offset.y - (origin?.y ?? 0);
   const px = (value: number) => `${value}px`;

@@ -44,6 +44,8 @@ An element with `vDragHandle` inside the handle keeps dragging the node. The edg
 
 In the `auto` layout the flow owns `position`, `top`, `left` and `translate` on the element; `transform` and `scale` stay yours.
 
+A handle follows its element when a list scrolls inside the node. Once the element is scrolled out of view, the connection point stays on the border of the scroll container it left through, so the edge never ends outside of the list. In the `auto` layout the parent element is what counts as in view.
+
 A handle is measured only while it is in layout. An element with `display: none`, or inside one, is not measured, and edges attached to it are hidden. `visibility: hidden` and `opacity: 0` keep the handle in layout.
 
 ## State attributes
