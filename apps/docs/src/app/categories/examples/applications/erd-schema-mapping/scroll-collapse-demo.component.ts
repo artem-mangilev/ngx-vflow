@@ -18,10 +18,12 @@ interface LongEntity {
 /**
  * Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still a
  * target, until its table is hovered, focused or selected. The table host is an element of core, so its state is read
- * from the port itself. Proxy ports on the header share one point: connected ones are visually merged.
+ * from the port itself. Proxy ports on the header share one point: connected ones are visually merged. The port of a
+ * row scrolled out of view waits on the border of the list: it shrinks to a mark of its edge and takes no pointer.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
   [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  data-[v-handle-clipped]:pointer-events-none data-[v-handle-clipped]:size-1
   forced-colors:opacity-100! [header>&]:data-[vui-connected=true]:opacity-60`;
 
 @Component({
@@ -85,7 +87,12 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                   [canAccept]="false"></span>
               </ng-template>
               @if (!ctx.data().collapsed) {
-                <div class="max-h-37.5 overflow-y-auto overscroll-contain" vNoWheel [attr.data-rows]="ctx.node.id">
+                <!-- A thin, translucent scrollbar through the WebKit pseudo-elements; other engines keep their own. The
+                     transparent border of the thumb keeps it clear of the ports on the node side. -->
+                <div
+                  class="max-h-37.5 overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-3.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-4 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-vui-muted/40 [&::-webkit-scrollbar-thumb]:bg-clip-padding hover:[&::-webkit-scrollbar-thumb]:bg-vui-muted/70"
+                  vNoWheel
+                  [attr.data-rows]="ctx.node.id">
                   @for (field of ctx.data().fields; track field.id) {
                     <div vuiRow [attr.data-field]="field.id">
                       <span vuiTitle>{{ field.name }}</span>
@@ -94,6 +101,13 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                     </div>
                   }
                 </div>
+                @if (ctx.data().fields.length > visibleRows) {
+                  <!-- Not part of the scroll box: the ports of rows below the box wait on its border, which this
+                       footer keeps inside the node. -->
+                  <footer vuiNodeFooter class="min-h-5 py-1">
+                    <span vuiMeta>Scroll for more fields</span>
+                  </footer>
+                }
               }
             </article>
           </ng-template>
@@ -109,6 +123,8 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
 export class ScrollCollapseDemoComponent {
   protected readonly background = SCENE_BACKGROUND;
   protected readonly quietPort = QUIET_PORT;
+  /** Rows that fit in the scroll box: a longer table scrolls and gets a footer. */
+  protected readonly visibleRows = 4;
   protected readonly nodes = createNodes<LongEntity>([
     {
       id: 'product',

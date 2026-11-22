@@ -42,6 +42,8 @@ Findings:
 - Collapse with proxy handles keeps every edge attached to the header; expand puts the endpoints back on the rows.
 - Core measures handles again when a list scrolls inside the node. A handle whose row is out of view stays on the
   border of the scroll container, so its edge never ends outside of the list; several hidden rows share that point.
+- Such a handle carries `data-v-handle-clipped` and has no magnet. The demos use the attribute to shrink the port to
+  a mark of its edge and to take the pointer away from it, so a connection is made with a row that is in view.
 - Zoom does not change the picture: endpoints stay on the visible rows at any zoom level.
 - Without `vNoWheel` the wheel zooms the graph instead of scrolling the rows.
 

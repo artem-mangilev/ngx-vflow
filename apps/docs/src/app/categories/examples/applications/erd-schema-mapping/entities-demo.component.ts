@@ -52,10 +52,12 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
 /**
  * Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still a
  * target, until its table is hovered, focused or selected. The table host is an element of core, so its state is read
- * from the port itself.
+ * from the port itself. The port of a row scrolled out of view waits on the border of the list: it shrinks to a mark
+ * of its edge and takes no pointer, so a connection is made with a row that is in view.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
   [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  data-[v-handle-clipped]:pointer-events-none data-[v-handle-clipped]:size-1
   forced-colors:opacity-100!`;
 
 @Component({
@@ -137,7 +139,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                   <!-- Seven rows, then the table scrolls; the wheel scrolls its rows instead of zooming the graph. Core
                        keeps the endpoint of a row scrolled out of view on the border of this box. -->
                   <div
-                    class="max-h-[calc(7*33px-1px)] overflow-y-auto overscroll-contain"
+                    class="max-h-[calc(7*33px-1px)] overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-3.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-4 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-vui-muted/40 [&::-webkit-scrollbar-thumb]:bg-clip-padding hover:[&::-webkit-scrollbar-thumb]:bg-vui-muted/70"
                     vNoWheel
                     [attr.data-rows]="ctx.node.id">
                     <ng-container *ngTemplateOutlet="rows" />
