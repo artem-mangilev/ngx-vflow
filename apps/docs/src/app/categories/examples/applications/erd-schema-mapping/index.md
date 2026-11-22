@@ -10,8 +10,8 @@ Add a field from the last row of a table: type a name, pick a type and press Ent
 draft; a taken name is refused. The new row gets its own ports at once, and the frame grows with the table. Tables and
 frames are dragged freely, like any node: a frame moves its tables along and is not a boundary for them (`extent` is
 lifted), and it grows only with their fields, not with where they are dragged. After
-seven fields a table scrolls and shows its new last row; rows scrolled out hand their endpoints to the header or to
-the "more below" border, as in the experiment below, which shares the same scroll policy. Deleting
+seven fields a table scrolls and shows its new last row; the endpoint of a row scrolled out of view stays on the
+border of the list it left through, which core does for any scroll container inside a node. Deleting
 a field is handled by the application: the field and every edge on it go together. Type compatibility and graph
 changes belong to this application, not to the UI directive. Frames are parents drawn below the edges
 (`parentsBelowEdges`), so connections inside them stay selectable.
@@ -25,11 +25,10 @@ changes belong to this application, not to the UI directive. Frames are parents 
 ## Scroll and collapse experiment
 
 Long entities need a policy for endpoints of hidden rows. Scroll the Product rows with the wheel; collapse a node
-to move its endpoints to the header. This experiment is local to the demo and is not a
-library contract. Collapsing moves every endpoint to the header by rendering proxy handles with the same IDs.
-Scrolling keeps rows mounted in an overflow container that owns the wheel through `vNoWheel`; rows scrolled
-out of view hand their endpoints to proxy handles at the nearest border, rows still in view are re-created so
-core measures them again.
+to move its endpoints to the header. Collapsing is a policy of this demo, not a library contract: it moves every
+endpoint to the header by rendering proxy handles with the same IDs. Scrolling needs no code. Rows stay mounted in an
+overflow container that owns the wheel through `vNoWheel`; core measures their handles again on scroll and keeps the
+endpoint of a row scrolled out of view on the border of the container.
 
 {{ NgDocActions.demo("ScrollCollapseDemoComponent", { container: false }) }}
 
@@ -37,20 +36,12 @@ core measures them again.
 
 ```
 
-The scroll policy both demos share:
-
-```typescript file="./scroll-rows.ts"
-
-```
-
 Findings:
 
 - Model and IDs survive both operations; edges are never removed or re-created by the UI.
 - Collapse with proxy handles keeps every edge attached to the header; expand puts the endpoints back on the rows.
-- Core positions handles in the node's coordinate space from measurements taken after render and resize. It does
-  not observe scroll: without the policy above, handles of scrolled rows keep their measured positions and are
-  drawn outside the node, and a visible row's handle stays where the row was before the scroll.
-- Re-creating visible rows on scroll makes core measure them again; it is a demo trick, not a recommended API.
+- Core measures handles again when a list scrolls inside the node. A handle whose row is out of view stays on the
+  border of the scroll container, so its edge never ends outside of the list; several hidden rows share that point.
 - Zoom does not change the picture: endpoints stay on the visible rows at any zoom level.
 - Without `vNoWheel` the wheel zooms the graph instead of scrolling the rows.
 

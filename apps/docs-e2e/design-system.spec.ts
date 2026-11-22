@@ -589,15 +589,26 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
     }, selector);
   const rowPort =
     '[data-entity="product"] [data-field="brand-id"] .vui-port[data-v-handle][data-v-handle-position="right"]';
-  const footerPort = '[data-entity="product"] footer .vui-port[data-v-handle][data-v-handle-position="right"]';
+  const hiddenRowPort =
+    '[data-entity="product"] [data-field="supplier-id"] .vui-port[data-v-handle][data-v-handle-position="right"]';
+  /** How far the port of the hidden supplier row is from the bottom border of the scroll box. */
+  const hiddenPortToBorder = () =>
+    demo.evaluate((root, s) => {
+      const port = root.querySelector(s)!.getBoundingClientRect();
+      return Math.abs(
+        port.y + port.height / 2 - root.querySelector('[data-rows="product"]')!.getBoundingClientRect().bottom,
+      );
+    }, hiddenRowPort);
   const distance = (index: number, selector: string) => async () => {
     const start = await edgeStart(index);
     const port = await portCenter(selector);
     return Math.hypot(start.x - port.x, start.y - port.y);
   };
-  // Initial layout: the brand edge sits on its visible row, the supplier edge on the footer proxy.
+  // Initial layout: the brand edge sits on its visible row; the supplier row is below the scroll box, and core keeps
+  // its port and its edge on the bottom border of the box.
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
-  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+  await expect.poll(distance(0, hiddenRowPort)).toBeLessThan(1.5);
+  await expect.poll(hiddenPortToBorder).toBeLessThan(1.5);
   // Wheel over the rows scrolls them instead of zooming the graph.
   const zoom = () => demo.locator('.v-viewport').evaluate((element) => element.style.transform);
   const zoomBefore = await zoom();
@@ -606,8 +617,9 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await page.mouse.wheel(0, 120);
   await expect.poll(() => rows.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   expect(await zoom()).toBe(zoomBefore);
-  // Demo policy: the supplier edge stays on the footer proxy, the visible brand row keeps its re-measured handle.
-  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+  // The supplier row is still below: its edge stays on the border, and the visible brand row is measured again.
+  await expect.poll(distance(0, hiddenRowPort)).toBeLessThan(1.5);
+  await expect.poll(hiddenPortToBorder).toBeLessThan(1.5);
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await rows.evaluate((element) => (element.scrollTop = 0));
   // Collapse: rows leave the DOM, proxy handles keep both edges attached to the header.
@@ -623,7 +635,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await demo.getByRole('button', { name: 'Expand Product', exact: true }).click();
   await expect(rows.locator('[vuiRow]')).toHaveCount(12);
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
-  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+  await expect.poll(distance(0, hiddenRowPort)).toBeLessThan(1.5);
 });
 
 test('ERD: deleting a field removes its edges and leaves no detached endpoints', async ({ page }) => {
@@ -728,37 +740,31 @@ test('ERD: a table longer than seven fields scrolls, and hidden rows keep their 
   await expect.poll(() => box.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
   await expect.poll(() => box.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   await expect(order.locator('[data-field="currency"]')).toBeInViewport();
-  // Two more fields push the foreign key row out above: its edge ends on the header proxy, not inside the scroll box.
+  // Two more fields push the foreign key row out above: core keeps its port and the end of its edge on the top border
+  // of the scroll box.
   for (const name of ['paid_at', 'refunded_at']) {
     await order.getByRole('button', { name: 'Add a field to Order', exact: true }).click();
     await order.getByLabel('Name of the new field of Order', { exact: true }).fill(name);
     await order.getByLabel('Name of the new field of Order', { exact: true }).press('Enter');
   }
   await expect(order.locator('[data-field="refunded-at"]')).toBeInViewport();
-  const endpointToHeader = () =>
-    demo.evaluate((root) => {
-      const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
-      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(edge.getScreenCTM()!);
-      // Rows are re-created on scroll: a port can be missing for a moment.
-      const port = root
-        .querySelector('[data-entity="order"] header .vui-port[data-v-handle][data-v-handle-position="left"]')
-        ?.getBoundingClientRect();
-      return port ? Math.hypot(end.x - port.left, end.y - port.y - port.height / 2) : Infinity;
-    });
-  await expect.poll(endpointToHeader).toBeLessThan(1.5);
-  // Scrolling back to the top puts the endpoint on its row again.
-  await box.evaluate((element) => (element.scrollTop = 0));
-  const endpointToRow = () =>
+  /** The end of the edge: how far it is from the port of its row, and how far below the top of the scroll box. */
+  const endpoint = () =>
     demo.evaluate((root) => {
       const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
       const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(edge.getScreenCTM()!);
       const port = root
         .querySelector(
           '[data-entity="order"] [data-field="customer-id"] .vui-port[data-v-handle][data-v-handle-position="left"]',
-        )
-        ?.getBoundingClientRect();
-      return port ? Math.hypot(end.x - port.left, end.y - port.y - port.height / 2) : Infinity;
+        )!
+        .getBoundingClientRect();
+      const top = root.querySelector('[data-rows="order"]')!.getBoundingClientRect().top;
+      return { toPort: Math.hypot(end.x - port.left, end.y - port.y - port.height / 2), belowTop: end.y - top };
     });
-  await expect.poll(endpointToRow).toBeLessThan(1.5);
-  await expect(order.locator('footer')).toContainText('more below');
+  await expect.poll(async () => (await endpoint()).toPort).toBeLessThan(1.5);
+  await expect.poll(async () => Math.abs((await endpoint()).belowTop)).toBeLessThan(1.5);
+  // Scrolling back to the top puts the endpoint on its row again.
+  await box.evaluate((element) => (element.scrollTop = 0));
+  await expect.poll(async () => (await endpoint()).belowTop).toBeGreaterThan(5);
+  await expect.poll(async () => (await endpoint()).toPort).toBeLessThan(1.5);
 });

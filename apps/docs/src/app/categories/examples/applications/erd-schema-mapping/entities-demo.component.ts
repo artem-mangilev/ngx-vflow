@@ -28,7 +28,6 @@ import {
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
-import { ScrollRows } from './scroll-rows';
 
 interface Field {
   id: string;
@@ -53,12 +52,11 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
 /**
  * Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still a
  * target, until its table is hovered, focused or selected. The table host is an element of core, so its state is read
- * from the port itself. Proxy ports, on the header and the footer, share one point per border: connected ones are
- * visually merged.
+ * from the port itself.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
   [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
-  forced-colors:opacity-100! [:is(header,footer)>&]:data-[vui-connected=true]:opacity-60`;
+  forced-colors:opacity-100!`;
 
 @Component({
   selector: 'app-ui-entities-demo',
@@ -90,15 +88,10 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                 </header>
               </div>
             } @else {
-              @let view = scroll.visibility(ctx.node.id);
               <article vuiNode class="w-[250px] text-[14px]" [attr.data-entity]="ctx.node.id">
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                   <span vuiMeta>{{ ctx.data().category }}</span>
-                  <!-- Rows scrolled out above hand their endpoints to proxies with the same IDs on the header. -->
-                  @for (field of scroll.hidden(ctx.data().fields, view.above); track field.id) {
-                    <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
-                  }
                 </header>
                 <ng-template #ports let-field>
                   <span
@@ -117,12 +110,12 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                     [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
                 </ng-template>
                 <ng-template #rows>
-                  @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
-                    <div vuiRow class="group" [attr.data-field]="row.field.id">
+                  @for (field of ctx.data().fields; track field.id) {
+                    <div vuiRow class="group" [attr.data-field]="field.id">
                       <!-- Keys are structure, not state: the accent belongs to selection. -->
-                      <span class="min-w-5.5 text-xs font-semibold text-vui-muted">{{ row.field.key }}</span>
-                      <span vuiTitle>{{ row.field.name }}</span>
-                      <span vuiMeta>{{ row.field.type }}</span>
+                      <span class="min-w-5.5 text-xs font-semibold text-vui-muted">{{ field.key }}</span>
+                      <span vuiTitle>{{ field.name }}</span>
+                      <span vuiMeta>{{ field.type }}</span>
                       <!-- Row actions appear on the row a pointer or the focus is on, and on every row of a selected
                            table (touch). -->
                       <button
@@ -132,39 +125,25 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                         class="opacity-0 transition-opacity! group-focus-within:opacity-100 group-hover:opacity-100 [&:is([data-v-selected]_*)]:opacity-100"
                         vNoDrag
                         type="button"
-                        [attr.aria-label]="'Delete ' + ctx.data().title + '.' + row.field.name"
-                        (click)="deleteField(ctx.node.id, row.field.id)">
+                        [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"
+                        (click)="deleteField(ctx.node.id, field.id)">
                         <app-demo-icon name="close" />
                       </button>
-                      @if (row.handles) {
-                        <ng-container *ngTemplateOutlet="ports; context: { $implicit: row.field }" />
-                      }
+                      <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
                     </div>
                   }
                 </ng-template>
                 @if (ctx.data().fields.length > maxRows) {
-                  <!-- Seven rows, then the table scrolls; the wheel scrolls its rows instead of zooming the graph. -->
+                  <!-- Seven rows, then the table scrolls; the wheel scrolls its rows instead of zooming the graph. Core
+                       keeps the endpoint of a row scrolled out of view on the border of this box. -->
                   <div
                     class="max-h-[calc(7*33px-1px)] overflow-y-auto overscroll-contain"
                     vNoWheel
-                    [attr.data-rows]="ctx.node.id"
-                    (scroll)="scroll.onScroll(ctx.node.id, $event)">
+                    [attr.data-rows]="ctx.node.id">
                     <ng-container *ngTemplateOutlet="rows" />
                   </div>
                 } @else {
                   <div><ng-container *ngTemplateOutlet="rows" /></div>
-                }
-                @if (view.below.length) {
-                  <!-- Rows cut by the scroll box fade into the border below; a mask on the box would also cut the
-                       ports. -->
-                  <footer
-                    vuiNodeFooter
-                    class="relative min-h-5 py-1 before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-linear-to-b before:from-transparent before:to-vui-surface before:content-['']">
-                    <span vuiMeta>{{ view.below.length }} more below</span>
-                    @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
-                      <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
-                    }
-                  </footer>
                 }
                 @if (draft()?.entity === ctx.node.id) {
                   <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone.
@@ -249,7 +228,6 @@ export class EntitiesDemoComponent {
   protected readonly quietPort = QUIET_PORT;
   /** Rows a table shows before it scrolls. */
   protected readonly maxRows = 7;
-  protected readonly scroll = new ScrollRows<Field>();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
 
@@ -358,7 +336,6 @@ export class EntitiesDemoComponent {
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     node.data.set({ ...data, fields: [...data.fields, { id, name, type: draft.type, key: '' }] });
     this.draft.set(null);
-    this.scroll.reset(draft.entity);
     // A long table scrolls to its new last row.
     afterNextRender(
       () => {
@@ -385,7 +362,6 @@ export class EntitiesDemoComponent {
     node.data.update((data) =>
       data.kind === 'entity' ? { ...data, fields: data.fields.filter((field) => field.id !== fieldId) } : data,
     );
-    this.scroll.reset(nodeId);
     this.edges.update((edges) =>
       edges.filter(
         (edge) =>
