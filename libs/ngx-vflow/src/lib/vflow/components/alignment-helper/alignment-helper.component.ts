@@ -12,11 +12,13 @@ const TICK = 4;
   selector: 'g[alignmentHelper]',
   templateUrl: './alignment-helper.component.html',
   // The whole group is faded at once, so crossings of lines, dots and ticks do not darken.
-  host: { 'data-v-alignment-guides': '' },
   styles: [
     `
       :host {
         color: var(--v-alignment-guides);
+      }
+
+      [data-v-alignment-guide] {
         opacity: 0.5;
       }
 
@@ -32,12 +34,8 @@ const TICK = 4;
       }
 
       @media (forced-colors: active) {
-        :host {
+        [data-v-alignment-guide] {
           opacity: 1;
-        }
-
-        [data-v-alignment-guide='line'],
-        [data-v-alignment-guide='point'] {
           forced-color-adjust: none;
         }
       }

@@ -8,9 +8,9 @@ describe('allowRootZoomForNodeTarget', () => {
     return event;
   }
 
-  function child(parentAttribute?: string) {
+  function child(...parentAttributes: string[]) {
     const parent = document.createElement('div');
-    if (parentAttribute) parent.setAttribute(parentAttribute, '');
+    parentAttributes.forEach((name) => parent.setAttribute(name, ''));
     const body = document.createElement('div');
     parent.append(body);
     return body;
@@ -28,6 +28,8 @@ describe('allowRootZoomForNodeTarget', () => {
   it('allows a press that no control or handle keeps, and rejects one inside a no-pan part', () => {
     expect(allowRootZoomForNodeTarget(pointerdownOn(child()), false)).toBe(true);
     expect(allowRootZoomForNodeTarget(pointerdownOn(child('data-v-no-pan')), false)).toBe(false);
-    expect(allowRootZoomForNodeTarget(pointerdownOn(child('data-v-handle-type')), false)).toBe(false);
+    expect(
+      allowRootZoomForNodeTarget(pointerdownOn(child('data-v-handle-type', 'data-v-handle-can-start')), false),
+    ).toBe(false);
   });
 });

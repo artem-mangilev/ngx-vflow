@@ -10,7 +10,7 @@ describe('press target table', () => {
   it('lets the nearest library element decide', () => {
     const find = tree(`
       <div data-v-node>
-        <div data-v-handle-type="source" id="handle">
+        <div data-v-handle-type="source" data-v-handle-can-start id="handle">
           <span id="in-handle"></span><div data-v-drag-handle id="drag"><b id="drag-in-handle"></b></div>
         </div>
         <div data-v-no-drag><i id="control"></i></div>
@@ -29,9 +29,9 @@ describe('press target table', () => {
 
   it('leaves a press on a handle that cannot start a connection to the node, like the node body', () => {
     const find = tree(`
-      <div data-v-node data-v-handle-type="any" data-v-handle-can-start="false" id="ball">
+      <div data-v-node data-v-handle-type="any" id="ball">
         <i id="label"></i>
-        <div data-v-handle-type="source" data-v-handle-can-start="true" id="port"></div>
+        <div data-v-handle-type="source" data-v-handle-can-start id="port"></div>
         <div data-v-drag-handle id="grip"></div>
       </div>`);
 
@@ -71,7 +71,7 @@ describe('press target table', () => {
         <i id="body"></i>
         <div data-v-drag-handle><i id="title"></i></div>
         <div data-v-no-drag><i id="control"></i></div>
-        <div data-v-handle-type="source"><i id="port"></i></div>
+        <div data-v-handle-type="source" data-v-handle-can-start><i id="port"></i></div>
         <div data-v-no-pan><i id="no-pan"></i></div>
       </div>`);
     const drag = (selector: string, handles = false) => isNodeDragPress(pressTarget(find(selector)), handles);

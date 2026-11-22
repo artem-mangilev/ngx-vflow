@@ -9,7 +9,7 @@ import { SquareHandleComponent } from './square-handle.component';
  */
 const DOT = `size-3 rounded-full bg-vui-foreground transition-[scale] hover:scale-125
   data-[v-handle-state=valid]:bg-vui-success data-[v-handle-state=invalid]:bg-vui-danger
-  data-[v-handle-can-start=false]:opacity-40 data-[v-handle-can-start=false]:hover:scale-100`;
+  not-data-[v-handle-can-start]:opacity-40 not-data-[v-handle-can-start]:hover:scale-100`;
 
 @Component({
   template: `<docs-demo>

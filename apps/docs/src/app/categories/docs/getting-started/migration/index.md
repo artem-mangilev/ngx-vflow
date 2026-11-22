@@ -95,7 +95,7 @@ Under `forced-colors: active` core maps its tokens to system colors and keeps th
 | Dots/grid `color`, `backgroundColor`                 | `--v-background-pattern` and `--v-background`; the `data-v-background-pattern` attribute       |
 | `resizerColor`, resize control `color`               | `--v-resize-control`, `--v-resize-control-border`; `data-v-resize-control` (`handle` / `line`) |
 | `mini-map` `maskColor`, `strokeColor`                | `--v-minimap-mask`, `--v-minimap-viewport`, and node styles, see [Minimap](#minimap)           |
-| `lineColor` in `alignmentHelper` settings            | `--v-alignment-guides`; `[data-v-alignment-guides]`. `tolerance` stays                         |
+| `lineColor` in `alignmentHelper` settings            | `--v-alignment-guides`; `[data-v-alignment-guide]`. `tolerance` stays                          |
 | `color` in `selectionBox` settings                   | `--v-selection-box`; `[data-v-selection-box]`. `mode` became the `selectionBoxMode` input      |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
@@ -262,7 +262,7 @@ export class TaskNodeComponent {
 
 ### Selection by click
 
-Core writes the selection to the DOM: a node host carries `data-v-node="<id>"`, `data-v-selected` while the node is selected and `data-v-preselected` while the selection box covers it; an edge host carries `data-v-edge="<id>"` and the same two. Style your presentation from them (`[data-v-selected] .card { … }`). The `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` is removed: they read these attributes.
+Core writes the selection to the DOM: a node host carries `data-v-node="<id>"`, `data-v-selected` while the node is selected or the selection box covers it; an edge host carries `data-v-edge="<id>"` and the same `data-v-selected`. The `preselected` signal of the template context tells the two apart. Style your presentation from them (`[data-v-selected] .card { … }`). The `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` is removed: they read these attributes.
 
 A click on a node presentation selects the node; the `[selectable]` directive and `SelectableDirective` are removed. Edges already worked this way. A press that becomes a drag, a resize, a pan or a selection box does not select. Mark an embedded control with `vNoSelect` to keep its clicks from selecting the entity, as `vNoDrag` keeps them from dragging. `Node.selectable`, `Edge.selectable`, `[nodesSelectable]` and `[edgesSelectable]` still decide whether an entity may be selected at all.
 
@@ -620,7 +620,7 @@ A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow
 | `viewportTo(state)`                                                                                                 | Rename to `setViewport(state)`.                                                                                    |
 | `panTo({ x, y })`                                                                                                   | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
 | `step` input on `vui-controls`                                                                                      | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
-| `selected` input of `vuiNode`, `vuiGroup`, `vuiEdge`                                                                | Remove the binding. The parts read `data-v-selected` and `data-v-preselected` from the core host.                  |
+| `selected` input of `vuiNode`, `vuiGroup`, `vuiEdge`                                                                | Remove the binding. The parts read `data-v-selected` from the core host.                                           |
 | `useDefaults` option of the `create*` factories                                                                     | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
 | `ConnectionControllerDirective`                                                                                     | Remove the import. The connection outputs belong to `vflow`.                                                       |
 | `[selectable]`, `SelectableDirective`                                                                               | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |

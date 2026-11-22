@@ -5,7 +5,7 @@ import { Directive } from '@angular/core';
  * lighter `separator` color so the card reads as one surface. Dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
- * Selection is read from the core node host (`data-v-selected`, or `data-v-preselected` inside the selection box) and
+ * Selection is read from the core node host (`data-v-selected`, also while the selection box covers it) and
  * colors the edge itself: the border and a 1px box-shadow ring outside it, with no gap. A box shadow is painted
  * under the content, so ports on the edge stay on top of it, as on the resting border; an outline would cross them.
  * Forced colors drop box shadows, so there the selection is an offset outline in `Highlight`.
@@ -16,12 +16,12 @@ import { Directive } from '@angular/core';
     class: `vui-node
       relative rounded-vui-surface border border-vui-border
       bg-vui-surface text-vui-foreground shadow-vui-node
-      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:border-vui-accent
-      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-1
-      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-vui-accent
-      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-2
-      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-offset-2
-      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-[Highlight]`,
+      [&:is([data-v-selected]_*)]:border-vui-accent
+      [&:is([data-v-selected]_*)]:ring-1
+      [&:is([data-v-selected]_*)]:ring-vui-accent
+      forced-colors:[&:is([data-v-selected]_*)]:outline-2
+      forced-colors:[&:is([data-v-selected]_*)]:outline-offset-2
+      forced-colors:[&:is([data-v-selected]_*)]:outline-[Highlight]`,
   },
 })
 export class VuiNode {}

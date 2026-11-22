@@ -277,8 +277,8 @@ describe('VflowHandleDirective', () => {
     expect(handle.id()).toBe('in');
     expect(port.textContent!.trim()).toBe('target idle');
     expect(port.getAttribute('data-v-handle-position')).toBe('left');
-    expect(port.getAttribute('data-v-handle-can-accept')).toBe('false');
-    expect(port.getAttribute('data-v-handle-can-start')).toBe('true');
+    expect(port.hasAttribute('data-v-handle-can-accept')).toBe(false);
+    expect(port.hasAttribute('data-v-handle-can-start')).toBe(true);
     expect(centerInNode(port)).toEqual({ x: 0, y: 20 });
 
     handle.state.set('valid');

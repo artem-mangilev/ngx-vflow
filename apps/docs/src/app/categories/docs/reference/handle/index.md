@@ -57,8 +57,8 @@ The element gets the `data-v-handle` attribute, its identity as a handle, and th
 | `data-v-handle-type`       | `source`, `target`                                                                                    |
 | `data-v-handle-position`   | `left`, `right`, `top`, `bottom`                                                                      |
 | `data-v-handle-state`      | `idle`; `connecting` on the handle a connection is dragged from; `valid` / `invalid` on the candidate |
-| `data-v-handle-can-start`  | `true`, `false`                                                                                       |
-| `data-v-handle-can-accept` | `true`, `false`                                                                                       |
+| `data-v-handle-can-start`  | present while the handle can start a connection (`canStart`)                                          |
+| `data-v-handle-can-accept` | present while the handle can accept a connection (`canAccept`)                                        |
 | `data-v-handle-clipped`    | present while the handle is scrolled out of view inside the node                                      |
 
 `data-v-handle-state` follows the default connection checks and `ConnectionSettings.validator()`. The handle a

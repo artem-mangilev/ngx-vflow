@@ -48,8 +48,8 @@ import { NodeMeasureDirective } from '../../directives/node-measure.directive';
   // (2026-11-01): a selection change is rare next to a pan, and one pass over the list is accepted for it.
   host: {
     '[attr.data-v-node]': 'model().rawNode.id',
-    '[attr.data-v-selected]': "model().selected() ? '' : null",
-    '[attr.data-v-preselected]': "model().preselected() ? '' : null",
+    // Also while the selection box covers it: the box shows what a release will select.
+    '[attr.data-v-selected]': "model().selected() || model().preselected() ? '' : null",
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the presentation bubble here; a drag or a resize suppresses the click that follows it.

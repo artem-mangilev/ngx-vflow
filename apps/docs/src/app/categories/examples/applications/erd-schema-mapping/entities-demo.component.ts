@@ -56,7 +56,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
  * of its edge and takes no pointer, so a connection is made with a row that is in view.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
-  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*)]:opacity-0
   data-[v-handle-clipped]:pointer-events-none data-[v-handle-clipped]:size-1
   forced-colors:opacity-100!`;
 

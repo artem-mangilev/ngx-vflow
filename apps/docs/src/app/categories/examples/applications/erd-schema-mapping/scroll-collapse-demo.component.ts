@@ -22,7 +22,7 @@ interface LongEntity {
  * row scrolled out of view waits on the border of the list: it shrinks to a mark of its edge and takes no pointer.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
-  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*)]:opacity-0
   data-[v-handle-clipped]:pointer-events-none data-[v-handle-clipped]:size-1
   forced-colors:opacity-100! [header>&]:data-[vui-connected=true]:opacity-60`;
 

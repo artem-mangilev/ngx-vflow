@@ -64,7 +64,7 @@ To disable the selection-box gesture, provide `withShortcuts({ modifiers: { sele
 
 ### Template state access
 
-The `preselected` state is also exposed in rendering contexts, so custom templates can style the drag-preview state differently from the final selected state.
+The host of a covered entity already carries `data-v-selected`, so CSS shows the preview like the selection. The `preselected` state is also exposed in rendering contexts, so custom templates can style the drag-preview state differently from the final selected state.
 
 - Node template contexts expose `preselected` together with `selected`.
 - Component nodes read the same `preselected` signal from `injectNode()`.

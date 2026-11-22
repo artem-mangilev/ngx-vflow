@@ -94,10 +94,10 @@ To validate connections with your own rule, see
 - To keep a handle from starting connections, set `[canStart]="false"`. A press on it then drags the node.
 - To keep it from accepting them, set `[canAccept]="false"`.
 
-Both are reflected in attributes, so a disabled handle can be dimmed:
+Each is reflected in an attribute present while it is on, so a handle without it can be dimmed:
 
 ```css
-.dot[data-v-handle-can-start='false'] {
+.dot:not([data-v-handle-can-start]) {
   opacity: 0.5;
 }
 ```

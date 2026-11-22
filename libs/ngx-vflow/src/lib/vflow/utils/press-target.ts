@@ -33,7 +33,7 @@ export function pressTarget(target: EventTarget | null): PressTarget {
   if (!(target instanceof Element)) return NO_TARGET;
 
   const nearest = target.closest(
-    '[data-v-handle-type]:not([data-v-handle-can-start="false"]), [data-v-reconnect-handle], [data-v-drag-handle]',
+    '[data-v-handle-type][data-v-handle-can-start], [data-v-reconnect-handle], [data-v-drag-handle]',
   );
   const isDragHandle = !!nearest?.hasAttribute('data-v-drag-handle');
 

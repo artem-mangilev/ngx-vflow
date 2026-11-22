@@ -35,7 +35,7 @@
   initial-value: #fff;
 }
 
-// `[data-v-alignment-guides]`, drawn at 50%.
+// `[data-v-alignment-guide]`, drawn at 50%.
 @property --v-alignment-guides {
   syntax: '<color>';
   inherits: true;

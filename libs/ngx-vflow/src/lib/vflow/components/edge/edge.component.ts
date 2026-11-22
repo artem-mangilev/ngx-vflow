@@ -52,8 +52,8 @@ function leadingGroup(view: EmbeddedViewRef<unknown>): Element | null {
   // Identity and selection are host bindings by decision, as in NodeComponent; the rest stays in effects.
   host: {
     '[attr.data-v-edge]': 'model().edge.id',
-    '[attr.data-v-selected]': "model().selected() ? '' : null",
-    '[attr.data-v-preselected]': "model().preselected() ? '' : null",
+    // Also while the selection box covers it: the box shows what a release will select.
+    '[attr.data-v-selected]': "model().selected() || model().preselected() ? '' : null",
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the interaction stroke and from presentation elements bubble here.

@@ -62,7 +62,7 @@ The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is ras
 
 Three kinds of state stay separate so they can be shown at once:
 
-- **Interaction** is owned by core and read from its DOM: `vuiNode`, `vuiGroup` and `vuiEdge` show the selection of the node or edge host they are in (`data-v-selected`, or `data-v-preselected` inside the selection box). Focus comes from the core wrapper.
+- **Interaction** is owned by core and read from its DOM: `vuiNode`, `vuiGroup` and `vuiEdge` show the selection of the node or edge host they are in (`data-v-selected`, also while the selection box covers it). Focus comes from the core wrapper.
 - **Diagnostics** about the model and **application status** are both your vocabulary and your components: one badge of your design system per message, so a warning and a running status sit side by side. A status is presentation only and never disables anything; let the text name the activity ("Running", "Syncing"), and put an indicator that changes while the user works in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
@@ -195,7 +195,7 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--v-background-pattern`                          | Dots and grid lines (`[data-v-background-pattern]`)            | `--vui-border`          |
 | `--v-selection-box`                               | `[data-v-selection-box]` stroke; its fill is the color at 12%  | `--vui-accent`          |
 | `--v-resize-control`, `--v-resize-control-border` | `[data-v-resize-control]` handles and lines; the handle border | accent, surface         |
-| `--v-alignment-guides`                            | `[data-v-alignment-guides]`, at 50%                            | `--vui-foreground`      |
+| `--v-alignment-guides`                            | `[data-v-alignment-guide]`, at 50%                             | `--vui-foreground`      |
 | `--v-connection`                                  | The line of a connection in progress without a template        | `--vui-muted`           |
 | `--v-minimap-node`, `--v-minimap-mask`            | Fill of minimap nodes; the mask outside the viewport           | mixes of muted          |
 | `--v-minimap-node-radius`                         | Corner radius of minimap nodes, in flow pixels                 | surface radius          |

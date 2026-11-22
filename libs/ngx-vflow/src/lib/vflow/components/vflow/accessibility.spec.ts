@@ -231,7 +231,7 @@ describe('public graph accessibility', () => {
         expect(handle.hasAttribute(name), name).toBe(false);
       }
     }
-    expect(handles[0].getAttribute('data-v-handle-can-accept')).toBe('false');
+    expect(handles[0].hasAttribute('data-v-handle-can-accept')).toBe(false);
     root.querySelector('button')!.click();
     expect(host.clicks).toBe(1);
   });

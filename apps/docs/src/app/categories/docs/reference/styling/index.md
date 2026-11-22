@@ -6,10 +6,13 @@ connection preview, the minimap and the focus ring.
 
 | Element   | Attributes                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------- |
-| Node host | `data-v-node="<id>"`, `data-v-selected`, `data-v-preselected`                                           |
-| Edge host | `data-v-edge="<id>"`, `data-v-selected`, `data-v-preselected`                                           |
+| Node host | `data-v-node="<id>"`, `data-v-selected`                                                                 |
+| Edge host | `data-v-edge="<id>"`, `data-v-selected`                                                                 |
 | Handle    | `data-v-handle`, `data-v-handle-type`, `data-v-handle-position`, `data-v-handle-state` and the policies |
 | Flow root | `data-v-root`                                                                                           |
+
+`data-v-selected` is also present while the selection box covers the entity, so a presentation shows what a release
+will select; the `preselected` signal of the template context tells the two apart.
 
 The node and edge hosts are elements of the library, outside the view of an application component. The handle is an
 element of the application. The values of the handle attributes are in the
@@ -59,7 +62,7 @@ ends, not on every frame of a gesture.
 | `data-v-background-pattern`                                                    | The background pattern                                                   |
 | `data-v-selection-box`                                                         | The selection box                                                        |
 | `data-v-resize-control` (`handle` or `line`), `data-v-resize-control-position` | Resize controls, see [Resizing](/docs/nodes/resizer)                     |
-| `data-v-alignment-guides`, `data-v-alignment-guide` (`line` or `point`)        | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping)  |
+| `data-v-alignment-guide` (`line` or `point`)                                   | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping)  |
 | `data-v-marker="<type>"`                                                       | An edge marker, see [Markers](/docs/edges/markers)                       |
 | `data-v-panel="<position>"`                                                    | An element placed with `vPanel`, see [Panels](/docs/viewport/panel)      |
 | `data-v-node-toolbar="<position>"`                                             | A `v-node-toolbar` element, see [Node toolbar](/docs/nodes/node-toolbar) |
