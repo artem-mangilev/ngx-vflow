@@ -28,12 +28,9 @@ import { pressTarget } from '../utils/press-target';
     '[attr.data-v-handle-can-start]': 'canStart()',
     '[attr.data-v-handle-can-accept]': 'canAccept()',
     '[attr.data-v-pending]': "pending() ? '' : null",
-    '[style.position]': "placement() ? 'absolute' : null",
-    '[style.top]': 'placement()?.top ?? null',
-    '[style.left]': 'placement()?.left ?? null',
-    '[style.right]': 'placement()?.right ?? null',
-    '[style.bottom]': 'placement()?.bottom ?? null',
-    '[style.transform]': 'placement()?.transform ?? null',
+    '[attr.data-v-handle-placed]': "placed() ? '' : null",
+    '[style.top]': 'styles()?.top ?? null',
+    '[style.left]': 'styles()?.left ?? null',
     '(pointerdown)': 'startConnection($event)',
     '(pointerenter)': 'pointerEnter()',
     '(pointerleave)': 'pointerLeave()',
@@ -87,19 +84,9 @@ export class VflowHandleDirective {
   /** Rendered but not measured yet, so not placed: the flow stylesheet hides it until the next measurement. */
   protected readonly pending = computed(() => this.model.hasBox() && !this.model.isMeasured());
 
-  protected readonly placement = computed(() => {
-    if (this.layout() !== 'auto' || this.model.dynamic()) return null;
-
-    const styles = this.model.layoutStyles();
-    // Styles anchored to the right or bottom edge put the element's far half outside of that edge.
-    const x = styles.right === 'auto' ? '-50%' : '50%';
-    const y = styles.bottom === 'auto' ? '-50%' : '50%';
-
-    return {
-      ...styles,
-      transform: `translate(${x}, ${y}) translate(${this.offsetX()}px, ${this.offsetY()}px)`,
-    };
-  });
+  /** The flow stylesheet makes a placed element absolute and centers it on the `top` and `left` written here. */
+  protected readonly placed = computed(() => this.layout() === 'auto' && !this.model.dynamic());
+  protected readonly styles = this.model.layoutStyles;
 
   constructor() {
     const node = this.model.parentNode;

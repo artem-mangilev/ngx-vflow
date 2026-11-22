@@ -5,8 +5,7 @@ import { Connection, Edge, Vflow, addEdges, createEdges, createNodes } from 'ngx
 import { SquareHandleComponent } from './square-handle.component';
 
 /**
- * The look of a plain element with `vHandle`: a dot that follows the attributes core reflects on the handle. In the
- * auto layout the directive owns `transform`, so the hover effect uses the `scale` property.
+ * The look of a plain element with `vHandle`: a dot that follows the attributes core reflects on the handle.
  */
 const DOT = `size-3 rounded-full bg-vui-foreground transition-[scale] hover:scale-125
   data-[v-handle-state=valid]:bg-vui-success data-[v-handle-state=invalid]:bg-vui-danger

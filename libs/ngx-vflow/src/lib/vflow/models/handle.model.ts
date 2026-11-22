@@ -10,12 +10,11 @@ export type { HandleState } from '../types/handle-type.type';
 export type HandleLayoutStyles = {
   top: string;
   left: string;
-  right: string;
-  bottom: string;
 };
 
 export type HandleGeometry = {
-  layoutStyles: HandleLayoutStyles;
+  /** `null`: nothing to write, for a handle the library does not place or has not measured yet. */
+  layoutStyles: HandleLayoutStyles | null;
   localPoint: Point;
 };
 
@@ -25,8 +24,8 @@ type Box = { left: number; top: number; width: number; height: number };
 export interface HandleBoxes {
   /** The box of the element. */
   handle: Box;
-  /** The box of the parent element, which anchors the `auto` layout; `null` without a parent, which the node box replaces. */
-  anchor: Box | null;
+  /** The box of the parent element, which anchors the `auto` layout. */
+  anchor: Box;
   /** Origin of the containing block of the element, when it is not the node; see {@link containingBlockOrigin}. */
   origin: Point | null;
 }
@@ -87,8 +86,7 @@ function clientRect(context: HandleMeasureContext, element: Element): DOMRect {
   return rect;
 }
 
-const UNPLACED: HandleLayoutStyles = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto' };
-const UNMEASURED: HandleGeometry = { layoutStyles: UNPLACED, localPoint: { x: 0, y: 0 } };
+const UNMEASURED: HandleGeometry = { layoutStyles: null, localPoint: { x: 0, y: 0 } };
 
 /**
  * A connection point of a node. The DOM is read in {@link measure}, a pure read of the element's boxes; the layout
@@ -128,27 +126,27 @@ export class HandleModel {
     const node = { width: this.parentNode.width(), height: this.parentNode.height() };
 
     if (position === 'auto' || position === 'center') {
-      return { layoutStyles: UNPLACED, localPoint: { x: node.width / 2, y: node.height / 2 } };
+      return { layoutStyles: null, localPoint: { x: node.width / 2, y: node.height / 2 } };
     }
 
     const boxes = this.boxes();
     if (!boxes) return UNMEASURED;
 
     if (this.layout() === 'manual') {
-      return { layoutStyles: UNPLACED, localPoint: sidePoint(position, boxes.handle) };
+      return { layoutStyles: null, localPoint: sidePoint(position, boxes.handle) };
     }
 
     return computeAutoGeometry({
       position,
       node,
       handle: boxes.handle,
-      anchor: boxes.anchor ?? { left: 0, top: 0, ...node },
+      anchor: boxes.anchor,
       offset: { x: this.offsetX(), y: this.offsetY() },
       origin: boxes.origin,
     });
   });
 
-  /** Styles of the `auto` layout, relative to the containing block of the element. */
+  /** Where the `auto` layout puts the element center, relative to the containing block of the element. */
   public readonly layoutStyles = computed(() => this.geometry().layoutStyles);
 
   /** Connection point relative to the node origin, in flow units; the node center for a dynamic position. */
@@ -183,7 +181,9 @@ export class HandleModel {
       return null;
     }
 
-    if (!element.getClientRects().length) {
+    // An element with a layout box has a parent; the check also narrows the type.
+    const parent = element.parentElement;
+    if (!parent || !element.getClientRects().length) {
       return HANDLE_WITHOUT_BOX;
     }
 
@@ -197,7 +197,7 @@ export class HandleModel {
 
     return {
       handle: toLocal(element.getBoundingClientRect()),
-      anchor: element.parentElement ? toLocal(clientRect(context, element.parentElement)) : null,
+      anchor: toLocal(clientRect(context, parent)),
       origin: containingBlockOrigin(element, nodeElement, context),
     };
   }
@@ -291,36 +291,33 @@ function computeAutoGeometry({
 }): HandleGeometry {
   const anchorX = anchor.left + anchor.width / 2;
   const anchorY = anchor.top + anchor.height / 2;
+  const dx = offset.x - (origin?.x ?? 0);
+  const dy = offset.y - (origin?.y ?? 0);
   const px = (value: number) => `${value}px`;
+  // While the node is the containing block, a percentage follows its size in CSS, ahead of the measured size.
+  const far = (size: number, shift: number) => (origin ? px(size + shift) : `calc(100% + ${shift}px)`);
 
-  // The element center sits on the node side; the connection point is the outer edge of the element.
+  // The flow stylesheet centers the element on `top` and `left`, so its center sits on the node side; the
+  // connection point is the outer edge of the element.
   switch (position) {
     case 'left':
       return {
-        layoutStyles: origin
-          ? { top: px(anchorY - origin.y), left: px(-origin.x), right: 'auto', bottom: 'auto' }
-          : { top: px(anchorY), left: '0', right: 'auto', bottom: 'auto' },
+        layoutStyles: { top: px(anchorY + dy), left: px(dx) },
         localPoint: { x: -handle.width / 2 + offset.x, y: anchorY + offset.y },
       };
     case 'right':
       return {
-        layoutStyles: origin
-          ? { top: px(anchorY - origin.y), left: px(node.width - origin.x), right: 'auto', bottom: 'auto' }
-          : { top: px(anchorY), left: 'auto', right: '0', bottom: 'auto' },
+        layoutStyles: { top: px(anchorY + dy), left: far(node.width, dx) },
         localPoint: { x: node.width + handle.width / 2 + offset.x, y: anchorY + offset.y },
       };
     case 'top':
       return {
-        layoutStyles: origin
-          ? { top: px(-origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
-          : { top: '0', left: px(anchorX), right: 'auto', bottom: 'auto' },
+        layoutStyles: { top: px(dy), left: px(anchorX + dx) },
         localPoint: { x: anchorX + offset.x, y: -handle.height / 2 + offset.y },
       };
     case 'bottom':
       return {
-        layoutStyles: origin
-          ? { top: px(node.height - origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
-          : { top: 'auto', left: px(anchorX), right: 'auto', bottom: '0' },
+        layoutStyles: { top: far(node.height, dy), left: px(anchorX + dx) },
         localPoint: { x: anchorX + offset.x, y: node.height + handle.height / 2 + offset.y },
       };
   }

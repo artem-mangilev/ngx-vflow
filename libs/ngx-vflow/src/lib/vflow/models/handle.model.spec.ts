@@ -68,7 +68,7 @@ describe('HandleModel', () => {
 
     syncHandle(model);
 
-    expect(model.layoutStyles().top).toBe('40px');
+    expect(model.layoutStyles()?.top).toBe('40px');
     expect(model.pointAbsolute()).toEqual({ x: 110, y: 40 });
 
     parentNode.width.set(160);
@@ -79,7 +79,7 @@ describe('HandleModel', () => {
 
     syncHandle(model, 2);
 
-    expect(model.layoutStyles().top).toBe('80px');
+    expect(model.layoutStyles()?.top).toBe('80px');
     expect(model.pointAbsolute()).toEqual({ x: 170, y: 80 });
   });
 
@@ -89,16 +89,17 @@ describe('HandleModel', () => {
 
     syncHandle(model);
     expect(model.localPoint()).toEqual({ x: 105, y: 20 });
-    expect(model.layoutStyles()).toEqual({ top: '20px', left: 'auto', right: '0', bottom: 'auto' });
+    expect(model.layoutStyles()).toEqual({ top: '20px', left: 'calc(100% + 0px)' });
 
     // A positive offset moves the element and its point to the right; no new measurement is needed.
     position.set('left');
     offsetX.set(4);
     expect(model.localPoint()).toEqual({ x: -1, y: 20 });
-    expect(model.layoutStyles()).toEqual({ top: '20px', left: '0', right: 'auto', bottom: 'auto' });
+    expect(model.layoutStyles()).toEqual({ top: '20px', left: '4px' });
 
     // The manual layout takes the middle of the element's side as it is rendered and ignores offsets.
     layout.set('manual');
+    expect(model.layoutStyles()).toBeNull();
     expect(model.localPoint()).toEqual({ x: 30, y: 20 });
 
     position.set('bottom');
@@ -167,7 +168,7 @@ describe('HandleModel', () => {
 
     model.reset();
     expect(model.isMeasured()).toBe(false);
-    expect(model.layoutStyles()).toEqual({ top: 'auto', left: 'auto', right: 'auto', bottom: 'auto' });
+    expect(model.layoutStyles()).toBeNull();
 
     syncHandle(model);
     expect(model.isMeasured()).toBe(true);

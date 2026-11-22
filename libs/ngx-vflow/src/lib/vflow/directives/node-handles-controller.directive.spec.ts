@@ -78,7 +78,8 @@ describe('NodeHandlesControllerDirective', () => {
     const firstElement = document.createElement('div');
     const secondElement = document.createElement('div');
     const executionOrder: string[] = [];
-    const boxes = { handle: { left: 0, top: 0, width: 10, height: 10 }, anchor: null, origin: null };
+    const box = { left: 0, top: 0, width: 10, height: 10 };
+    const boxes = { handle: box, anchor: box, origin: null };
     anchor.append(firstElement, secondElement);
     const first = { measure: vi.fn(), applyMeasurement: vi.fn(), element: firstElement };
     const second = { measure: vi.fn(), applyMeasurement: vi.fn(), element: secondElement };

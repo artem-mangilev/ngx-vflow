@@ -155,7 +155,7 @@ describe('VflowHandleDirective', () => {
     expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 40 });
     expect(target.localPoint()).toEqual({ x: -5, y: 20 });
     expect(source.localPoint()).toEqual({ x: 125, y: 40 });
-    expect(handleElement(fixture, 'right').style.right).toBe('0px');
+    expect(handleElement(fixture, 'right').style.left).toBe('calc(100% + 0px)');
   });
 
   it('moves the handle when its side changes', async () => {
@@ -181,7 +181,7 @@ describe('VflowHandleDirective', () => {
     // Row center: 4px border + 20px margin + 10px half height.
     expect(centerInNode(right)).toEqual({ x: 120, y: 34 });
     expect(source.localPoint()).toEqual({ x: 125, y: 34 });
-    expect(left.style.transform).toBe('');
+    expect(getComputedStyle(left).translate).toBe('none');
     // Manual: the left side of the element as rendered, inside the 4px border.
     expect(target.localPoint()).toEqual({ x: 34, y: 24 });
   });

@@ -39,10 +39,10 @@ An element with `vDragHandle` inside the handle keeps dragging the node. The edg
 
 ## Layout
 
-- `auto` (default): the directive writes `position: absolute`, the side offsets and `transform` on the element, so it sits on the `position` side of the node at the center of its parent element. The connection point is the outer edge of the element on that side.
+- `auto` (default): the directive writes `top` and `left` on the element, and the flow stylesheet makes it absolute and centers it on that point with `translate`, so it sits on the `position` side of the node at the center of its parent element. The connection point is the outer edge of the element on that side.
 - `manual`: the directive writes no styles. Position the element yourself; the connection point is read from the element's box on the `position` side, and `offsetX` and `offsetY` are ignored.
 
-In the `auto` layout the directive owns `transform` on the element.
+In the `auto` layout the flow owns `position`, `top`, `left` and `translate` on the element; `transform` and `scale` stay yours.
 
 A handle is measured only while it is in layout. An element with `display: none`, or inside one, is not measured, and edges attached to it are hidden. `visibility: hidden` and `opacity: 0` keep the handle in layout.
 

@@ -135,6 +135,13 @@
     [data-v-resize-control] {
       touch-action: none;
     }
+
+    // A handle in the `auto` layout: the directive writes `top` and `left` of a point on the node side, and the
+    // element is centered on it. `translate` leaves `transform` and `scale` to the application.
+    [data-v-handle-placed] {
+      position: absolute;
+      translate: -50% -50%;
+    }
   }
 }
 
