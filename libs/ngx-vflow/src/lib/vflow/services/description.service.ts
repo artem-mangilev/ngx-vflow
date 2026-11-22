@@ -49,7 +49,6 @@ export class DescriptionService implements OnDestroy {
     if (!this.container) {
       this.container = this.document.createElement('div');
       this.container.hidden = true;
-      this.container.setAttribute('data-v-descriptions', '');
       this.document.body.appendChild(this.container);
     }
     return this.container;

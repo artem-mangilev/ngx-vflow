@@ -62,6 +62,8 @@ const PADDING = 5;
       /* Without specificity: any selector of the application wins, an element selector included. */
       :where(:host) {
         display: block;
+        /* A frame the application adds stays inside the size it sets. */
+        box-sizing: border-box;
         width: clamp(120px, 20%, 240px);
         aspect-ratio: 4 / 3;
         background: var(--v-background);

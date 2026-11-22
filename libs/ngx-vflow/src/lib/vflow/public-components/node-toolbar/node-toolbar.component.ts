@@ -22,33 +22,33 @@ import { VflowNoDragDirective } from '../../public-directives/gesture-exclusions
         --_gap: var(--v-node-toolbar-offset, 10px);
       }
 
-      :host([data-position='top']) {
+      :host([data-v-node-toolbar='top']) {
         bottom: calc(100% + var(--_gap));
         left: 50%;
-        transform: translateX(-50%);
+        translate: -50% 0;
       }
 
-      :host([data-position='bottom']) {
+      :host([data-v-node-toolbar='bottom']) {
         top: calc(100% + var(--_gap));
         left: 50%;
-        transform: translateX(-50%);
+        translate: -50% 0;
       }
 
-      :host([data-position='left']) {
+      :host([data-v-node-toolbar='left']) {
         right: calc(100% + var(--_gap));
         top: 50%;
-        transform: translateY(-50%);
+        translate: 0 -50%;
       }
 
-      :host([data-position='right']) {
+      :host([data-v-node-toolbar='right']) {
         left: calc(100% + var(--_gap));
         top: 50%;
-        transform: translateY(-50%);
+        translate: 0 -50%;
       }
     `,
   ],
   host: {
-    '[attr.data-position]': 'position()',
+    '[attr.data-v-node-toolbar]': 'position()',
   },
   hostDirectives: [VflowNoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,

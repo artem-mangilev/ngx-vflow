@@ -124,10 +124,6 @@
   user-select: none;
 
   ::ng-deep {
-    * {
-      box-sizing: border-box;
-    }
-
     // Touches on these start library gestures, so they must not scroll the page even where the pane lets it.
     [data-v-handle-type],
     [data-v-drag-handle],
@@ -206,10 +202,8 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  overflow: hidden;
 }
 
-// d3-zoom target, receives all wheel/drag events
 // The application's own overlays. The layer lets the pointer through to the pane; the elements in it take it.
 .v-content-layer {
   position: absolute;
@@ -258,69 +252,58 @@
   translate: 0 -50%;
 }
 
+// Target of the viewport gestures.
 .v-pane {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   z-index: 1;
   -webkit-tap-highlight-color: transparent;
 }
 
 // Transformed layer (translate + scale). Must never block the pane.
 .v-viewport {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 0;
   height: 0;
   transform-origin: 0 0;
+}
+
+// The layers in flow space: no size, at the origin of the viewport, and the pointer goes through them to the pane.
+// The edges and nodes layers have no z-index, so the z-index of each edge competes with the z-index of each node.
+.v-viewport,
+.v-defs-svg,
+.v-edges-layer,
+.v-nodes-layer,
+.v-edge-labels-layer,
+.v-portal-layer,
+.v-overlay-svg,
+.v-connection-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
   pointer-events: none;
+}
+
+.v-defs-svg,
+.v-overlay-svg,
+.v-connection-svg {
+  overflow: visible;
 }
 
 .v-defs-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 0;
   height: 0;
-  overflow: visible;
-  pointer-events: none;
 }
 
-// No z-index here so per-edge svg z-index competes with per-node z-index
-.v-edges-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-// No z-index here so per-node z-index competes with per-edge z-index
-.v-nodes-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform-origin: 0 0;
-  pointer-events: none;
-}
-
-.v-edge-labels-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
+.v-overlay-svg,
+.v-connection-svg {
+  width: 1px;
+  height: 1px;
 }
 
 // Content of the application in flow space. The layers have no size and let the pointer through; so does the
 // content, unless it asks for the pointer itself. Below every entity, groups under edges included; above every entity
 // and under the overlays, so the alignment guides, the selection box and the connection line stay visible.
 .v-portal-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-
   &[data-v-portal-layer='below'] {
     z-index: -1000000;
   }
@@ -331,23 +314,9 @@
 }
 
 .v-overlay-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  overflow: visible;
-  pointer-events: none;
   z-index: 1000000;
 }
 
 .v-connection-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  overflow: visible;
-  pointer-events: none;
   z-index: 1000001;
 }

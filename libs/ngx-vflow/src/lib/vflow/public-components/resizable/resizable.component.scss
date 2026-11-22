@@ -9,6 +9,7 @@
 // the side or corner (`top`, `right`, `bottom`, `left`, `top-left`, `top-right`, `bottom-left`, `bottom-right`).
 [data-v-resize-control] {
   position: absolute;
+  box-sizing: border-box;
   pointer-events: all;
 }
 
@@ -41,7 +42,7 @@
   border: 1px solid var(--v-resize-control-border);
   border-radius: 1px;
   translate: -50% -50%;
-  scale: var(--resizer-scale, 1);
+  scale: var(--_scale, 1);
 }
 
 // Side lines
@@ -51,55 +52,42 @@
   border-color: var(--v-resize-control);
 }
 
+// A line is one pixel wide, so a border on one of its sides draws it.
 [data-v-resize-control='line'][data-v-resize-control-position='left'],
 [data-v-resize-control='line'][data-v-resize-control-position='right'] {
   width: 1px;
-  transform: translate(-50%, 0);
+  translate: -50% 0;
   top: 0;
   height: 100%;
-}
-
-[data-v-resize-control='line'][data-v-resize-control-position='left'] {
   border-left-width: 1px;
-}
-
-[data-v-resize-control='line'][data-v-resize-control-position='right'] {
-  border-right-width: 1px;
 }
 
 [data-v-resize-control='line'][data-v-resize-control-position='top'],
 [data-v-resize-control='line'][data-v-resize-control-position='bottom'] {
   height: 1px;
-  transform: translate(0, -50%);
+  translate: 0 -50%;
   left: 0;
   width: 100%;
-}
-
-[data-v-resize-control='line'][data-v-resize-control-position='top'] {
   border-top-width: 1px;
-}
-
-[data-v-resize-control='line'][data-v-resize-control-position='bottom'] {
-  border-bottom-width: 1px;
 }
 
 // Placement on the gap outside the node box: a side, or the sides a corner is named after.
 [data-v-resize-control-position='left'],
 [data-v-resize-control-position$='-left'] {
-  left: calc(0px - var(--resizer-gap));
+  left: calc(0px - var(--_gap));
 }
 
 [data-v-resize-control-position='right'],
 [data-v-resize-control-position$='-right'] {
-  left: calc(100% + var(--resizer-gap));
+  left: calc(100% + var(--_gap));
 }
 
 [data-v-resize-control-position^='top'] {
-  top: calc(0px - var(--resizer-gap));
+  top: calc(0px - var(--_gap));
 }
 
 [data-v-resize-control-position^='bottom'] {
-  top: calc(100% + var(--resizer-gap));
+  top: calc(100% + var(--_gap));
 }
 
 @media (forced-colors: active) {

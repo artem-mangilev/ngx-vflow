@@ -172,7 +172,7 @@ describe('VflowResizableComponent', () => {
     const controls = Array.from(host.querySelectorAll<HTMLElement>('[data-v-resize-control]'));
 
     expect(controls.length).toBe(8);
-    controls.forEach((control) => expect(getComputedStyle(control).getPropertyValue('--resizer-gap')).toBe('4px'));
+    controls.forEach((control) => expect(getComputedStyle(control).getPropertyValue('--_gap')).toBe('4px'));
   });
 
   it('renders controls at the default 1.5px gap', async () => {

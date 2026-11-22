@@ -651,6 +651,8 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 
 The `vflow` element is now its own stacking context. The minimap no longer paints above application overlays, and positioned elements placed after the flow no longer need a `z-index` to appear above its pane. To keep the flow above or below other page elements, set `z-index` on the `vflow` element or its container.
 
+The flow no longer sets `box-sizing: border-box` on every element inside it, the content of nodes and panels included. If your node templates relied on it, set it in your own CSS; Tailwind and most CSS resets already do.
+
 ### Minimap
 
 The `v-minimap` element is now the minimap block itself, an ordinary element of the flow content:
@@ -669,6 +671,7 @@ Replace `class="nodrag"` with `vNoDrag` and import the directive or `Vflow`. The
 ### Node toolbar
 
 The node toolbar is no longer rendered in a separate layer above the graph; the `v-node-toolbar` element itself is the positioned box inside the node. Selectors that targeted `.v-toolbar` must target `v-node-toolbar`, and node presentations clipped with `overflow: hidden` must stop clipping the node box.
+The element carries its side as `data-v-node-toolbar="top|right|bottom|left"` and is centered on that side with the `translate` property, so `transform` stays yours.
 
 ### Selection settings
 

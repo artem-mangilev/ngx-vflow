@@ -54,17 +54,18 @@ ends, not on every frame of a gesture.
 
 ## Part attributes
 
-| Attribute                                                                      | Part                                                                    |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `data-v-background-pattern`                                                    | The background pattern                                                  |
-| `data-v-selection-box`                                                         | The selection box                                                       |
-| `data-v-resize-control` (`handle` or `line`), `data-v-resize-control-position` | Resize controls, see [Resizing](/docs/nodes/resizer)                    |
-| `data-v-alignment-guides`, `data-v-alignment-guide` (`line` or `point`)        | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping) |
-| `data-v-marker="<type>"`                                                       | An edge marker, see [Markers](/docs/edges/markers)                      |
-| `data-v-panel="<position>"`                                                    | An element placed with `vPanel`, see [Panels](/docs/viewport/panel)     |
+| Attribute                                                                      | Part                                                                     |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `data-v-background-pattern`                                                    | The background pattern                                                   |
+| `data-v-selection-box`                                                         | The selection box                                                        |
+| `data-v-resize-control` (`handle` or `line`), `data-v-resize-control-position` | Resize controls, see [Resizing](/docs/nodes/resizer)                     |
+| `data-v-alignment-guides`, `data-v-alignment-guide` (`line` or `point`)        | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping)  |
+| `data-v-marker="<type>"`                                                       | An edge marker, see [Markers](/docs/edges/markers)                       |
+| `data-v-panel="<position>"`                                                    | An element placed with `vPanel`, see [Panels](/docs/viewport/panel)      |
+| `data-v-node-toolbar="<position>"`                                             | A `v-node-toolbar` element, see [Node toolbar](/docs/nodes/node-toolbar) |
 
-These parts are rendered by the library, outside the view of an application component, except the panel, which is
-an element of the application.
+These parts are rendered by the library, outside the view of an application component, except the panel and the
+node toolbar, which are elements of the application.
 
 ## Gesture attributes
 

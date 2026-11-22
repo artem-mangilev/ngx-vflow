@@ -3,8 +3,8 @@
     <div
       vNoDrag
       class="v-resize-controls"
-      [style.--resizer-gap.px]="gap()"
-      [style.--resizer-scale]="scale()"
+      [style.--_gap.px]="gap()"
+      [style.--_scale]="scale()"
       (pointerdown)="press($event)">
       @for (control of controls; track control.position) {
         <div [attr.data-v-resize-control]="control.kind" [attr.data-v-resize-control-position]="control.position"></div>
