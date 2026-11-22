@@ -6,7 +6,7 @@ A click selects a node or an edge, and a box dragged over the canvas selects sev
 2. A press that turns into a drag, a resize, a pan or a selection box does not select the entity under the pointer.
 3. To keep a click on an embedded control from selecting its entity, mark the control with `vNoSelect`, like the gesture exclusions `vNoDrag` and `vNoPan`. In the demo below the Approve button of the Review node carries it: a click on it counts an approval and leaves the selection as it is, while a click anywhere else on the card selects the node.
 
-An edge is clickable along its whole path: the flow draws a transparent stroke of `interactionWidth` (20px by default) in the edge host. A `<svg:g vEdgeInteractionArea>` around the presentation moves the stroke inside the group, where the group's CSS `:hover` and listeners see it.
+An edge is clickable along its whole path: the flow draws a transparent stroke of `interactionWidth` (20px by default). When the edge template starts with a `<svg:g>`, or a component draws the edge, the stroke sits inside that group, where the group's CSS `:hover` and listeners see it; otherwise it sits in the edge host. The stroke shows the pointer cursor only while the edge can be selected.
 
 Selected nodes and edges are raised above their neighbours while `elevateNodesOnSelect` and `elevateEdgesOnSelect` are on (the default), whether the selection came from a click, the keyboard, the selection box or the application.
 

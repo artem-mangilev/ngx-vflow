@@ -255,7 +255,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
             </article>
           </ng-template>
           <!-- A number travels along a dashed edge. -->
-          <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+          <svg:g *vEdge="let ctx">
             <svg:path
               vuiEdge
               [attr.d]="ctx.path()"

@@ -48,8 +48,8 @@ its projected buttons the look of its own.
 `vuiNode`, `vuiGroup` and `vuiEdge` show the selection of their core host (`data-v-selected`, `data-v-preselected`); nothing to bind. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
-gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and
-`vEdgeInteractionArea` keeps the edge hit area inside the group. UI never changes roles, focus or graph state.
+gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and the edge hit
+area sits inside the `<svg:g>` an edge template starts with. UI never changes roles, focus or graph state.
 
 ## Theme
 

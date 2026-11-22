@@ -65,7 +65,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
           (nodeDragEnd)="dragEnd($event)"
           (initialized)="flow().fitView({ maxZoom: 1 })">
           <ng-template let-ctx vEdge>
-            <svg:g vEdgeInteractionArea>
+            <svg:g>
               <!-- A link of content to a team is dashed. -->
               <svg:path
                 vuiEdge

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from '@angular/core';
 import { Vui } from '@vflow/ui';
-import { VflowEdgeInteractionAreaDirective, Vflow } from 'ngx-vflow';
+import { Vflow } from 'ngx-vflow';
 
 /**
  * Presentations shared by the documentation demos. Core is headless: every demo supplies
@@ -91,7 +91,6 @@ export class DocsNodeComponent {
  */
 @Component({
   selector: 'g[docsEdge]',
-  hostDirectives: [VflowEdgeInteractionAreaDirective],
   imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

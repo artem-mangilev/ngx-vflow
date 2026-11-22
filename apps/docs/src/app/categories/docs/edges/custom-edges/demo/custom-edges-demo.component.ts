@@ -12,7 +12,7 @@ interface LinkData {
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
     <!-- The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. -->
-    <svg:g *vEdge="let ctx of edges" vEdgeInteractionArea class="group">
+    <svg:g *vEdge="let ctx of edges" class="group">
       <svg:path
         class="fill-none stroke-2 group-hover:stroke-3"
         [class]="ctx.selected() ? 'stroke-vui-accent' : 'stroke-vui-foreground'"

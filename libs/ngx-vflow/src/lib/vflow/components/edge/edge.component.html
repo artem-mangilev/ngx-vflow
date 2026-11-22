@@ -1,13 +1,19 @@
-<svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
+<!--
+  The hit area of the edge. An effect moves it into the group the presentation starts with, so the styles are inline:
+  the styles of a presentation must not repaint it. A click on an edge that cannot be selected does nothing, so the
+  stroke does not promise one with a cursor.
+-->
+<svg:path
+  #interactionStroke
+  aria-hidden="true"
+  data-v-interactive-edge
+  style="fill: none; stroke: transparent; pointer-events: stroke"
+  [attr.d]="model().path().path"
+  [style.display]="model().interactionWidth() > 0 ? null : 'none'"
+  [style.cursor]="model().selectable() ? 'pointer' : null"
+  [style.stroke-width.px]="model().interactionWidth()" />
 
-<!-- The hit area of an edge without g[vEdgeInteractionArea]; the directive draws it inside the presentation instead -->
-@if (model().interactionAreasCount() === 0 && model().interactionWidth() > 0) {
-  <svg:path
-    aria-hidden="true"
-    data-v-interactive-edge
-    [attr.d]="model().path().path"
-    [style.stroke-width.px]="model().interactionWidth()" />
-}
+<svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
 
 @if (model().component; as component) {
   <ng-container
@@ -15,12 +21,10 @@
     [entityComponentOutletLoad]="model().shouldLoad()"
     [entityComponentOutletInjector]="injector"
     [entityComponentOutletSvgHost]="true"
+    (entityComponentHost)="presentationRoot.set($event)"
     (entityComponentEvent)="pushComponentEvent($event)" />
-} @else if (edgeTemplate(); as edgeTemplate) {
-  <ng-container
-    [ngTemplateOutlet]="edgeTemplate"
-    [ngTemplateOutletContext]="model().context"
-    [ngTemplateOutletInjector]="injector" />
+} @else if (edgeTemplate()) {
+  <ng-container #templateOutlet />
 }
 
 @if (model().sourceHandle() && model().targetHandle()) {

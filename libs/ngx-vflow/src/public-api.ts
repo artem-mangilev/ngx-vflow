@@ -130,7 +130,6 @@ export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component
 // Directives
 export * from './lib/vflow/public-directives/template.directive';
 export * from './lib/vflow/public-directives/handle.directive';
-export * from './lib/vflow/public-directives/edge-interaction-area.directive';
 export * from './lib/vflow/public-directives/drag-handle.directive';
 export * from './lib/vflow/public-directives/gesture-exclusions.directive';
 export * from './lib/vflow/public-directives/portal.directive';

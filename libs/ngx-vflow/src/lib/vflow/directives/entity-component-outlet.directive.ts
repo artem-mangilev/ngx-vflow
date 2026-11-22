@@ -54,6 +54,8 @@ export class EntityComponentOutletDirective {
   public readonly entityComponentOutletSvgHost = input(false);
 
   public readonly entityComponentEvent = output<EntityComponentOutputEvent>();
+  /** The SVG group of a component created with `entityComponentOutletSvgHost`. */
+  public readonly entityComponentHost = output<Element>();
 
   private requested: EntityComponentType | null = null;
   private request = 0;
@@ -104,6 +106,7 @@ export class EntityComponentOutletDirective {
         hostElement: this.document.createElementNS(SVG_NAMESPACE, 'g'),
       });
       this.viewContainer.insert(ref.hostView);
+      this.entityComponentHost.emit(ref.location.nativeElement);
     } else {
       ref = this.viewContainer.createComponent(type, { injector });
     }

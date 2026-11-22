@@ -1,8 +1,8 @@
 import { Directive } from '@angular/core';
 
 /**
- * SVG presentation only. Put it inside a core `vEdgeInteractionArea` group for the hit area and selection, which is read
- * from the core edge host (`data-v-selected`, `data-v-preselected`).
+ * SVG presentation only. Core draws the hit area of the edge, and the selection is read from the core edge host
+ * (`data-v-selected`, `data-v-preselected`).
  */
 @Directive({
   selector: 'path[vuiEdge]',

@@ -46,7 +46,7 @@ const chord: CurveFactory = ({ sourcePoint, targetPoint }) => ({
         <span vHandle handleType="target" position="left"></span>
       </div>
       <ng-template vEdge let-ctx>
-        <svg:g vEdgeInteractionArea><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
+        <svg:g><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
         <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>
       </ng-template>
       <ng-template vConnection let-ctx><svg:path [attr.d]="ctx.path()" /></ng-template>

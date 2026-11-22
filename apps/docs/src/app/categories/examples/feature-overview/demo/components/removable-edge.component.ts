@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { DemoIconComponent, DocsButton } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { Vflow, VflowEdgeInteractionAreaDirective, injectEdge } from 'ngx-vflow';
+import { Vflow, injectEdge } from 'ngx-vflow';
 import { EdgeData } from '../services/flow-store.service';
 
 /**
  * An edge drawn by a component: a line with a label that holds a button, which removes the edge. The flow renders
- * the component on its own SVG group; the host directive moves the interaction stroke into that group, so hover and
- * clicks near the line reach this presentation.
+ * the component on its own SVG group, which holds the interaction stroke, so hover and clicks near the line reach this
+ * presentation.
  *
  * A label is HTML in the label layer of the flow, so it can hold a control.
  */
 @Component({
   selector: 'g[docsRemovableEdge]',
-  hostDirectives: [VflowEdgeInteractionAreaDirective],
   template: `
     @let label = edge.data().label;
 

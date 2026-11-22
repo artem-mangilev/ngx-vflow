@@ -19,7 +19,7 @@ import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
         <span vHandle handleType="source" position="right" class="port"></span>
       </div>
 
-      <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+      <svg:g *vEdge="let ctx">
         <svg:path class="link" [class.link--selected]="ctx.selected()" [attr.d]="ctx.path()" />
       </svg:g>
     </vflow>

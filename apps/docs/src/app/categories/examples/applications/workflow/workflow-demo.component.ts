@@ -112,7 +112,7 @@ const KIND_COLOR: Record<StepKind, string> = {
           </article>
           <ng-template let-ctx vEdge>
             @let state = edgeState(ctx.edge.id);
-            <svg:g vEdgeInteractionArea>
+            <svg:g>
               <!-- The process state is the application's own, drawn by utilities keyed on its attribute; a selected
                    edge keeps the library color. -->
               <svg:path

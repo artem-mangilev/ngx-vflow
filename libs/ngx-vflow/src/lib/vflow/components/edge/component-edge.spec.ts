@@ -8,14 +8,12 @@ import { AnyComponentNodeEvent } from '../../interfaces/component-node-event.int
 import { VflowEdgeTemplateDirective, VflowNodeTemplateDirective } from '../../public-directives/template.directive';
 import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { injectEdge } from '../../utils/inject-edge';
-import { VflowEdgeInteractionAreaDirective } from '../../public-directives/edge-interaction-area.directive';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 @Component({
   // The flow creates the SVG host itself, so this selector is only documentation.
   selector: 'g[probeEdge]',
-  hostDirectives: [VflowEdgeInteractionAreaDirective],
   template: `<svg:path class="probe-path" fill="none" [attr.d]="ctx.path()" />`,
   host: { class: 'probe-edge', '[attr.data-edge]': 'ctx.edge.id', '(click)': 'clicks = clicks + 1' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,13 +50,12 @@ class TemplateEdgeChildComponent {
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <svg:g *vEdge="let ctx" vEdgeInteractionArea templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
+    <svg:g *vEdge="let ctx" templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
   </vflow>`,
   imports: [
     VflowComponent,
     VflowNodeTemplateDirective,
     VflowEdgeTemplateDirective,
-    VflowEdgeInteractionAreaDirective,
     VflowHandleDirective,
     TemplateEdgeChildComponent,
   ],
@@ -113,7 +110,7 @@ describe('Component edges', () => {
     expect(path?.getAttribute('d')).toMatch(/^M/);
   });
 
-  it('puts the interaction stroke first inside component hosts and vEdgeInteractionArea groups', () => {
+  it('puts the interaction stroke first inside component hosts and the root group of a template', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
 
     for (const svg of svgs.slice(0, 3)) {
@@ -126,6 +123,16 @@ describe('Component edges', () => {
       expect(stroke.style.strokeWidth).toBe('20px');
       expect(stroke.style.pointerEvents).toBe('stroke');
     }
+  });
+
+  it('hit-tests a point near the line to the stroke inside the root group, so the group is hovered', () => {
+    const svg = root.querySelectorAll<SVGSVGElement>('svg[edge]')[2];
+    const rect = svg.querySelector('path[data-v-interactive-edge]')!.getBoundingClientRect();
+    // The edge is a horizontal line; 8px below it is off the visible path and inside the 20px stroke.
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2 + 8);
+
+    expect(hit?.hasAttribute('data-v-interactive-edge')).toBe(true);
+    expect(hit?.parentElement).toBe(svg.querySelector(':scope > g'));
   });
 
   it('delivers clicks on the stroke to presentation listeners and selects the edge', () => {
@@ -203,13 +210,44 @@ class PlainTemplateHostComponent {
     { id: 'c', point: { x: 200, y: 120 } },
   ]);
   edges: Edge[] = createEdges([
-    { id: 'plain', source: 'a', target: 'b' },
-    { id: 'plain-component', source: 'a', target: 'c', component: PlainEdgeComponent },
+    { id: 'plain', source: 'a', target: 'b', selectable: true },
+    { id: 'plain-component', source: 'a', target: 'c', component: PlainEdgeComponent, selectable: true },
   ]);
 }
 
-describe('Edges without vEdgeInteractionArea', () => {
-  it('draws the interaction stroke in the host without vEdgeInteractionArea and selects from presentation elements', async () => {
+@Component({
+  template: `<vflow style="width: 400px; height: 200px" [nodes]="nodes" [edges]="edges">
+    <div *vNode style="width: 60px; height: 30px">
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
+    </div>
+    <ng-template let-ctx vEdge>
+      <svg:g class="spaced"><svg:path fill="none" [attr.d]="ctx.path()" /></svg:g>
+    </ng-template>
+  </vflow>`,
+  imports: [VflowComponent, VflowNodeTemplateDirective, VflowEdgeTemplateDirective, VflowHandleDirective],
+  preserveWhitespaces: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class PreservedWhitespaceHostComponent {
+  nodes = createNodes([
+    { id: 'a', point: { x: 0, y: 0 } },
+    { id: 'b', point: { x: 200, y: 0 } },
+  ]);
+  edges: Edge[] = createEdges([{ id: 'spaced', source: 'a', target: 'b' }]);
+}
+
+describe('Edges without opt-in', () => {
+  it('finds the root group of a template behind preserved whitespace', async () => {
+    const fixture = TestBed.createComponent(PreservedWhitespaceHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const group = fixture.nativeElement.querySelector('svg[edge] > g.spaced') as SVGGElement;
+    expect((group.firstElementChild as SVGElement).hasAttribute('data-v-interactive-edge')).toBe(true);
+  });
+
+  it('draws the interaction stroke in the edge host for a template that starts with a path and inside the host of any edge component', async () => {
     PlainEdgeComponent.instances = [];
     const fixture = TestBed.createComponent(PlainTemplateHostComponent);
     fixture.detectChanges();
@@ -218,11 +256,15 @@ describe('Edges without vEdgeInteractionArea', () => {
 
     const svgs = Array.from(fixture.nativeElement.querySelectorAll('svg[edge]')) as SVGSVGElement[];
     expect(svgs.length).toBe(2);
-    for (const svg of svgs) {
-      const stroke = svg.querySelector<SVGPathElement>(':scope > path[data-v-interactive-edge]')!;
+    const strokes = [
+      svgs[0].querySelector<SVGPathElement>(':scope > path[data-v-interactive-edge]')!,
+      svgs[1].querySelector<SVGPathElement>(':scope > g > path[data-v-interactive-edge]:first-child')!,
+    ];
+    strokes.forEach((stroke, index) => {
       expect(stroke).not.toBeNull();
-      expect(stroke.getAttribute('d')).toBe(svg.querySelector('path.v-focus-indicator')!.getAttribute('d'));
-    }
+      expect(stroke.getAttribute('d')).toBe(svgs[index].querySelector('path.v-focus-indicator')!.getAttribute('d'));
+      expect(svgs[index].querySelectorAll('path[data-v-interactive-edge]').length).toBe(1);
+    });
 
     svgs[0].querySelector('path.plain')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.edges[0].selected!()).toBe(true);
@@ -230,5 +272,18 @@ describe('Edges without vEdgeInteractionArea', () => {
     svgs[1].querySelector('path.plain-component')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.edges[1].selected!()).toBe(true);
     expect(PlainEdgeComponent.instances[0].clicks).toBe(1);
+
+    // The stroke sits inside the component host, so the host listener sees a click near the line.
+    strokes[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(PlainEdgeComponent.instances[0].clicks).toBe(2);
+
+    // The stroke of an edge that cannot be selected stays, without the pointer cursor.
+    const cursors = () => strokes.map((stroke) => getComputedStyle(stroke).cursor);
+    expect(cursors()).toEqual(['pointer', 'pointer']);
+    fixture.componentInstance.edges.forEach((edge) => edge.selectable!.set(false));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(strokes.every((stroke) => stroke.isConnected)).toBe(true);
+    expect(cursors().includes('pointer')).toBe(false);
   });
 });

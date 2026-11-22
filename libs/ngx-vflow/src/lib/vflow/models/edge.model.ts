@@ -74,8 +74,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public readonly curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
   public readonly reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
   public readonly interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
-  /** `g[vEdgeInteractionArea]` groups and host directives drawing the interaction stroke inside the presentation. */
-  public readonly interactionAreasCount = signal(0);
   public readonly markers = computed<{ start?: MarkerRef; end?: MarkerRef }>(
     () => this.raw().markers?.() ?? EDGE_DEFAULTS.markers,
   );

@@ -16,14 +16,14 @@ user connects two handles; see [Connections](/docs/handles/connections).
 
 To draw edges with a template:
 
-1. Put an SVG element with the structural `vEdge` directive inside `vflow`, usually a `<svg:g vEdgeInteractionArea>` group, as in the example below
-2. The `vEdgeInteractionArea` group wraps the `<svg:path>` you customize. The flow draws a transparent 20px interaction stroke along the edge path, so a click near the line selects the edge. Without the group the stroke lives in the edge host; the directive moves it into the group as its first child, so the group's listeners and CSS `:hover` see the whole clickable area, and elements you place after it stay on top. Set `interactionWidth` on the edge to change the width.
+1. Put an SVG element with the structural `vEdge` directive inside `vflow`, usually a `<svg:g>` group, as in the example below
+2. The flow draws a transparent 20px interaction stroke along the edge path, so a click near the line selects the edge. When the template starts with a `<svg:g>`, the stroke is the first child of that group, so the group's listeners and CSS `:hover` see the whole clickable area, and elements you place after it stay on top. A template that starts with another element or with control flow, such as `@if`, gets the stroke in the edge host instead: a click still selects the edge. Set `interactionWidth` on the edge to change the width.
 3. Draw the visible `<svg:path>` inside the group.
 4. The library provides `ctx` to the template with important data for you, such as the `path` signal with current path. Additionally, the `edge` field contains current edge from one the `[edges]`, from which you can retrieve custom `data`. Furthermore, you can access `markerStart` and `markerEnd` signals with markers for current `edge`.
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+  <svg:g *vEdge="let ctx">
     <svg:path class="edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
   </svg:g>
 </vflow>
@@ -58,7 +58,7 @@ to type it; the flow never reads this input:
 {% raw %}
 
 ```html
-<svg:g *vEdge="let ctx; of: edges" vEdgeInteractionArea>{{ ctx.data().label }}</svg:g>
+<svg:g *vEdge="let ctx; of: edges">{{ ctx.data().label }}</svg:g>
 ```
 
 {% endraw %}
@@ -73,7 +73,7 @@ the group, which includes the interaction stroke.
 
 ## Edge components
 
-An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. Or register the component under a key with `withEdgeComponents()` inside `provideVflow()` and name the key, `component: 'transition'`, as the demo below does; the `VflowEdgeComponents` interface can be augmented to have the keys checked, see [Component keys](/docs/nodes/custom-nodes#refer-to-components-by-key). The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. Add `VflowEdgeInteractionAreaDirective` to its `hostDirectives` to move the interaction stroke into the component host, so host listeners and `:host(:hover)` see the whole clickable area; a click selects the edge either way.
+An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. Or register the component under a key with `withEdgeComponents()` inside `provideVflow()` and name the key, `component: 'transition'`, as the demo below does; the `VflowEdgeComponents` interface can be augmented to have the keys checked, see [Component keys](/docs/nodes/custom-nodes#refer-to-components-by-key). The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. The interaction stroke is the first child of that group, so host listeners and `:host(:hover)` see the whole clickable area.
 
 An edge component declares labels in its own template with the `vEdgeLabel` structural directive, next to its SVG
 elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label renders in the HTML label layer of the

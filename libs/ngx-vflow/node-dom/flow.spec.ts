@@ -29,7 +29,7 @@ class TaskNodeComponent {
       <span vHandle handleType="target" position="left"></span>
     </div>
     <ng-template vEdge let-ctx>
-      <svg:g vEdgeInteractionArea><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
+      <svg:g><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
       <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>
     </ng-template>
     <span *vPortal="{ x: 10, y: 20 }" class="portal-note">portal note</span>
@@ -115,6 +115,9 @@ describe('Vflow in a DOM without layout', () => {
 
   it('renders an edge presentation with a path between the node positions and its label', () => {
     expect(element.querySelector('.edge-path')!.getAttribute('d')).toMatch(/^M0,0 .*250,0$/);
+    // The template starts with a group, a label follows it: the interaction stroke is the first child of the group.
+    expect(element.querySelector('svg[edge] > g > path[data-v-interactive-edge]:first-child')).not.toBeNull();
+    expect(element.querySelector('svg[edge] > path[data-v-interactive-edge]')).toBeNull();
     expect(element.querySelector('.v-edge-labels-layer')!.textContent).toContain('task-note');
   });
 

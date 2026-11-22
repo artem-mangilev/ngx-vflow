@@ -212,7 +212,7 @@ viewport change ends, not on every frame of a gesture, because a change recomput
 element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
 the node's border. The minimap is drawn with SVG, so its color tokens follow the theme like any other CSS.
 
-Keep the interaction stroke of custom edges inside the presentation with core `vEdgeInteractionArea`; use core gesture
+Start a custom edge template with a `<svg:g>`, so the interaction stroke of the edge sits inside it; use core gesture
 exclusions such as `vNoDrag` and `vNoSelect` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 

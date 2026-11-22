@@ -4,7 +4,6 @@ import { Vui } from '@vflow/ui';
 import {
   AnyComponentEdgeEvent,
   Vflow,
-  VflowEdgeInteractionAreaDirective,
   createEdges,
   createNodes,
   injectEdge,
@@ -24,16 +23,14 @@ const TONES = {
 };
 
 /**
- * A transition between two states, drawn by a component. The flow renders it on its own SVG group; the host
- * directive moves the interaction stroke into that group, so the host listener and the `group-hover` variant react
- * to the whole clickable area.
+ * A transition between two states, drawn by a component. The flow renders it on its own SVG group, which
+ * holds the interaction stroke, so the host listener and the `group-hover` variant react to the whole clickable area.
  *
  * The label is declared next to the path and renders in the HTML label layer of the flow. Its clicks do not reach the
  * host, so the label emits the output itself.
  */
 @Component({
   selector: 'g[docsTransitionEdge]',
-  hostDirectives: [VflowEdgeInteractionAreaDirective],
   imports: [Vflow, Vui],
   host: { class: 'group', '(click)': 'picked.emit(edge.data().label)' },
   template: `

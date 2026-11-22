@@ -12,15 +12,20 @@ import { Node } from '../interfaces/node.interface';
  * with control flow:
  *
  * ```html
- * <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+ * <svg:g *vEdge="let ctx">
  *   <svg:path [attr.d]="ctx.path()" />
  * </svg:g>
  *
  * <ng-template let-ctx vEdge>
- *   <svg:g vEdgeInteractionArea><svg:path [attr.d]="ctx.path()" /></svg:g>
+ *   <svg:g><svg:path [attr.d]="ctx.path()" /></svg:g>
  *   <span *vEdgeLabel>{{ ctx.data().label }}</span>
  * </ng-template>
  * ```
+ *
+ * When the presentation starts with an `<svg:g>`, the flow draws the transparent interaction stroke of the edge as
+ * the first child of that group, so listeners and `:hover` on the group see the whole clickable area. A presentation
+ * that starts with another element or with control flow gets the stroke in the edge host: a click still selects the
+ * edge. The host group of an edge component always holds the stroke.
  *
  * `of` names the edges the template renders, so that `ctx.data()` has their data type; it is read by the type
  * checker only. Without it `ctx` is an `EdgeRef<any>`.

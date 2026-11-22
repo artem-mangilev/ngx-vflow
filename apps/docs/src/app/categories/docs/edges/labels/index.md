@@ -10,7 +10,7 @@ together with the edge.
 
 ```html
 <ng-template let-ctx vEdge>
-  <svg:g vEdgeInteractionArea>
+  <svg:g>
     <svg:path vuiEdge [attr.d]="ctx.path()" />
   </svg:g>
 

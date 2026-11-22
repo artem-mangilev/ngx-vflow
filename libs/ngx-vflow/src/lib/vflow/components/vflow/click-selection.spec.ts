@@ -18,7 +18,7 @@ import { createEdges } from '../../interfaces/edge.interface';
     </div>
     <ng-template let-ctx vEdge>
       @if (ctx.edge.id === 'a-b') {
-        <svg:g vEdgeInteractionArea>
+        <svg:g>
           <svg:path class="line" fill="none" [attr.d]="ctx.path()" />
         </svg:g>
       } @else {
@@ -92,11 +92,12 @@ describe('selection by click', () => {
     expect(node('a').selected!()).toBe(true);
   });
 
-  it('draws the hit area of an edge in its host unless the presentation has g[vEdgeInteractionArea]', async () => {
+  it('draws the hit area of an edge in its host when the template starts with control flow', async () => {
     const withGroup = edgeElement('a-b');
     const plain = edgeElement('a-c');
-    expect(withGroup.querySelector(':scope > [data-v-interactive-edge]')).toBeNull();
-    expect(withGroup.querySelector('g > [data-v-interactive-edge]:first-child')).not.toBeNull();
+    // A group inside control flow can be destroyed without the view, so it never holds the stroke.
+    expect(withGroup.querySelector(':scope > [data-v-interactive-edge]')).not.toBeNull();
+    expect(withGroup.querySelector('g > [data-v-interactive-edge]')).toBeNull();
     const stroke = plain.querySelector<SVGPathElement>(':scope > [data-v-interactive-edge]')!;
     expect(stroke).not.toBeNull();
     expect(stroke.style.strokeWidth).toBe('20px');
@@ -113,7 +114,7 @@ describe('selection by click', () => {
 
     edge('a-c').interactionWidth!.set(0);
     await settle();
-    expect(plain.querySelector(':scope > [data-v-interactive-edge]')).toBeNull();
+    expect(stroke.style.display).toBe('none');
   });
 
   it('elevates a node and an edge when they become selected, however the selection is made', async () => {

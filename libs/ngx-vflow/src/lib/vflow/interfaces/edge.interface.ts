@@ -45,7 +45,7 @@ export interface Edge<T = unknown> extends Connection {
   selected?: WritableSignal<boolean>;
   /**
    * Width in pixels of the transparent stroke along the edge path that makes the edge easy to click. The flow draws
-   * it in the edge host, or inside the presentation when it has a `g[vEdgeInteractionArea]` group. `0` removes it;
+   * it inside the presentation when it starts with an `<svg:g>`, otherwise in the edge host. `0` removes it;
    * presentation elements can then opt into hit-testing with `pointer-events="stroke"`.
    *
    * @default 20

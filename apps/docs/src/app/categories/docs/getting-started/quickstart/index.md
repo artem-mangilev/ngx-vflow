@@ -92,7 +92,7 @@ target handle and a source handle into the node, and add a template for edges th
     <span vHandle handleType="source" position="right" class="port"></span>
   </div>
 
-  <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+  <svg:g *vEdge="let ctx">
     <svg:path class="link" [attr.d]="ctx.path()" />
   </svg:g>
 </vflow>

@@ -69,7 +69,7 @@ const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)=
     <span vHandle handleType="source" position="right"></span>
   </div>
 
-  <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+  <svg:g *vEdge="let ctx">
     <svg:path [attr.d]="ctx.path()" />
   </svg:g>
 </vflow>`;

@@ -33,7 +33,7 @@ import { FlowStoreService } from './services/flow-store.service';
     <ng-template let-ctx vEdge [vEdgeOf]="store.edges()">
       @let data = ctx.data();
 
-      <svg:g vEdgeInteractionArea>
+      <svg:g>
         <svg:path
           vuiEdge
           [attr.d]="ctx.path()"

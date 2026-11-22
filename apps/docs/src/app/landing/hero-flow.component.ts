@@ -238,7 +238,7 @@ const GLOW_OFFSET = 40;
       </ng-template>
 
       <!-- An edge has the color it carries; its dashes run toward the gradient while the angle turns. -->
-      <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+      <svg:g *vEdge="let ctx">
         <svg:path
           vuiEdge
           stroke-dasharray="6 6"

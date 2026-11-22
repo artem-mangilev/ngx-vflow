@@ -209,7 +209,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
             }
           </ng-template>
           <ng-template let-ctx vEdge>
-            <svg:g vEdgeInteractionArea>
+            <svg:g>
               <svg:path vuiEdge [attr.d]="ctx.path()" />
             </svg:g>
             @if (ctx.data()?.label; as label) {

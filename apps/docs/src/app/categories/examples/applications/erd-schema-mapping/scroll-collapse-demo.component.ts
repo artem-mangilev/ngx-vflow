@@ -119,7 +119,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
               }
             </article>
           </ng-template>
-          <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+          <svg:g *vEdge="let ctx">
             <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
           <vui-controls vPanel="bottom-left" />

@@ -20,7 +20,7 @@ interface RelationData {
     <ng-template let-ctx vEdge [vEdgeOf]="edges()">
       @let data = ctx.data();
 
-      <svg:g vEdgeInteractionArea>
+      <svg:g>
         <svg:path vuiEdge [attr.d]="ctx.path()" />
       </svg:g>
 
