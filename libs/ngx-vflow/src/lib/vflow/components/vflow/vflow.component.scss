@@ -137,10 +137,13 @@
     }
 
     // A handle in the `auto` layout: the directive writes `top` and `left` of a point on the node side, and the
-    // element is centered on it. `translate` leaves `transform` and `scale` to the application.
+    // element is centered on it. `translate` leaves `transform` and `scale` to the application. It lies above the
+    // resize controls, which follow the node content in the DOM: a port on a side takes the press, not the line
+    // that crosses it.
     [data-v-handle-placed] {
       position: absolute;
       translate: -50% -50%;
+      z-index: 1;
     }
   }
 }
