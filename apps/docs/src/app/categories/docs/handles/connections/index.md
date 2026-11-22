@@ -6,6 +6,10 @@ Edges are not created automatically. To create a new edge, follow these steps:
 
 The connection gesture does not depend on the handler: a handle starts a connection whether or not `(connect)` or any other connection output is bound, and without a handler the gesture ends with no new edge. To stop a handle from starting or accepting connections, set its `canStart` or `canAccept` input to `false`.
 
+`(connectEnd)` reports how the gesture ended. Its `to` is the handle under the pointer, or `null` when the
+connection was released over the canvas. Its `point` is where the pointer was released, in flow space: the place for
+a node that such a release creates.
+
 ## Typed handles
 
 Edges run from a `source` handle to a `target` handle: a connection dragged the other way round is reversed, and two handles of the same type do not connect.

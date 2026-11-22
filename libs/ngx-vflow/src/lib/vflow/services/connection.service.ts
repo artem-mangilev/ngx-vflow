@@ -20,9 +20,12 @@ import {
 } from '../interfaces/connection-events.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
+import { FlowRenderingService } from './flow-rendering.service';
+import { ViewportService } from './viewport.service';
 import { adjustDirection } from '../utils/adjust-direction';
 import { sameConnection } from '../utils/same-connection';
 import { listen } from '../utils/listen';
+import { clientToFlowPosition } from '../utils/coordinates';
 import { createPointerTracker } from '../gestures/pointer-drag';
 
 /** The handle under the pointer and whether the connection it would make is valid. */
@@ -51,6 +54,8 @@ export interface ConnectionGesture {
 export class ConnectionService {
   private readonly settings = inject(FlowSettingsService);
   private readonly entities = inject(FlowEntitiesService);
+  private readonly rendering = inject(FlowRenderingService);
+  private readonly viewport = inject(ViewportService);
   private readonly document = inject(DOCUMENT);
 
   public readonly gesture = signal<ConnectionGesture | null>(null);
@@ -83,7 +88,10 @@ export class ConnectionService {
         begin?.();
       },
       onMove: ({ point }) => this.pointer.set(point),
-      onEnd: () => this.end(),
+      onEnd: ({ point }) => {
+        this.pointer.set(point);
+        this.end();
+      },
       onCancel: () => this.end(),
     },
     this.document,
@@ -170,8 +178,18 @@ export class ConnectionService {
       this.reconnectEnd$.next({ edge: oldEdge.edge, from, ...outcome });
     } else {
       if (outcome.valid && connection) this.connect$.next(connection);
-      this.connectEnd$.next({ from, ...outcome });
+      this.connectEnd$.next({ from, point: this.flowPointer(), ...outcome });
     }
+  }
+
+  /** The pointer in flow space. The pane is the origin of flow coordinates; a service tested on its own has none. */
+  private flowPointer(): Point {
+    const pane = this.rendering.pane()?.getBoundingClientRect();
+
+    return clientToFlowPosition(this.pointer(), {
+      viewport: this.viewport.readableViewport(),
+      containerPosition: { x: pane?.left ?? 0, y: pane?.top ?? 0 },
+    });
   }
 
   private begin(handle: HandleModel, oldEdge?: EdgeModel) {

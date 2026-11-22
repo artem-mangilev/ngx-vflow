@@ -2,6 +2,7 @@ import { HandlePosition, HandleType } from '../types/handle-type.type';
 import { Connection } from './connection.interface';
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
+import { Point } from './point.interface';
 
 /** A handle as the connection events and the connection validator describe it. */
 export interface ConnectionHandle {
@@ -33,6 +34,8 @@ export interface ConnectStartEvent<N extends Node = Node> {
 export type ConnectEndEvent<N extends Node = Node> = {
   /** The side where the connection started from. */
   from: ConnectionEndpoint<N>;
+  /** Where the pointer was released, in flow space: the place for a node that a release over the canvas creates. */
+  point: Point;
 } & ConnectionEventOutcome<N>;
 
 export interface ReconnectStartEvent<N extends Node = Node, E extends Edge = Edge> {

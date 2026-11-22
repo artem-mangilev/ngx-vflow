@@ -135,9 +135,27 @@ describe('ConnectionService', () => {
       {
         valid: true,
         from: { node: source.parentNode.rawNode, handle: { id: undefined, type: 'source', position: 'right' } },
+        point: { x: 150, y: 100 },
         to: { node: target.parentNode.rawNode, handle: { id: undefined, type: 'target', position: 'left' } },
       },
     ]);
+  });
+
+  it('reports where a connection dropped over the canvas was released, in flow space', () => {
+    const source = createHandle(createNodeModel('source'), 'source');
+    const pane = document.createElement('div');
+    pane.getBoundingClientRect = () => ({ left: 10, top: 20 }) as DOMRect;
+    TestBed.inject(FlowRenderingService).pane.set(pane);
+    TestBed.inject(ViewportService).readableViewport.set({ x: 40, y: 30, zoom: 2 });
+    const ends: unknown[] = [];
+    connection.connectEnd$.subscribe((end) => ends.push(end));
+
+    connection.start(source, pointerEvent('pointerdown', { x: 100 }));
+    dispatchPointer(document, 'pointermove', { x: 150 });
+    dispatchPointer(document, 'pointerup', { x: 250, y: 150 });
+
+    // The release, not the last move: (250 - 10 - 40) / 2 and (150 - 20 - 30) / 2.
+    expect(ends).toMatchObject([{ valid: null, to: null, point: { x: 100, y: 50 } }]);
   });
 
   it('should mark the origin handle connecting and keep it while leaving it or resetting other handles', () => {
