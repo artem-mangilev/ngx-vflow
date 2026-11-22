@@ -9,8 +9,8 @@ import { Directive } from '@angular/core';
   host: {
     class: `vui-edge
       fill-none stroke-2 [stroke-linejoin:round]
-      stroke-vui-muted [&:is([data-v-selected]_*)]:stroke-vui-accent
-      forced-colors:stroke-[CanvasText] forced-colors:[&:is([data-v-selected]_*)]:stroke-[Highlight]`,
+      stroke-vui-muted [[data-v-selected]_&]:stroke-vui-accent
+      forced-colors:stroke-[CanvasText] forced-colors:[[data-v-selected]_&]:stroke-[Highlight]`,
   },
 })
 export class VuiEdge {}

@@ -37,14 +37,14 @@ import { VflowHandleDirective } from 'ngx-vflow';
       data-[v-handle-position=right]:before:-inset-y-vui-3 data-[v-handle-position=right]:before:-left-vui-2 data-[v-handle-position=right]:before:right-0
       data-[v-handle-position=top]:before:-inset-x-vui-3 data-[v-handle-position=top]:before:-bottom-vui-2 data-[v-handle-position=top]:before:top-0
       data-[v-handle-position=bottom]:before:-inset-x-vui-3 data-[v-handle-position=bottom]:before:-top-vui-2 data-[v-handle-position=bottom]:before:bottom-0
-      border-vui-muted bg-vui-surface data-[v-handle-state=idle]:data-[vui-connected=true]:bg-vui-muted
+      border-vui-muted bg-vui-surface data-[v-handle-state=idle]:data-[vui-connected]:bg-vui-muted
       data-[v-handle-state=idle]:data-[v-handle-can-start]:hover:border-vui-accent
       data-[v-handle-state=idle]:data-[v-handle-can-start]:hover:shadow-(--vui-port-halo)
-      data-[v-handle-state=connecting]:border-vui-accent data-[v-handle-state=connecting]:bg-vui-accent data-[v-handle-state=connecting]:shadow-(--vui-port-halo)
-      data-[v-handle-state=valid]:[--vui-tone:var(--vui-success)] data-[v-handle-state=valid]:border-vui-success data-[v-handle-state=valid]:bg-vui-success data-[v-handle-state=valid]:shadow-(--vui-port-halo)
-      data-[v-handle-state=invalid]:[--vui-tone:var(--vui-danger)] data-[v-handle-state=invalid]:border-vui-danger data-[v-handle-state=invalid]:bg-vui-surface data-[v-handle-state=invalid]:shadow-(--vui-port-halo)
+      data-[v-handle-state=valid]:[--vui-tone:var(--vui-success)] data-[v-handle-state=invalid]:[--vui-tone:var(--vui-danger)]
+      not-data-[v-handle-state=idle]:border-(--vui-tone) not-data-[v-handle-state=idle]:shadow-(--vui-port-halo)
+      data-[v-handle-state=connecting]:bg-vui-accent data-[v-handle-state=valid]:bg-vui-success
       forced-colors:bg-[ButtonText] forced-colors:border-[Canvas] forced-colors:shadow-none forced-colors:[forced-color-adjust:none]`,
-    '[attr.data-vui-connected]': 'vuiPortConnected()',
+    '[attr.data-vui-connected]': "vuiPortConnected() ? '' : null",
   },
 })
 export class VuiPort {

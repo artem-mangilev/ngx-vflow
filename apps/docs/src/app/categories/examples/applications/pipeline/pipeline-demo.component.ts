@@ -49,7 +49,7 @@ const EXPORT = { width: 1200, height: 780 };
  * utilities are important because they replace colors the port part sets for the same states.
  */
 const TYPED_PORT = `data-[v-handle-state=idle]:[--vui-tone:var(--type)] data-[v-handle-state=idle]:border-(--type)!
-  data-[v-handle-state=idle]:data-[vui-connected=true]:bg-(--type)!`;
+  data-[v-handle-state=idle]:data-[vui-connected]:bg-(--type)!`;
 
 const PORT_COLOR: Record<PortType, string> = {
   image: `[--type:var(--color-violet-500)] ${TYPED_PORT}`,

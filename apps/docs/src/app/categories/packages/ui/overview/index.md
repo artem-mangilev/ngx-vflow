@@ -66,9 +66,9 @@ Three kinds of state stay separate so they can be shown at once:
 - **Diagnostics** about the model and **application status** are both your vocabulary and your components: one badge of your design system per message, so a warning and a running status sit side by side. A status is presentation only and never disables anything; let the text name the activity ("Running", "Syncing"), and put an indicator that changes while the user works in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
-Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
+Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `connecting`, `valid`, `invalid`),
 read from the core `data-v-handle-state` attribute of the handle that `vuiPort` applies to the same element; `vuiPortConnected` is your
-knowledge about existing edges. An idle port is an 8px ring, filled once connected. A hovered port that can start a connection,
+knowledge about existing edges, reflected as `data-vui-connected` while it is true. An idle port is an 8px ring, filled once connected. A hovered port that can start a connection,
 the port a connection is drawn from and the candidate under the pointer get a halo in the state color (selection,
 success, danger) that draws the ring 2px larger without changing its box, so the endpoint never moves. A valid
 candidate is filled and an invalid one stays hollow, so the state does not depend on color alone. A pseudo-element
@@ -124,7 +124,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 | `VuiToolbar`                     | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                             |
 | `VuiControls`                    | `<vui-controls>` inside `vflow`                                      | Viewport controls of the flow it is in; project plain icon buttons               |
 
-Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
+Each directive is independently importable. Only `vuiPort` (the core handle directive) and `vui-controls` (the flow) use ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
 `.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-port[data-v-handle-state='valid']`.
 A role looks the same in every shell; a row that needs its own look, such as a group title, is a part of its own.

@@ -56,7 +56,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
  * of its edge and takes no pointer, so a connection is made with a row that is in view.
  */
 const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
-  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*)]:opacity-0
+  [&[data-v-handle-state=idle]:not([data-vui-connected]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*)]:opacity-0
   data-[v-handle-clipped]:pointer-events-none data-[v-handle-clipped]:size-1
   forced-colors:opacity-100!`;
 
@@ -124,7 +124,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                         docsButton="plain"
                         small
                         icon
-                        class="opacity-0 transition-opacity! group-focus-within:opacity-100 group-hover:opacity-100 [&:is([data-v-selected]_*)]:opacity-100"
+                        class="opacity-0 transition-opacity! group-focus-within:opacity-100 group-hover:opacity-100 [[data-v-selected]_&]:opacity-100"
                         vNoDrag
                         type="button"
                         [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"

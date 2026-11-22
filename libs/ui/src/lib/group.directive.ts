@@ -11,12 +11,12 @@ import { Directive } from '@angular/core';
     class: `vui-group
       relative rounded-vui-surface border border-vui-border
       bg-vui-surface-muted text-vui-foreground
-      [&:is([data-v-selected]_*)]:border-vui-accent
-      [&:is([data-v-selected]_*)]:ring-1
-      [&:is([data-v-selected]_*)]:ring-vui-accent
-      forced-colors:[&:is([data-v-selected]_*)]:outline-2
-      forced-colors:[&:is([data-v-selected]_*)]:outline-offset-2
-      forced-colors:[&:is([data-v-selected]_*)]:outline-[Highlight]`,
+      [[data-v-selected]_&]:border-vui-accent
+      [[data-v-selected]_&]:ring-1
+      [[data-v-selected]_&]:ring-vui-accent
+      forced-colors:[[data-v-selected]_&]:outline-2
+      forced-colors:[[data-v-selected]_&]:outline-offset-2
+      forced-colors:[[data-v-selected]_&]:outline-[Highlight]`,
   },
 })
 export class VuiGroup {}

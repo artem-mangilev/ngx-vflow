@@ -112,7 +112,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   // Two diagrams on one canvas, each in its titled frame.
   await expect(demo.locator('[data-frame] .vui-title')).toHaveText(['Relationships', 'Field mapping']);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
-  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
+  await expect(demo.locator('.vui-port[data-vui-connected]')).toHaveCount(4);
   // Free ports and row actions show on interaction; connected ports always do.
   const freePort = demo.locator(
     '[data-entity="customer"] [data-field="email"] .vui-port[data-v-handle-position="left"]',
@@ -173,7 +173,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.locator('.vui-edge-label').filter({ hasText: 'Copy email' }).hover();
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
-  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
+  await expect(demo.locator('.vui-port[data-vui-connected]')).toHaveCount(2);
   const source = demo.locator(
     '[data-entity="crm"] [data-field="email"] [data-v-handle][data-v-handle-position="right"]',
   );
@@ -193,7 +193,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   // The label says what the new mapping does.
   await expect(demo.locator('.vui-edge-label').filter({ hasText: 'Copy email' })).toBeVisible();
-  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
+  await expect(demo.locator('.vui-port[data-vui-connected]')).toHaveCount(4);
   await expect.poll(endpointError).toBeLessThan(1);
   // Delete removes a selected connection.
   const middle = await demo.evaluate((root) => {
@@ -434,9 +434,8 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
     await center(blendB),
   );
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
-  await expect(demo.locator('[data-stage="blur"] .vui-port[data-v-handle-position="right"]')).toHaveAttribute(
+  await expect(demo.locator('[data-stage="blur"] .vui-port[data-v-handle-position="right"]')).not.toHaveAttribute(
     'data-vui-connected',
-    'false',
   );
   await expect(output.locator('img')).toHaveCount(2);
   await expect(output.locator('img').last()).toHaveAttribute('src', photo!);
@@ -646,7 +645,7 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await demo.getByRole('button', { name: 'Delete CRM contact.email', exact: true }).click();
   await expect(demo.locator('[data-entity="crm"] [vuiRow]')).toHaveCount(1);
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
-  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
+  await expect(demo.locator('.vui-port[data-vui-connected]')).toHaveCount(2);
 });
 
 test('ERD: adding a field with a name and a type, refusing a taken name, cancelling with Escape', async ({ page }) => {
