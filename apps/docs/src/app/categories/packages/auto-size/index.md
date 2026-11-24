@@ -2,7 +2,7 @@
 keyword: 'PackagesAutoSize'
 ---
 
-`@vflow/auto-size` grows a parent node around its children while they are dragged or resized, through every level of nesting. Drag Backend or Frontend out of the squad, or the squad out of the team: the parent grows to keep it, with a padding, and keeps its other children where they are. The demo also sets `vxAutoSizeShrink`, so the parents always fit their children: drag the node back in and the squad shrinks with it.
+`@vflow/auto-size` grows a parent node around its children while they are dragged or resized, through every level of nesting. Drag Backend or Frontend out of the squad, or the squad out of the team: the parent grows to keep it, with a padding, and keeps its other children where they are. With `vxAutoSizeShrink` on, the parents always fit their children: drag the node back in and the squad shrinks with it. Turn it off, and a parent only grows.
 
 {{ NgDocActions.demoPane("AutoSizeDemoComponent") }}
 
@@ -38,7 +38,7 @@ The directive fits the parents once when the flow is initialized, before the fir
 
 ## What a parent needs
 
-- An explicit size on the axes that grow: a `width` signal for the horizontal axis, a `height` signal for the vertical one. An axis that follows the content is left alone.
+- `width` and `height`, as every group has; see [Subflows](/docs/nodes/subflows). The directive writes the new size into these signals and never adds signals to your nodes. An axis without its signal follows the content of the parent itself, which the children do not affect, so it is left alone.
 - Children with `extent: null`. With `extent: 'parent'`, the default, the flow holds a dragged child inside its parent before the parent can grow.
 
 A change on the left or the top moves the origin of the parent and compensates every child, so nothing moves on screen; the flow keeps the dragged node under the pointer while its parent moves. A parent that is itself a child sizes its own parent in turn, the deepest first.

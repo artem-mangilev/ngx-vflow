@@ -1,25 +1,36 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { VxAutoSize } from '@vflow/auto-size';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow
-    #flow
-    vxAutoSize
-    [vxAutoSizePadding]="padding"
-    [vxAutoSizeShrink]="true"
-    [nodes]="nodes"
-    [edges]="edges"
-    (initialized)="flow.fitView({ maxZoom: 1 })">
-    <docs-node *vNode="let ctx" [ctx]="ctx" />
-    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-  </vflow>`,
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <label>
+        <input type="checkbox" [checked]="shrink()" (change)="shrink.set(!shrink())" />
+        Shrink parents to fit (<code>vxAutoSizeShrink</code>)
+      </label>
+    </div>
+
+    <vflow
+      #flow
+      vxAutoSize
+      [vxAutoSizePadding]="padding"
+      [vxAutoSizeShrink]="shrink()"
+      [nodes]="nodes"
+      [edges]="edges"
+      (initialized)="flow.fitView({ maxZoom: 1 })">
+      <docs-node *vNode="let ctx" [ctx]="ctx" />
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    </vflow>
+  </docs-demo>`,
   host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VxAutoSize],
+  imports: [DocsKit, DocsPresentations, Vflow, VxAutoSize],
 })
 export class AutoSizeDemoComponent {
+  protected readonly shrink = signal(true);
+
   // The top side keeps the group header clear when a parent shrinks.
   protected readonly padding = { top: 56, right: 24, bottom: 24, left: 24 };
 
