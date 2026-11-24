@@ -201,7 +201,6 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--v-minimap-node-radius`                         | Corner radius of minimap nodes, in flow pixels                 | surface radius          |
 | `--v-focus`                                       | Focus halo of nodes and edges                                  | `--vui-accent`          |
 | `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                      | radius = surface radius |
-| `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px                | —                       |
 
 The focus radius is the corner radius of the node itself; the halo follows it, so it stays concentric, and the theme
 sets it to the surface radius since the node part is rounded with it. Without the UI theme a
@@ -212,7 +211,7 @@ viewport change ends, not on every frame of a gesture, because a change recomput
 element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
 the node's border. The minimap is drawn with SVG, so its color tokens follow the theme like any other CSS.
 
-Start a custom edge template with a `<svg:g>`, so the interaction stroke of the edge sits inside it; use core gesture
+Start an edge template with a `<svg:g>`, so the interaction stroke of the edge sits inside it; use core gesture
 exclusions such as `vNoDrag` and `vNoSelect` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 

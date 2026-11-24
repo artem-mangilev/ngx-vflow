@@ -1,6 +1,5 @@
 This guide shows how to put your own content on the canvas next to the graph: notes, regions behind a part of the
-graph, decorations. Such content pans and zooms with the flow but is not a node or an edge. Its inputs and exact
-behavior are in the [Viewport reference](/docs/reference/viewport#portal).
+graph, decorations. Such content pans and zooms with the flow but is not a node or an edge.
 
 The lanes are drawn below the graph and the note above it. Drag “Payment”: the note follows it.
 
@@ -68,6 +67,12 @@ nodes.
 The pointer goes through the content to the nodes and the pane under it, so a note never blocks a node. To make a
 part of it interactive, give that part `pointer-events: auto`. A press on it then pans the viewport and a click
 clears the selection, as on the pane; put a button or a field inside `vNoDrag`, see
-[Gesture exclusions](/docs/reference/viewport#gesture-exclusions).
+[Gestures](/docs/viewport/viewport-gestures#gesture-exclusions).
 
 Content that users move, select or remove themselves is part of the graph: make it a node.
+
+## Layers
+
+`vPortalLayer` chooses where the content paints: `above`, the default, is over the nodes, edges and edge labels and
+under the alignment guides, the selection box and the connection line; `below` is under every node and edge, groups
+below edges included. Several portals in one layer paint in the order they were declared.

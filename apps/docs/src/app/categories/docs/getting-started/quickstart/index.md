@@ -1,7 +1,7 @@
 In this tutorial we build a small flow: three nodes drawn with our own HTML, an edge between two of them, and
 handles that let the user connect the rest. It takes about ten minutes and ends with this:
 
-{{ NgDocActions.demo("FirstFlowComponent") }}
+{{ NgDocActions.demoPane("FirstFlowComponent") }}
 
 ## Install
 
@@ -39,7 +39,9 @@ import { createNodes, Vflow } from 'ngx-vflow';
   styles: `
     :host {
       display: block;
-      height: 320px;
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
     }
 
     .step {
@@ -64,7 +66,7 @@ export class FirstFlowComponent {
 {% endraw %}
 
 Three cards appear. We can already drag them, pan the canvas by dragging its empty space, and zoom with the mouse
-wheel. The flow fills its parent, which is why the host of the component has a height. `of nodes` in the template
+wheel. The flow fills its parent, which is why the host of the component has a size: it fills its own parent and is never shorter than 320 pixels. `of nodes` in the template
 changes nothing on the screen: it tells the type checker which nodes the template draws, so `ctx.data()` has the
 type of our `data`.
 
@@ -185,8 +187,7 @@ we call `fitView()` when the flow reports its first layout; `maxZoom: 1` keeps a
 
 ## Where to go next
 
-- [Core concepts](/docs/concepts/core-concepts) explains who owns the graph and why nodes hold signals.
 - [Controlling the viewport](/docs/viewport/viewport-control) has the other viewport methods.
-- [Custom nodes](/docs/nodes/custom-nodes) draws nodes with components instead of one template.
+- [Rendering nodes](/docs/nodes/rendering) draws nodes with components instead of one template.
 - [Connections](/docs/handles/connections) validates connections and reconnects edges.
 - [@vflow/ui](/packages/ui/overview) has ready node cards, ports and edges if you would rather not draw your own.

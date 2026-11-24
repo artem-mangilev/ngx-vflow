@@ -1,5 +1,6 @@
-This guide shows how to let users resize nodes and groups, limit the result and keep it in your data. For the
-model behind it, see [Node sizes](/docs/concepts/node-sizes).
+This guide shows how to let users resize nodes and groups, limit the result and keep it in your data. Each axis of a
+node is either `auto`, sized by its content and measured by the flow, or `explicit`, a size your data or a resize
+gesture sets.
 
 ## Make a node resizable
 
@@ -19,8 +20,13 @@ a `vNode` template and in a component node.
 - If you want it to start with a fixed size, give the node `width`, `height` or both. A resize writes the new size
   into those signals.
 
-Do not bind `[style.width.px]` or `[style.height.px]` yourself: the directive sets the size on its element. Size a
-content-sized node with regular CSS, for example `width: 240px`, and avoid `width: 100%` and `height: 100%`.
+Do not bind `[style.width.px]` or `[style.height.px]` yourself: the directive sets the size of each explicit axis
+inline on its element. Size a content-sized node with regular CSS, for example `width: 240px`, and avoid
+`width: 100%` and `height: 100%`: a percentage resolves against the node wrapper, which is itself sized by its
+content.
+
+While any axis is explicit the element has `box-sizing: border-box`, so padding and border stay inside the size the
+user drags to. The controls sit outside the box, so `overflow: hidden` on the element does not clip them.
 
 In the example the first card has no size in its data and the second one starts with `width` and `height`. Each
 shows its rendered size, and neither gets smaller than the `min-width` and `min-height` of its CSS.
@@ -56,15 +62,6 @@ over the CSS.
 
 - To keep the aspect ratio, set `[keepAspectRatio]="true"`.
 - To resize only the width or only the height, set `resizeAxis` to `horizontal` or `vertical`.
-
-## Refuse a step
-
-Give `[shouldResize]` a function. It receives the `ResizeEvent` of a step before the step is applied; return `false`
-to skip it:
-
-```ts
-protected readonly notTooWide: ShouldResize = (event) => event.width <= 600;
-```
 
 ## React to the gesture
 
@@ -111,11 +108,11 @@ Persist an axis only when its mode is `explicit`. An `auto` axis is a measuremen
 
 ## Restyle the controls
 
-Set the `--v-resize-control` and `--v-resize-control-border` tokens for the colors, and select the controls by the
-`data-v-resize-control` attribute for size and shape. See the [Resizer reference](/docs/reference/resizer#appearance).
+Set the `--v-resize-control` and `--v-resize-control-border` tokens for the colors. For size and shape, select the
+controls in a global stylesheet by `data-v-resize-control`, which is `handle` on a corner and `line` on a side, and by
+`data-v-resize-control-position`, the side or corner of the control.
 
 ## See also
 
-- [Resizer reference](/docs/reference/resizer)
 - [Subflows](/docs/nodes/subflows)
 - [Handling changes](/docs/interactions/handling-changes)

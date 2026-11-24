@@ -1,6 +1,5 @@
 This guide shows how to give nodes handles, the elements that connections start from and end on, and how to place,
-style and restrict them. The inputs, attributes and signals are listed in the
-[Handle reference](/docs/reference/handle).
+style and restrict them.
 
 ## Add handles to a node
 
@@ -71,6 +70,13 @@ The [Easy connect](/examples/recipes/easy-connect) example builds on this.
 - To take over positioning, set `layout="manual"` and position the element with your CSS. The connection point is
   then read from the box of the element on the `position` side.
 
+In the `auto` layout the flow owns `position`, `top`, `left` and `translate` on the element; `transform` and `scale`
+stay yours.
+
+A handle follows its element when a list scrolls inside the node. Once the element is scrolled out of view, the
+connection point stays on the border of the scroll container it left through, the element carries
+`data-v-handle-clipped`, and the handle accepts no connection in progress.
+
 ## Show connection feedback
 
 Style the handle by its `data-v-handle-state` attribute, which is `valid` or `invalid` on the handle under a
@@ -85,6 +91,22 @@ connection in progress:
   background-color: red;
 }
 ```
+
+The element gets the `data-v-handle` attribute, its identity as a handle, and these:
+
+| Attribute                  | Values                                                                                                |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `data-v-handle-type`       | `source`, `target`                                                                                    |
+| `data-v-handle-position`   | `left`, `right`, `top`, `bottom`                                                                      |
+| `data-v-handle-state`      | `idle`; `connecting` on the handle a connection is dragged from; `valid` / `invalid` on the candidate |
+| `data-v-handle-can-start`  | present while the handle can start a connection (`canStart`)                                          |
+| `data-v-handle-can-accept` | present while the handle can accept a connection (`canAccept`)                                        |
+| `data-v-handle-clipped`    | present while the handle is scrolled out of view inside the node                                      |
+
+`data-v-handle-state` follows the default connection checks and `ConnectionSettings.validator()`. The handle a
+connection is dragged from stays `connecting` for the whole gesture: it is never its own candidate, and a release on
+it is a drop. While a connection is in progress the handle element is a drop zone in addition to the magnet around
+its point, so a handle of any size validates the candidate under the pointer.
 
 To validate connections with your own rule, see
 [Connections](/docs/handles/connections#connection-validation).
@@ -105,7 +127,7 @@ Each is reflected in an attribute present while it is on, so a handle without it
 In the demo, turn off `canStart` on `Temperature` and `canAccept` on `Chart`. The handles of `Sensor` are plain
 elements styled through the attributes; the handles of `Dashboard` are the handle component of the next section.
 
-{{ NgDocActions.demoPane("CustomHandlesDemoComponent") }}
+{{ NgDocActions.demoPane("HandleStatesDemoComponent") }}
 
 ## Build a handle component
 

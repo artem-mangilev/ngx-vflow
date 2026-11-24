@@ -27,11 +27,12 @@ The directive only positions. The size, the look and the content are the element
 
 ## Change the gap to the edge
 
-A panel keeps 10 pixels to the edges of the flow. Set `--v-panel-offset` on the flow or on a panel to change it:
+A panel keeps a `10px` margin to the edges of the flow. The rule has no specificity, so a margin of yours replaces
+it:
 
 ```css
-vflow {
-  --v-panel-offset: 16px;
+.legend {
+  margin: 16px;
 }
 ```
 
@@ -58,3 +59,11 @@ specificity, so a class of yours also adjusts a panel:
 ```
 
 The pointer reaches the pane around the elements of the layer; each element takes the pointer over itself.
+
+## Behavior
+
+- The directive sets `data-v-panel="<position>"`; the placement is CSS: `position: absolute`, a margin of `10px` and
+  the sides of the position. The rules have no specificity.
+- The element is positioned against the flow when it is a direct child of `vflow` or inside wrappers without
+  positioning of their own.
+- Panels at the same position overlap.

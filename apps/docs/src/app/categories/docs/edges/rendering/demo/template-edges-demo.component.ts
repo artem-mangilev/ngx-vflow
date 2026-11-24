@@ -25,7 +25,7 @@ interface LinkData {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
-export class CustomEdgesDemoComponent {
+export class TemplateEdgesDemoComponent {
   protected readonly nodes = createNodes([
     { id: 'service', point: { x: 0, y: 45 }, data: { text: 'Service' } },
     { id: 'database', point: { x: 220, y: 0 }, data: { text: 'Database' } },

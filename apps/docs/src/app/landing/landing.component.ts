@@ -116,8 +116,8 @@ export class LandingComponent {
     {
       title: 'A node belongs to you',
       text: 'A node is an Angular template or component: your HTML, your CSS, your data.',
-      link: '/docs/nodes/custom-nodes',
-      linkText: 'Read about custom nodes',
+      link: '/docs/nodes/rendering',
+      linkText: 'Read about rendering nodes',
       demoLabel: 'Live flow: one node that shows a service; add or remove a replica',
       demo: ServiceNodeFlowComponent,
       demoHeight: 'h-90',

@@ -4,12 +4,12 @@ import { StaticEdge, StaticNode, Vflow, createEdges, createNodes } from 'ngx-vfl
 
 @Component({
   // The whole graph is far too large to fit, and a view of all of it would leave virtualization nothing to hide.
-  // So the first view is the middle of the graph, zoomed out only as far as its nodes stay recognizable.
+  // So the first view is the middle of the graph, and the zoom stops at about a hundred nodes in the pane.
   template: `<vflow
     #flow
     [nodes]="nodes"
     [edges]="edges"
-    [minZoom]="0.1"
+    [minZoom]="0.4"
     [virtualization]="true"
     (initialized)="flow.fitView({ minZoom: 0.55 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
@@ -20,13 +20,13 @@ import { StaticEdge, StaticNode, Vflow, createEdges, createNodes } from 'ngx-vfl
   imports: [DocsPresentations, Vflow],
 })
 export class VirtualizationDemoComponent {
-  private readonly graph = createPipelines(70, 70);
+  private readonly graph = createPipelines(100, 100);
 
   protected readonly nodes = this.graph.nodes;
   protected readonly edges = this.graph.edges;
 }
 
-/** `count` pipelines of `steps` nodes each, one pipeline per row: 4900 nodes for 70 by 70. */
+/** `count` pipelines of `steps` nodes each, one pipeline per row: 10000 nodes for 100 by 100. */
 function createPipelines(count: number, steps: number) {
   const nodes: StaticNode<{ text: string }>[] = [];
   const edges: StaticEdge[] = [];

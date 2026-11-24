@@ -6,7 +6,7 @@ Where each part is described:
 
 - The toolbar of a selected node: [Node toolbar](/docs/nodes/node-toolbar).
 - Ports on any side of a node, and the rule that an input takes one edge: [Handles](/docs/handles/handles) and [Connections](/docs/handles/connections).
-- The four curves, the labels, the edge drawn by a component and reconnecting: [Curves](/docs/edges/curves), [Labels](/docs/edges/labels), [Custom edges](/docs/edges/custom-edges) and [Connections](/docs/handles/connections).
+- The four curves, the labels, the edge drawn by a component and reconnecting: [Curves](/docs/edges/curves), [Labels](/docs/edges/labels), [Rendering edges](/docs/edges/rendering) and [Connections](/docs/handles/connections).
 - The group, its children and its resizer: [Subflows](/docs/nodes/subflows) and [Resizing](/docs/nodes/resizer).
 - The alignment guides: [Snapping and alignment](/docs/viewport/snapping).
 - The selection box and removing the selection with `Delete`: [Selection](/docs/interactions/selection) and [Delete selected](/examples/recipes/delete-selected).

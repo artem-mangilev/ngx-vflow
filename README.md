@@ -16,7 +16,7 @@
 
 ---
 
-- **Declarative API & Full Customization** - Custom nodes, edges, and handles with Angular components
+- **Headless** - Nodes, edges and handles are your own Angular templates and components
 - **Subflows** - Create nested flows with parent-child relationships
 - **Interactive Connections** - Create, validate, and reconnect edges
 - **Rich Interactions** - Dragging, selecting, zooming, panning, and keyboard shortcuts

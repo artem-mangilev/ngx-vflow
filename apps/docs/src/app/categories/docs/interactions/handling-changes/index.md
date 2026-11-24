@@ -60,24 +60,36 @@ To use RxJS operators, wrap an output with `outputToObservable(this.vflow.nodesC
 An edge whose source or target node is absent, or whose handle is not rendered, is not drawn. To delete such edges
 from your collection, handle `(edgesChanges.detached)`, or read the `detachedEdges` signal of the flow. An edge whose
 nodes are not measured yet is not detached, so the edges a flow starts with are not reported while their handles are
-being rendered. Removing a node with `removeElements()` removes its edges with it, so nothing is left detached. This
-change type is experimental.
+being rendered. Removing a node with `removeElements()` removes its edges with it, so nothing is left detached.
 
 ## Change types
 
-| Output                    | Emitted when                                                                                                                                                   |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `(nodesChanges.position)` | A node was moved by a drag or the keyboard                                                                                                                     |
-| `(nodesChanges.size)`     | The rendered size of a node changed; `mode` tells for each axis whether it is `explicit` or an `auto` measurement, see [Node sizes](/docs/concepts/node-sizes) |
-| `(nodesChanges.select)`   | A node was selected or deselected                                                                                                                              |
-| `(edgesChanges.select)`   | An edge was selected or deselected                                                                                                                             |
-| `(edgesChanges.detached)` | An edge stopped being drawn because an end is missing                                                                                                          |
+| Output                    | Emitted when                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `(nodesChanges.position)` | A node was moved by a drag or the keyboard                                                                                                             |
+| `(nodesChanges.size)`     | The rendered size of a node changed; `mode` tells for each axis whether it is `explicit` or an `auto` measurement, see [Resizing](/docs/nodes/resizer) |
+| `(nodesChanges.select)`   | A node was selected or deselected                                                                                                                      |
+| `(edgesChanges.select)`   | An edge was selected or deselected                                                                                                                     |
+| `(edgesChanges.detached)` | An edge stopped being drawn because an end is missing                                                                                                  |
 
 Do not replay these notifications through the [graph operations](/docs/graph/graph-operations): the change has
 already happened.
 
+## What the flow writes
+
+The flow writes into a few signals of a node: `point`, `selected`, and `width` / `height` after a resize gesture. With
+the signal in the node, the flow writes into it; without `selected` or a size signal, the flow holds the value
+itself, and the change above is the way to learn it. Every other signal of a node, `data`, `draggable`, `parentId`
+and the rest, the flow only reads. Of an edge, the flow writes only `selected`.
+
+The flow never adds signals to your objects. You can add one later: assign it and pass a new array, and the flow
+reads it without recreating the node; a signal of the application wins over the value the flow held.
+
+```ts
+node.selected = signal(true);
+this.nodes.update((nodes) => [...nodes]);
+```
+
 ## See also
 
-- [Core concepts](/docs/concepts/core-concepts#what-the-flow-writes) for which signals of a node or an edge the flow
-  writes, and which it only reads.
 - [Resizing](/docs/nodes/resizer#save-the-size-a-user-set) for saving a size from a `size` change.

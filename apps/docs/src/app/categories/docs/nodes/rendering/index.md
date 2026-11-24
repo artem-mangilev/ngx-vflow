@@ -1,5 +1,5 @@
 ---
-keyword: 'FeaturesCustomNodes'
+keyword: 'RenderingNodes'
 ---
 
 Core is headless: it owns geometry, interaction and accessibility, and draws nothing of a node itself. Every node
@@ -60,7 +60,7 @@ the template renders with `of`; the flow never reads this input, it only tells t
 Every node without `component` renders through this template. The library does not read a node kind: if your flow has
 several kinds of nodes, keep a discriminator in `data` and branch on it with `@if` or `@switch` in the template.
 
-{{ NgDocActions.demoPane("CustomNodesDemoComponent") }}
+{{ NgDocActions.demoPane("TemplateNodesDemoComponent") }}
 
 ## Draw nodes with components
 
@@ -115,12 +115,9 @@ declare module 'ngx-vflow' {
 }
 ```
 
-{{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}
+{{ NgDocActions.demoPane("ComponentNodesDemoComponent") }}
 
 ## Listen to the outputs of component nodes
-
-> **Warning**
-> This is an experimental API
 
 There is a `(componentNodeEvent)` event on `VflowComponent`. Here is how it works:
 

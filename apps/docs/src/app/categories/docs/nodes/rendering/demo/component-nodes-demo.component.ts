@@ -33,7 +33,7 @@ import { RequestData, RequestNodeComponent } from './components/request-node.com
   // The nodes name their components by key; the classes are imported once, here.
   providers: [provideVflow(withNodeComponents({ request: RequestNodeComponent, approval: ApprovalNodeComponent }))],
 })
-export class CustomComponentNodesDemoComponent {
+export class ComponentNodesDemoComponent {
   protected readonly status = signal('Press a button in a node: the flow reports the output of its component.');
 
   // The data type is the union of the data of both components.

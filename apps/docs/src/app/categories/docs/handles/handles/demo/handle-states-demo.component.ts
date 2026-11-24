@@ -76,7 +76,7 @@ const DOT = `size-3 rounded-full bg-vui-foreground transition-[scale] hover:scal
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsKit, DocsPresentations, Vflow, Vui, SquareHandleComponent],
 })
-export class CustomHandlesDemoComponent {
+export class HandleStatesDemoComponent {
   protected readonly dot = DOT;
 
   protected readonly temperatureCanStart = signal(true);

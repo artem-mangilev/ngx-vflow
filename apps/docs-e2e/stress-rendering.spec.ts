@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('virtualization demo retains node DOM and geometry through viewport pan', async ({ page }) => {
   await page.goto('/docs/performance/virtualization');
   const nodes = page.locator('[data-v-node]');
-  await expect(nodes).toHaveCount(4900);
+  await expect(nodes).toHaveCount(10000, { timeout: 30_000 });
   await page.locator('.v-pane').scrollIntoViewIfNeeded();
   await expect
     .poll(() => nodes.evaluateAll((items) => items.filter((node) => getComputedStyle(node).display === 'none').length))

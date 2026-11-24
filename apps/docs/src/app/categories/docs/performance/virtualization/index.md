@@ -1,8 +1,10 @@
-This guide shows how to turn on viewport virtualization for a large graph and how to get the most from it. For
-what it does underneath, see [How virtualization works](/docs/concepts/virtualization).
+This guide shows how to turn on viewport virtualization for a large graph and how to get the most from it. Nodes and
+edges outside the viewport get `display: none`: their components stay mounted and keep their state, and only layout
+and paint are saved, not memory.
 
-The demo holds 4900 nodes in 70 rows and opens on the middle of the graph. Pan and zoom it: only the nodes and
-edges in view are laid out and painted.
+The demo holds 10000 nodes in 100 rows and opens on the middle of the graph. Pan and zoom it: only the nodes and
+edges in view are laid out and painted. Its `minZoom` keeps about a hundred nodes in view: virtualization saves the
+work of what is hidden, so a view of the whole graph would be as slow as no virtualization at all.
 
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}
 

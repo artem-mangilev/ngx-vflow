@@ -27,7 +27,9 @@ import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
   styles: `
     :host {
       display: block;
-      height: 320px;
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
     }
 
     .step {

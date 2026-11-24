@@ -551,7 +551,7 @@ validator: ({ source, target }) => source.node.data().type === target.node.data(
 - Every change of one tick comes in a single array. In v2 each moved, resized or selected node came in an array of its own, so dragging several selected nodes called the handler once per node on every move. A handler that reads only `changes[0]` must go through the whole array.
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
 - Adding and removing nodes and edges is no longer reported: the application owns the `nodes` and `edges` arrays, so these changes only echoed its own actions. The `add` and `remove` change types (`NodeAddChange`, `NodeRemoveChange`, `EdgeAddChange`, `EdgeRemoveChange`) and the `(nodesChanges.add)`, `(nodesChanges.remove)`, `(edgesChanges.add)` and `(edgesChanges.remove)` outputs are removed; react where the application changes its arrays instead.
-- `NodeChange` is now `position | size | select` and `EdgeChange` is `detached | select`. The experimental `detached` change and `(edgesChanges.detached)` stay; `getDetachedEdges()` became the `detachedEdges` signal of the flow, read as `flow.detachedEdges()`.
+- `NodeChange` is now `position | size | select` and `EdgeChange` is `detached | select`. The `detached` change and `(edgesChanges.detached)` stay; `getDetachedEdges()` became the `detachedEdges` signal of the flow, read as `flow.detachedEdges()`.
 - `viewportChange$` is removed: `viewport` is state, and the signal is the way to read it; `(viewportChangeEnd)` reports the end of a change. `initialized$` is removed with the `initialized` signal: the first layout is a moment, reported by the `(initialized)` output.
 
 ### Configuration through `provideVflow()`
@@ -576,7 +576,7 @@ The object inputs `optimization` and `selectionBox` are flattened into plain inp
 
 The `Optimization` and `SelectionBoxSettings` interfaces are removed; `SelectionBoxMode` stays. The remaining object input, `connection`, reads as the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding; code that built it over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
 
-The `view` input is removed: the size of a flow is CSS. By default `vflow` fills its parent element, which therefore needs a width and a height; for a fixed size, style the element, `style="width: 400px; height: 400px"`, where v2 took `[view]="[400, 400]"`. See [View size](/docs/viewport/view-size).
+The `view` input is removed: the size of a flow is CSS. By default `vflow` fills its parent element, which therefore needs a width and a height; for a fixed size, style the element, `style="width: 400px; height: 400px"`, where v2 took `[view]="[400, 400]"`.
 
 `optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model.
 
@@ -660,7 +660,7 @@ The `v-minimap` element is now the minimap block itself, an ordinary element of 
 - It has no `position` input and no place of its own. Add `vPanel="bottom-right"` (or another position) for the place it had, or position it with your own CSS. `vPanel` places any element of the flow content, see [Panels](/docs/viewport/panel).
 - It has no frame. Add `border`, `border-radius` or `box-shadow` on `v-minimap` if you want one, and set its size the same way: by default it is `clamp(120px, 20%, 240px)` wide at 4:3 instead of a fifth of each side of the flow.
 - Its bounds include the viewport, so the part in view cannot leave the minimap; the minimap zooms out while the viewport is away from the nodes.
-- Nodes are filled with `--v-minimap-node` and have no outline; tokens set their outline and radius and the look of groups. Style the nodes of a component, also by their data, with `withMinimapSettings()`, see [Minimap](/docs/viewport/minimap#style-the-nodes).
+- Nodes are filled with `--v-minimap-node` and have no outline; tokens set their outline and radius and the look of groups. Style the nodes of a component, also by their data, with `withMinimap()`, see [Minimap](/docs/viewport/minimap#style-the-nodes).
 - `--v-minimap-mask` is now the whole color of the mask, alpha included (it was an opaque color drawn at 35%), and the mask lies above the nodes outside the viewport. `--v-minimap-viewport` outlines the viewport.
 - Selection is no longer shown and `--v-minimap-selected` is removed.
 

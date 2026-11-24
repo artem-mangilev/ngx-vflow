@@ -10,7 +10,7 @@ An edge is clickable along its whole path: the flow draws a transparent stroke o
 
 Selected nodes and edges are raised above their neighbours while `elevateNodesOnSelect` and `elevateEdgesOnSelect` are on (the default), whether the selection came from a click, the keyboard, the selection box or the application.
 
-> Both custom nodes and edges have the `selected()` signal in their template context for applying styles based on this state. The Review node of the demo prints it in its header.
+> Node and edge templates have the `selected()` signal in their template context for applying styles based on this state. The Review node of the demo prints it in its header.
 
 ## What can be selected
 
@@ -64,11 +64,11 @@ To disable the selection-box gesture, provide `withShortcuts({ modifiers: { sele
 
 ### Template state access
 
-The host of a covered entity already carries `data-v-selected`, so CSS shows the preview like the selection. The `preselected` state is also exposed in rendering contexts, so custom templates can style the drag-preview state differently from the final selected state.
+The host of a covered entity already carries `data-v-selected`, so CSS shows the preview like the selection. The `preselected` state is also exposed in rendering contexts, so templates can style the drag-preview state differently from the final selected state.
 
 - Node template contexts expose `preselected` together with `selected`.
 - Component nodes read the same `preselected` signal from `injectNode()`.
-- Edge template context also exposes `preselected`, so custom edges can render preselection state explicitly.
+- Edge template context also exposes `preselected`, so edges can render preselection state explicitly.
 
 In this demo, switch the mode between `full` and `partial`, then hold `Shift` and drag a box that covers some nodes whole and only touches others.
 

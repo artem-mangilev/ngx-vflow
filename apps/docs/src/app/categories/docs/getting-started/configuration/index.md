@@ -2,25 +2,43 @@
 keyword: 'Configuration'
 ---
 
-Every setting of `vflow` is an input, and binding inputs is all a single flow needs. An application with several
-flows, or with labels that come from a translation service, configures them once through dependency injection:
-`provideVflow()` takes features, each a `with*()` call, and goes into the providers of `bootstrapApplication`, of a
-route, or of the component that hosts a flow.
+Every setting of `vflow` is an input, and binding inputs is all a single flow needs. `provideVflow()` moves the
+settings out of the template into dependency injection: it takes features, each a `with*()` call, and goes into the
+providers of `bootstrapApplication`, of a route, or of the component that hosts a flow.
+
+## Settings in the template or in providers
+
+With inputs, the settings sit in the template next to the graph, and every flow repeats them:
+
+```html
+<vflow [nodes]="nodes" [edges]="edges()" [minZoom]="0.2" [maxZoom]="4" [zoomOnDoubleClick]="true" (connect)="connect($event)" />
+```
+
+With a provider, the configuration is a piece of code of its own, and the template keeps only what this flow is about:
+its graph and its events.
 
 ```typescript
 import { provideVflow, withAccessibility, withNodeComponents, withSettings } from 'ngx-vflow';
 
-const settings = withSettings({ minZoom: 0.2, maxZoom: 4, zoomOnDoubleClick: true });
-const labels = withAccessibility({ flowLabel: 'Approval graph' });
-const components = withNodeComponents({
-  task: TaskNode,
-  decision: () => import('./decision-node').then((m) => m.DecisionNode),
-});
+export const flowConfig = provideVflow(
+  withSettings({ minZoom: 0.2, maxZoom: 4, zoomOnDoubleClick: true }),
+  withAccessibility({ flowLabel: 'Approval graph' }),
+  withNodeComponents({
+    task: TaskNode,
+    decision: () => import('./decision-node').then((m) => m.DecisionNode),
+  }),
+);
 
-bootstrapApplication(AppComponent, {
-  providers: [provideVflow(settings, labels, components)],
-});
+bootstrapApplication(AppComponent, { providers: [flowConfig] });
 ```
+
+```html
+<vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)" />
+```
+
+The configuration is written once for every flow below the provider, can be tested and changed without touching a
+template, and can come from services: labels from a translation service, keys from the preferences of the user. Some
+settings exist only as features: the labels, the keyboard shortcuts and the components and curves registered by key.
 
 ## Where a value comes from
 
@@ -35,9 +53,7 @@ is not `undefined`. An object setting such as `connection` merges its keys throu
 
 Two `provideVflow()` calls on the path to a flow do not replace each other: every feature provides its own token, and
 a feature closer to the flow lays its keys over the same feature further up. A route can therefore set the zoom range
-for all of its pages and one component can still turn off double-click zoom for its flow:
-
-{{ NgDocActions.demoPane("ConfigurationDemoComponent") }}
+for all of its pages and one component can still turn off double-click zoom for its flow.
 
 The inputs hold only what is bound. To read the settings in effect for a flow, use `flow.settings`, one signal per
 setting: `flow.settings.minZoom()`.
@@ -59,7 +75,7 @@ provideVflow(withSettings(() => inject(Preferences).flowSettings));
 
 Takes a `Partial<AriaLabelConfig>` with the names, descriptions and announcements of the graph; omitted keys keep
 their English defaults. A factory works as for `withSettings()`, so the labels can follow the language of the
-application. See the [Accessibility reference](/docs/reference/accessibility#labels) for the keys.
+application. See [Accessibility](/docs/interactions/accessibility#labels) for the keys.
 
 ### `withShortcuts(shortcuts)`
 
@@ -79,9 +95,9 @@ edge lays out its path. See [Curves](/docs/edges/curves#curves-by-key).
 Register component classes, or `() => import(...)` factories, under keys. A node or edge then names its component as
 `component: 'task'`, so the code that builds the graph imports no component classes and the graph serializes as
 data. A key that no `provideVflow()` on the path registers is an error when the entity is created. See
-[Custom nodes](/docs/nodes/custom-nodes#refer-to-components-by-key) and [Custom edges](/docs/edges/custom-edges).
+[Rendering nodes](/docs/nodes/rendering#refer-to-components-by-key) and [Rendering edges](/docs/edges/rendering).
 
-### `withMinimapSettings(settings)`
+### `withMinimap(settings)`
 
 Sets how the minimap draws the nodes of a component, by the key it is registered under: a style, or a function that
 derives one from the node, `nodeStyles: { task: { background: 'var(--task)' } }`. Every other node takes the

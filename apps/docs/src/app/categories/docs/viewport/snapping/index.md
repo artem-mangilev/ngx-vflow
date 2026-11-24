@@ -6,7 +6,7 @@ where the node aligned with a neighbour it keeps the alignment, and the grid app
 The library supports **alignment lines** that help align nodes relative to each other. To enable this feature, pass the `[alignmentHelper]` input to the `VflowComponent`. Its value can be either:
 
 - `true` – to enable the helper with default settings
-- An `AlignmentHelperSettings` object – to configure the helper with custom settings
+- An `AlignmentHelperSettings` object – to configure the helper
 
 Try it on the following flow: drag `Deploy` until its edge to `Test` is straight, drag `Alerts` into the gap between `Logs` and `Metrics`, and drag `Test` to the center of its group.
 

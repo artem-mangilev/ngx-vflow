@@ -32,7 +32,7 @@ To adapt your existing component nodes, replace component classes in the `compon
 
 ## Lazy loading template nodes
 
-For template nodes, the library provides a custom trigger for the `@defer` syntax through the context.
+For template nodes, the library provides a trigger for the `@defer` syntax through the context.
 
 ```
 <!-- Eagerly loaded -->

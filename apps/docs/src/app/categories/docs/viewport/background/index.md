@@ -20,8 +20,8 @@ To make dots pattern, pass an object to the `[background]` input according to `D
 
 To make an image background, pass an object to the `[background]` input according to `ImageBackground` interface
 
-The image lies at the origin of the flow and moves and zooms with it, unless `fixed` is set. In the example it is a
-floor plan at its natural size, so the positions of the nodes are positions on the plan.
+The image lies at the origin of the flow and moves and zooms with it, unless `fixed` is set. With `repeat: true` it
+tiles the whole canvas, so a small tile makes a pattern of your own; the example repeats a 32-pixel plus mark at its natural size, `scale: 1`.
 
 {{ NgDocActions.demoPane("ImageCustomBackgroundDemoComponent") }}
 

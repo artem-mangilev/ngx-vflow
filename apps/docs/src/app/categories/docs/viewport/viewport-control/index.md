@@ -1,7 +1,6 @@
 The viewport is the part of the graph the flow shows: an offset and a zoom. Users change it with
 [gestures](/docs/viewport/viewport-gestures); this page is about changing and reading it from code, for buttons of
-your own, a "go to node" search or a saved view. The methods and their options are listed in the
-[Viewport reference](/docs/reference/viewport#methods).
+your own, a "go to node" search or a saved view. The methods and their options are listed at the end of this page.
 
 {{ NgDocActions.demoPane("ViewportControlDemoComponent") }}
 
@@ -121,6 +120,40 @@ The viewport methods read no signal in a tracked way, so an effect may call them
 also reads a query such as `getNodesBounds()` or `getNodeRect()`, it reruns on every node move; read the query in
 `untracked` when it must not.
 
-## See also
+## Methods
 
-- [Viewport reference](/docs/reference/viewport#methods) for every method, option and event.
+| Method                                  | Effect                                                                                   |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `fitView(options?)`                     | Fits the given nodes, or all of them, into the flow                                      |
+| `setCenter(point, options?)`            | Puts a flow-space point in the center of the flow, at `options.zoom` or the current zoom |
+| `setViewport(viewport, options?)`       | Sets `x`, `y` and `zoom`                                                                 |
+| `zoomTo(zoom, options?)`                | Zooms around the center of the flow                                                      |
+| `zoomIn(options?)`, `zoomOut(options?)` | Zoom around the center by the step of the zoom keys, `1.2`                               |
+
+Every method takes `duration`, the length of the animated transition in milliseconds; `0`, the default, changes the
+viewport at once. `fitView()` also takes:
+
+| Option               | Meaning                                                                   |
+| -------------------- | ------------------------------------------------------------------------- |
+| `nodes`              | Ids of the nodes to fit; all nodes when omitted or empty                  |
+| `padding`            | Space around the fitted nodes, as a share of their size; `0.1` by default |
+| `minZoom`, `maxZoom` | Limits for this fit, within the `minZoom` and `maxZoom` of the flow       |
+
+- Zoom is clamped to the `minZoom` and `maxZoom` of the flow; `x` and `y` stay as given.
+- Methods apply at once and in order, each from where the previous one leads.
+- Each returns a promise that settles when the change ends: `true` when the viewport reached the target, `false`
+  when there was nothing to change or another change or a gesture interrupted it first.
+- The methods read no signal in a tracked way, so an effect may call them without `untracked`.
+
+Queries such as `getNodesBounds()`, `getNodeRect()` and `getNodesAtPoint()` are signal reads:
+`computed(() => flow.getNodesBounds())` follows the nodes, and an effect that reads a query reruns when its answer
+may change.
+
+## Signals and events
+
+| Member                                     | Description                                                                                                                                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `viewport`                                 | Signal of `{ x, y, zoom }`; follows every frame of a gesture or an animation                                                                                                                      |
+| `settings.minZoom()`, `settings.maxZoom()` | The resolved zoom limits                                                                                                                                                                          |
+| `(initialized)`                            | Emitted once, when the first layout is complete: the flow has a size, and every node has its size and handle positions. An empty graph completes it too. A later subscription does not receive it |
+| `(viewportChangeEnd)`                      | Emits the viewport when a change ends: a drag or a touch gesture is released, a double-click zoom lands, a series of wheel events stops for 150 ms, a programmatic call lands or is interrupted   |

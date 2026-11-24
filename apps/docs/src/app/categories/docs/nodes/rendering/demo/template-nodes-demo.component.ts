@@ -46,7 +46,7 @@ type QueueData = { kind: 'queue'; name: string; waiting: number };
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow, Vui],
 })
-export class CustomNodesDemoComponent {
+export class TemplateNodesDemoComponent {
   protected readonly nodes = createNodes<ServiceData | QueueData>([
     {
       id: 'gateway',

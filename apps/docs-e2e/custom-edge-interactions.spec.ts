@@ -30,7 +30,7 @@ async function hitTargetAtMidpoint(path: import('@playwright/test').Locator) {
 }
 
 test('custom edge interaction stroke can select without blocking empty canvas', async ({ page }) => {
-  await page.goto('/docs/edges/custom-edges');
+  await page.goto('/docs/edges/rendering');
 
   // The page opens with the plain edge demo; the edge template demo is the second flow.
   const flow = page.locator('vflow').nth(1);
