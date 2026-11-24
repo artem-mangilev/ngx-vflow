@@ -1,66 +1,43 @@
-Every color, size and radius in `@vflow/ui` parts comes from a small set of scales, so cards, rows, labels,
-toolbars and controls stay consistent with each other and with your overrides. Text is your application's. The
-colors are the Tailwind palette, as in shadcn/ui's zinc base with its blue theme: zinc neutrals, white surfaces, light
-hairline borders and one saturated accent; the layout is dense, with concentric corners.
+Every color, size and radius of the parts comes from a few theme roles. The colors are the Tailwind palette: zinc
+neutrals and one blue accent, as in shadcn/ui. Text is your application's: the parts inherit its typeface and use your
+type utilities.
 
 {{ NgDocActions.demo("TokensDemoComponent", { container: false }) }}
 
-## Theme variables
+## Theme roles
 
-The light values sit on `:root` and a `data-vui-theme` scope; override them on a scope so the core tokens follow (see Overview). Everything else is derived from them. Colors are oklch.
+`vflow-ui.css` sets the light values on `:root` and on `data-vui-theme="light"`, the dark ones on
+`data-vui-theme="dark"`. Override a role on a scope to change it.
 
-| Role                                         | Light / dark                                                                  | Purpose                                                                                     |
-| -------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `--vui-background`                           | zinc-50 `oklch(0.985 0 0)` / zinc-950 `oklch(0.141 0.005 285.823)`            | Flow background                                                                             |
-| `--vui-surface`                              | white / zinc-900 `oklch(0.21 0.006 285.885)`                                  | Nodes, labels, floating surfaces                                                            |
-| `--vui-surface-muted`                        | 10% / 8% zinc fill                                                            | Groups, hover; translucent so it works on any layer                                         |
-| `--vui-foreground`, `--vui-muted`            | zinc-950 / zinc-50; at least 4.6:1 for muted                                  | Primary and secondary text, edge strokes                                                    |
-| `--vui-border`                               | zinc-200 `oklch(0.92 0.004 286.32)` / zinc-800 `oklch(0.274 0.006 286.033)`   | Hairline border of a surface, background dots; separators are the border at 50%             |
-| `--vui-accent`                               | blue-600 `oklch(0.546 0.245 262.881)` / blue-500 `oklch(0.623 0.214 259.815)` | Selection and focus rings, selected edges, connecting ports, resize controls, selection box |
-| `--vui-success`, `--vui-danger`              | green-600 and red-600 / green-500 and red-400                                 | Port validity while connecting, at least 3:1 on the background                              |
-| `--vui-space`                                | `4px`                                                                         | Grid unit; every padding, gap and control size follows it                                   |
-| `--vui-radius`                               | `6px`                                                                         | Control radius; surfaces add one grid unit                                                  |
-| `--vui-shadow-node`, `--vui-shadow-floating` | per theme                                                                     | Resting node shadow (no blur) and floating layers                                           |
+| Role                                         | Light / dark                              | Use                                                 |
+| -------------------------------------------- | ----------------------------------------- | --------------------------------------------------- |
+| `--vui-background`                           | zinc-50 / zinc-950                        | The canvas                                          |
+| `--vui-surface`, `--vui-surface-muted`       | white / zinc-900; a translucent zinc fill | Cards, labels, toolbars; groups and hover           |
+| `--vui-foreground`, `--vui-muted`            | zinc-950 / zinc-50; muted at least 4.5:1  | Text and edges                                      |
+| `--vui-border`                               | zinc-200 / zinc-800                       | Hairlines and background dots                       |
+| `--vui-accent`                               | blue-600 / blue-500                       | Selection, focus, connecting ports, resize controls |
+| `--vui-success`, `--vui-danger`              | green and red                             | Port validity while connecting                      |
+| `--vui-space`                                | `4px`                                     | Grid unit of every padding, gap and control size    |
+| `--vui-radius`                               | `6px`                                     | Control radius; surfaces are one grid unit rounder  |
+| `--vui-shadow-node`, `--vui-shadow-floating` | per theme                                 | Cards (no blur) and floating layers                 |
 
-The core `--v-*` tokens are set from these roles by the mapping block of `vflow-ui.css`; the parts never read them. Transitions
-use the application's Tailwind defaults (`--default-transition-duration`, `--default-transition-timing-function`).
+In Tailwind the roles are utilities of the `vui` namespace: `bg-vui-surface`, `text-vui-muted`, `p-vui-3`,
+`rounded-vui-surface`, `shadow-vui-floating`.
 
-The theme has one accent, `--vui-accent`, which also colors the core focus ring; the parts ship no buttons or badges, so
-there is no accent fill under text. The accent keeps at least 4.7:1 on the background and the surface in both themes, so it also works for colored
-text such as a key marker in a row. Light `--vui-muted` is a step darker than zinc-500, so secondary text keeps 4.5:1
-on the group fill.
+## Core tokens
 
-## Scales
+The parts core draws itself read their own `--v-*` tokens, listed in [Styling](/docs/getting-started/styling#core-tokens).
+`vflow-ui.css` sets them from the roles, so a role override on a scope recolors core too:
 
-| Scale     | Steps                                                                                                        |
-| --------- | ------------------------------------------------------------------------------------------------------------ |
-| Spacing   | multiples of `--vui-space`: 0–8 units                                                                        |
-| Controls  | 24, 28, 32px (6, 7, 8 units); viewport controls 28px, rows 32px, ports 8px with a target of about 30 by 15px |
-| Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                           |
-| Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                  |
+| Core token                                        | Set from           |
+| ------------------------------------------------- | ------------------ |
+| `--v-background`                                  | `--vui-background` |
+| `--v-background-pattern`                          | `--vui-border`     |
+| `--v-selection-box`, `--v-focus`                  | `--vui-accent`     |
+| `--v-resize-control`, `--v-resize-control-border` | accent, surface    |
+| `--v-alignment-guides`                            | `--vui-foreground` |
+| `--v-connection`                                  | `--vui-muted`      |
+| `--v-minimap-node`, `--v-minimap-mask`            | mixes of muted     |
+| `--v-minimap-node-radius`, `--v-focus-radius`     | the surface radius |
 
-Headers align every item to the first line of the title: an icon, a meta label, a badge or a button stays beside it
-when the title wraps. A picture has no baseline of its own: the demos wrap an icon or an avatar in a slot with a
-zero-width text strut centered in it, which centers the picture on the first line of the title, whatever its size.
-
-Text is your application's, as in React Flow UI: parts inherit its typeface, size, line height and letter spacing
-and use its Tailwind type utilities, `text-xs` for meta and edge labels and `font-semibold` for headers. Secondary text keeps the regular weight
-inside a header. Parts use grayscale antialiasing, as native macOS text does; without it light text on the dark theme
-renders heavier. This setting is on the parts, not on the theme, so it does not change the rest of your page.
-
-Inside a card, the header, footer and field separators are the card border at half strength, so
-the card reads as one surface and follows any border override. A group is a tinted surface with a hairline, not a dashed frame.
-
-Corners are concentric: the viewport controls wrap their buttons at one grid unit, so their radius is the button
-radius plus one unit. Change `--vui-radius` or `--vui-space` and the relation holds.
-
-Nodes never get a blurred shadow or backdrop blur. Both are rasterized again for every visible node on each
-zoom step and pan; see the Virtualization page. The floating material is reserved for the few overlays above
-the graph.
-
-## Utilities
-
-Parts are styled with Tailwind utilities: the `vui` namespace for the scales and colors above (`bg-vui-surface`,
-`p-vui-3`, `rounded-vui-surface`, `shadow-vui-floating`) and your theme's type utilities. A detail that belongs to one
-part, such as the port ring width and its halo or the strut of the icon slot, is an arbitrary value in that part, not a
-token.
+To change one core part only, set its core token on any element inside the scope.

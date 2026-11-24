@@ -297,37 +297,33 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   );
 });
 
-test('themes stay scoped per editor, reach every layer and leave geometry alone', async ({ page }) => {
+test('the theme scope reaches every layer of the flow and leaves geometry alone', async ({ page }) => {
   await page.goto('/packages/ui/overview');
-  const a = page.locator('[data-testid="editor-a"]');
-  const b = page.locator('[data-testid="editor-b"]');
-  await b.scrollIntoViewIfNeeded();
+  const editor = page.locator('[data-testid="editor"]');
+  await editor.scrollIntoViewIfNeeded();
   const light = { node: 'oklch(1 0 0)', edge: 'oklch(0.53 0.016 285.938)' };
   const dark = { node: 'oklch(0.21 0.006 285.885)', edge: 'oklch(0.705 0.015 286.067)' };
-  await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', light.node);
-  await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', light.edge);
+  await expect(editor.locator('article.vui-node').first()).toHaveCSS('background-color', light.node);
+  await expect(editor.locator('path.vui-edge')).toHaveCSS('stroke', light.edge);
   // Markers take the edge stroke through context-stroke, so theming the edge themes its arrowhead.
-  await expect(a.locator('marker polyline')).toHaveCSS('fill', 'context-stroke');
-  await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
-  await expect(b.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
+  await expect(editor.locator('marker polyline')).toHaveCSS('fill', 'context-stroke');
 
   const geometry = () =>
-    a.evaluate((root) =>
+    editor.evaluate((root) =>
       Array.from(root.querySelectorAll<HTMLElement>('[data-v-node], [data-v-handle], path.vui-edge')).map(
         (element) =>
           element.getAttribute('d') ?? `${element.style.transform}|${element.style.top}|${element.style.left}`,
       ),
     );
   const before = await geometry();
-  await page.getByLabel('Editor A in the dark theme', { exact: true }).check();
-  await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
-  await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('[data-v-root]')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
+  await page.getByLabel('Dark theme', { exact: true }).check();
+  await expect(editor.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
+  await expect(editor.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
+  await expect(editor.locator('[data-v-root]')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
   expect(await geometry()).toEqual(before);
-  await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   // The minimap sits in a corner the nodes leave free.
-  await expect(a.locator('v-minimap')).toBeVisible();
-  expect(await overlapping(a, 'v-minimap')).toBe(0);
+  await expect(editor.locator('v-minimap')).toBeVisible();
+  expect(await overlapping(editor, 'v-minimap')).toBe(0);
 });
 
 /** How many of the floating layers matching the selector cover a node of the demo. */
