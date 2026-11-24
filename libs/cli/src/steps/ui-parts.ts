@@ -22,8 +22,6 @@ export interface UiPartsOptions {
   directory?: string;
   /** Import alias of the parts on the first run; skips its question. */
   importAlias?: string;
-  /** Nx only: whether the library gets a build target on the first run; the nx.json default otherwise, then true. */
-  buildable?: boolean;
   /** Set by the Angular CLI schematic: paths go to the root tsconfig instead of an Nx library. */
   angularCli?: boolean;
 }
@@ -70,7 +68,7 @@ export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): P
       throw new Error(`${install.componentsPath} already has files. Pass --directory with a new or empty folder.`);
     }
     if (angularCli) setupAngularCliProject(tree, install);
-    else task = await createNxLibrary(tree, install, options.buildable);
+    else task = await createNxLibrary(tree, install);
   }
 
   const directory = install.componentsPath;
@@ -105,7 +103,6 @@ function setupAngularCliProject(tree: Tree, { componentsPath: directory, importA
 async function createNxLibrary(
   tree: Tree,
   { componentsPath: directory, importAlias }: UiInstall,
-  buildable: boolean | undefined,
 ): Promise<GeneratorCallback> {
   let angular: typeof import('@nx/angular/generators');
   try {
@@ -123,7 +120,8 @@ async function createNxLibrary(
     ...defaults,
     directory,
     importPath: importAlias,
-    buildable: buildable ?? defaults.buildable ?? true,
+    // A build target unless nx.json sets the library default otherwise.
+    buildable: defaults.buildable ?? true,
     prefix: 'vui',
     skipModule: true,
     skipTests: true,

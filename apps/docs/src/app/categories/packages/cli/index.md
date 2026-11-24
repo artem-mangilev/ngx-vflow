@@ -28,7 +28,6 @@ tsconfig path, so nothing else is stored.
 | `--stylesEntryPoint` | Path to the global stylesheet relative to the workspace root. Found in the application when omitted |
 | `--directory`        | A directory for the parts on the first run, or the installed set to update when there are several   |
 | `--importAlias`      | The import alias of the parts on the first run, for example `@acme/flow-ui`. Asked for when omitted |
-| `--buildable`        | Nx only: whether the library of the parts gets a build target on the first run                      |
 
 ```bash
 npx @vflow/cli ui --directory libs/flow-ui --importAlias @acme/flow-ui

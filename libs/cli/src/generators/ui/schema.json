@@ -20,10 +20,6 @@
     "importAlias": {
       "type": "string",
       "description": "The import alias of the parts on the first run, e.g. @acme/flow-ui. Asked for when omitted."
-    },
-    "buildable": {
-      "type": "boolean",
-      "description": "Nx only: whether the library of the parts gets a build target on the first run. The nx.json default of @nx/angular:library when omitted, then true."
     }
   },
   "required": []

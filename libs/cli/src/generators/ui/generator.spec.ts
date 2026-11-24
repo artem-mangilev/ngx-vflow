@@ -76,10 +76,10 @@ describe('ui in Nx', () => {
     expect(tree.children('libs/vflow-ui/src/lib').sort()).toEqual(PARTS.map((part) => part.slice(4)).sort());
   });
 
-  it('creates a library without a build target with --buildable=false or the nx.json default', async () => {
+  it('creates a library with a build target unless the nx.json default says otherwise', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
-    await uiGenerator(tree, { buildable: false });
-    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
+    await uiGenerator(tree);
+    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeDefined();
 
     const other = createTreeWithEmptyWorkspace();
     updateNxJson(other, { generators: { '@nx/angular': { library: { buildable: false } } } });
@@ -146,14 +146,13 @@ describe('ui in Nx', () => {
     expect(tree.exists('libs/shared/flow/src/lib/node.directive.ts')).toBe(true);
   });
 
-  it('takes --importAlias and --buildable without asking for them', async () => {
+  it('takes --importAlias without asking for it', async () => {
     answer({ componentsPath: 'libs/vflow-ui' });
 
-    await uiGenerator(tree, { importAlias: '@acme/flow-ui', buildable: false });
+    await uiGenerator(tree, { importAlias: '@acme/flow-ui' });
 
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([expect.objectContaining({ name: 'componentsPath' })]);
     expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@acme/flow-ui']).toBeDefined();
-    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
   });
 
   it('asks nothing without an interactive terminal and takes the defaults', async () => {
@@ -303,7 +302,6 @@ describe('ui in Angular CLI', () => {
   it('asks without the Nx question and maps the alias in the root tsconfig', async () => {
     await uiGenerator(tree, { angularCli: true });
 
-    expect(vi.mocked(prompt).mock.calls[0][0]).not.toContainEqual(expect.objectContaining({ name: 'buildable' }));
     expect(tree.exists('vflow.json')).toBe(false);
     expect(readJson(tree, 'tsconfig.json').compilerOptions.paths['@vflow/ui']).toEqual([
       './libs/vflow-ui/src/index.ts',
