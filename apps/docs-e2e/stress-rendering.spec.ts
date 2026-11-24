@@ -84,7 +84,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
   expect(samples.flatMap((sample: { misplaced: string[] }) => sample.misplaced)).toEqual([]);
   expect(
     samples.filter(
-      (sample: { hidden: number; visibleEdges: number }) => sample.hidden === 1024 && sample.visibleEdges > 0,
+      (sample: { hidden: number; visibleEdges: number }) => sample.hidden === 2000 && sample.visibleEdges > 0,
     ),
   ).toEqual([]);
   await expect(page.getByRole('checkbox', { name: 'Enable virtualization' })).toHaveCount(0);
@@ -93,8 +93,8 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
       .locator('[data-v-node]')
       .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).display === 'none').length),
   ).toBe(0);
-  await expect(page.getByTestId('stress-node')).toHaveCount(1024);
+  await expect(page.getByTestId('stress-node')).toHaveCount(2000);
   await expect(page.locator('default-node')).toHaveCount(0);
-  await expect(page.locator('svg[edge] .vui-edge')).toHaveCount(1023);
-  expect(samples.at(-1).visibleEdges).toBe(1023);
+  await expect(page.locator('svg[edge] .vui-edge')).toHaveCount(1999);
+  expect(samples.at(-1).visibleEdges).toBe(1999);
 });

@@ -7,7 +7,7 @@ const GUIDES = {
   '/cookbook/delete-selected': '/examples/recipes/delete-selected',
   '/cookbook/drag-and-drop-nodes': '/examples/recipes/drag-and-drop-nodes',
   '/cookbook/expand-collapse': '/docs/nodes/subflows',
-  '/cookbook/force': '/examples/recipes/force',
+  '/cookbook/force': '/packages/layout',
   '/cookbook/group-auto-scaling': '/packages/auto-size',
   '/cookbook/mermaid-clone': '/examples/feature-overview',
   '/cookbook/node-position-animation': '/packages/layout',

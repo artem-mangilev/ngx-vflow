@@ -22,7 +22,7 @@ To turn it on for every flow of an application or a route, set `virtualization: 
 
 Virtualization helps when most of the graph is outside the viewport most of the time. If the whole graph usually
 fits in the view, everything visible is still drawn, and culling only adds work. The
-[stress test](/examples/recipes/stress-test) renders 1024 nodes without it, so you can compare both on your device.
+[stress test](/examples/recipes/stress-test) renders 2000 nodes without it, so you can compare both on your device.
 
 ## Keep the visible nodes cheap to paint
 

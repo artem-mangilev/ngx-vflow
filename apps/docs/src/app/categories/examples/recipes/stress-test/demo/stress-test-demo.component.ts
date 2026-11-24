@@ -20,7 +20,7 @@ import { StressTestNodeComponent } from './stress-test-node.component';
   imports: [DocsPresentations, Vflow, Vui],
 })
 export class StressTestDemoComponent {
-  protected readonly graph = createChain(32, 32);
+  protected readonly graph = createChain(40, 50);
 }
 
 /** A queue of jobs laid out as a grid, each one waiting for the one before it. */

@@ -67,7 +67,7 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## d3-force
 
-`forceLayout(options)` is a continuous layout: a [d3-force](https://github.com/d3/d3-force) simulation moves the nodes on every tick until it settles, starting from where they are. `linkDistance`, `chargeStrength`, `center`, `collide` and `alphaDecay` tune it. Drag a ball: the host reports the drag to the algorithm, which pins the node under the pointer and warms the simulation up again, as d3-drag does. The simulation stays ready for the next drag, so this layout never completes and `vxLayoutEnd` does not fire for it; the demo centers the view once on the `center` the simulation gathers the graph around. The balls of the demo are plain nodes whose whole surface is a handle with `position="center"`, so the straight edges meet them at their centers. The [D3 Force](/examples/recipes/force) recipe lays out cards instead.
+`forceLayout(options)` is a continuous layout: a [d3-force](https://github.com/d3/d3-force) simulation moves the nodes on every tick until it settles, starting from where they are. `linkDistance`, `chargeStrength`, `center`, `collide` and `alphaDecay` tune it. Drag a ball: the host reports the drag to the algorithm, which pins the node under the pointer and warms the simulation up again, as d3-drag does. The simulation stays ready for the next drag, so this layout never completes and `vxLayoutEnd` does not fire for it; the demo centers the view once on the `center` the simulation gathers the graph around. The balls of the demo are plain nodes whose whole surface is a handle with `position="center"`, so the straight edges meet them at their centers.
 
 {{ NgDocActions.demoPane("LayoutForceDemoComponent") }}
 
