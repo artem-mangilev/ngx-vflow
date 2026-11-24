@@ -105,7 +105,7 @@ const API_MOVED = {
   [`${TYPE}EdgeType`]: `${INTERFACE}Edge`,
   [`${TYPE}KeyboardAction`]: `${TYPE}KeyboardCommandName`,
   [`${TYPE}KeyboardShortcuts`]: `${INTERFACE}KeyboardShortcuts`,
-  [`${TYPE}MiniMapPosition`]: `${TYPE}MinimapPosition`,
+  [`${TYPE}MiniMapPosition`]: `${TYPE}PanelPosition`,
   [`${TYPE}Node`]: `${INTERFACE}Node`,
   [`${VARIABLE}DEFAULT_OPTIMIZATION`]: '/docs/performance/virtualization',
   [`${VARIABLE}EDGE_DEFAULTS`]: `${TYPE}EdgeWithDefaults`,
