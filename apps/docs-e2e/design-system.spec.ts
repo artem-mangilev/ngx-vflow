@@ -297,6 +297,38 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   );
 });
 
+test('the anatomy figure points every callout at the part it names', async ({ page }) => {
+  await page.goto('/packages/ui/overview');
+  const callouts = page.getByTestId('anatomy-callouts');
+  await callouts.scrollIntoViewIfNeeded();
+  await expect(callouts.locator('code')).toHaveCount(8);
+
+  // The end of each arrow, in client space, lies on the box of the element whose part its label names.
+  const misses = await callouts.evaluate((root) => {
+    const node = document.querySelector('[data-v-node="anatomy"]')!;
+    const svg = root.querySelector('svg')!;
+    const labels = Array.from(root.querySelectorAll('code'));
+    return Array.from(root.querySelectorAll('path[marker-end]')).flatMap((line, i) => {
+      const [x, y] = line
+        .getAttribute('d')!
+        .match(/-?[\d.]+/g)!
+        .slice(-2)
+        .map(Number);
+      const end = new DOMPoint(x, y).matrixTransform(svg.getScreenCTM()!);
+      const part = labels[i]
+        .textContent!.trim()
+        .replace(/^vui/, '')
+        .replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+      const near = Array.from(node.querySelectorAll(`.vui${part}`)).some((element) => {
+        const box = element.getBoundingClientRect();
+        return end.x >= box.left - 1 && end.x <= box.right + 1 && end.y >= box.top - 1 && end.y <= box.bottom + 1;
+      });
+      return near ? [] : [labels[i].textContent];
+    });
+  });
+  expect(misses).toEqual([]);
+});
+
 test('the theme scope reaches every layer of the flow and leaves geometry alone', async ({ page }) => {
   await page.goto('/packages/ui/overview');
   const editor = page.locator('[data-testid="editor"]');

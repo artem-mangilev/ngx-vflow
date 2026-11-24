@@ -27,16 +27,19 @@ import { Vflow } from 'ngx-vflow';
 
 ## Parts
 
-A part adds a `.vui-*` class to your element and nothing else: no wrapper, no role, no graph state.
+A part adds a `.vui-*` class to your element and nothing else: no wrapper, no role, no graph state. The card below is
+built from them; each callout names the part of the element it points at.
+
+{{ NgDocActions.demoPane("AnatomyDemoComponent") }}
 
 {% raw %}
 
 ```html
 <article *vNode="let ctx" vuiNode>
-  <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
-  <div vuiRow><span vuiMeta>{{ ctx.data().dataset }}</span></div>
-  <span vuiPort handleType="target" position="left"></span>
-  <span vuiPort handleType="source" position="right"></span>
+  <header vuiNodeHeader><span vuiTitle>Send invoice</span></header>
+  <div vuiRow>Order <span vuiPort handleType="target" position="left"></span></div>
+  <div vuiRow>Invoice <span vuiPort handleType="source" position="right"></span></div>
+  <footer vuiNodeFooter><span vuiMeta>Due tomorrow</span></footer>
 </article>
 ```
 
