@@ -49,6 +49,14 @@
         "command": "node apps/docs/scripts/site.mjs"
       }
     },
+    "preview": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": ["site"],
+      "options": {
+        "command": "node apps/docs/scripts/preview.mjs"
+      }
+    },
     "serve": {
       "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-dev-server",
       "continuous": true,
