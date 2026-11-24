@@ -67,13 +67,6 @@
   initial-value: 90deg;
 }
 
-/* A node of the flow on the landing page appears: see NODE_ENTER in hero-flow.component.ts. */
-@keyframes hero-node-in {
-  from {
-    opacity: 0;
-  }
-}
-
 @layer base {
   :root {
     /* The curve of something that arrives: fast at first, a long settle. The built-in `ease-out` is weaker. */
@@ -94,6 +87,40 @@
   max-width: calc(1080px + 2 * var(--lp-gutter));
   margin-inline: auto;
   padding-inline: var(--lp-gutter);
+}
+
+/*
+ * Where the middle of the room for the hero's flow is in the hero, for the dots that gather around it. It restates
+ * the layout of the hero in landing.component.html, so that the dots are in place before the flow exists to measure
+ * the room: two columns of 5 and 6 parts with a 40px gap in the landing column, the room being the second; under
+ * 900px one column with the room at its bottom, 26rem tall, and 19rem under 600px.
+ */
+@utility hero-slot-center {
+  --landing-column: min(1080px, 100% - 2 * var(--lp-gutter));
+  --slot-x: calc(50% + var(--landing-column) * 5 / 22 + 120px / 11);
+  --slot-y: 50%;
+
+  @media (width < 900px) {
+    --slot-x: 50%;
+    --slot-y: calc(100% - 13rem);
+  }
+  @media (width < 600px) {
+    --slot-y: calc(100% - 9.5rem);
+  }
+}
+
+/*
+ * A flow appears. The library keeps a flow hidden until it has laid itself out, and then shows it in one frame; on
+ * a page that was prerendered, and has been on screen for a while, that reads as a pop. Here what the library kept
+ * hidden fades in instead. Every flow of the site gets this, in a demo or outside one.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  vflow :is(.v-background-svg, .v-viewport) {
+    transition: opacity 300ms var(--ease-out-strong);
+  }
+  vflow.v-initializing:not(.v-no-layout) :is(.v-background-svg, .v-viewport) {
+    opacity: 0;
+  }
 }
 
 /* The chevron of the demos' select, drawn in the text color so it follows the theme. */
