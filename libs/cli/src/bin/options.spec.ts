@@ -10,6 +10,7 @@ describe('parseOptions', () => {
   });
 
   it('refuses unknown options, positional arguments and missing values', () => {
+    expect(parseOptions(['--diff', '--overwrite=false'])).toEqual({ diff: true, overwrite: false });
     expect(() => parseOptions(['--color'])).toThrow('Unknown option --color');
     expect(() => parseOptions(['--buildable'])).toThrow('Unknown option --buildable');
     expect(() => parseOptions(['app'])).toThrow('Unexpected argument app');

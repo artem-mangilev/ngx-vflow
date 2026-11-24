@@ -11,13 +11,16 @@ import {
   type UiInstall,
 } from '../utils/install';
 import { setJsoncValue } from '../utils/jsonc';
+import { type CopyResult, syncCopiedFile, type UpdateOptions } from '../utils/updates';
 
+/** Root of every copied file; their paths under it are the keys of the released hashes. */
+const TEMPLATES = join(__dirname, 'templates');
 /** Templates of the whole set, copied from libs/ui by `ui:sync-cli`. */
-const FILES = join(__dirname, 'templates', 'ui');
+const FILES = join(TEMPLATES, 'ui');
 /** File names of the parts, by which a later run recognizes an installed set. */
 const PART_FILES = readdirSync(join(FILES, 'src', 'lib')).map((file) => file.replace(/\.template$/, ''));
 
-export interface UiPartsOptions {
+export interface UiPartsOptions extends UpdateOptions {
   /** Directory of the parts on the first run, or the installed set to update when there are several. */
   directory?: string;
   /** Import alias of the parts on the first run; skips its question. */
@@ -30,9 +33,14 @@ export interface UiPartsOptions {
  * Step: copies the vflow UI parts into the workspace, like spartan's `ui` but as one set: the parts are one design
  * system in a handful of small files, so there is nothing to choose. The first run creates an Nx library or, in
  * Angular CLI, a tsconfig path. A later run, for example after an update of @vflow/cli, finds the set through that
- * path and only adds the files that are missing: the copied code belongs to the application. Nothing else is stored.
+ * path, adds the files that are missing and updates the ones the application has not changed; an edited file is
+ * kept unless `--overwrite` asks otherwise. Nothing else is stored.
  */
-export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): Promise<GeneratorCallback | undefined> {
+export async function ensureUiParts(
+  tree: Tree,
+  options: UiPartsOptions = {},
+  results = new Map<string, CopyResult>(),
+): Promise<GeneratorCallback | undefined> {
   const angularCli = options.angularCli ?? false;
   const installs = findInstalledUi(tree, PART_FILES);
   const wanted = options.directory && workspaceDirectory(options.directory);
@@ -54,6 +62,10 @@ export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): P
   }
 
   const installed = !!install;
+  if (!install && options.diff) {
+    logger.info('vflow UI is not installed in this workspace: run without --diff to add it.');
+    return undefined;
+  }
   if (!install) {
     install = await chooseUiInstall(options);
     const taken = readTsConfigPaths(tree)[install.importAlias];
@@ -72,9 +84,8 @@ export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): P
   }
 
   const directory = install.componentsPath;
-  const skipped = copyParts(tree, directory, installed);
-  if (installed) reportUnexported(tree, directory);
-  if (skipped.length) logger.info(`Kept ${skipped.length} existing files of ${install.importAlias}.`);
+  copyParts(tree, directory, options, results);
+  if (installed && !options.diff) reportUnexported(tree, directory);
   return task;
 }
 
@@ -138,19 +149,15 @@ async function createNxLibrary(
   return callback;
 }
 
-/** Writes every template; when the set is already installed only missing files. Returns the kept files. */
-function copyParts(tree: Tree, directory: string, installed: boolean): string[] {
-  const kept: string[] = [];
+/** Writes or updates every file of the set and records what happened to each. */
+function copyParts(tree: Tree, directory: string, options: UpdateOptions, results: Map<string, CopyResult>): void {
   for (const template of templates(FILES)) {
     const target = joinPathFragments(directory, relative(FILES, template).replace(/\.template$/, ''));
-    if (installed && tree.exists(target)) {
-      kept.push(target);
-      continue;
-    }
-    // index.ts lists the exports of the application: a missing one is written, an existing one is never merged.
-    tree.write(target, readFileSync(template, 'utf-8'));
+    // index.ts lists the exports of the application: an edited one is never replaced, not even by --overwrite.
+    const overwritable = !target.endsWith('/src/index.ts');
+    const key = relative(TEMPLATES, template).split('\\').join('/');
+    results.set(target, syncCopiedFile(tree, target, key, readFileSync(template, 'utf-8'), options, overwritable));
   }
-  return kept;
 }
 
 /**

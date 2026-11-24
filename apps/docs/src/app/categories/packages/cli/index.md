@@ -11,7 +11,7 @@ CLI or Nx workspace:
 npx @vflow/cli ui
 ```
 
-`ui` adds what is missing and never overwrites your files:
+`ui` adds what is missing:
 
 - `ngx-vflow` in `package.json`;
 - `vflow-ui.css`, the tokens, next to the global stylesheet of an application, imported after `@import 'tailwindcss'`;
@@ -28,15 +28,25 @@ tsconfig path, so nothing else is stored.
 | `--stylesEntryPoint` | Path to the global stylesheet relative to the workspace root. Found in the application when omitted |
 | `--directory`        | A directory for the parts on the first run, or the installed set to update when there are several   |
 | `--importAlias`      | The import alias of the parts on the first run, for example `@acme/flow-ui`. Asked for when omitted |
+| `--diff`             | Print what an update would change in the copied files, and write nothing                            |
+| `--overwrite`        | Replace copied files that have your changes with the files of this version                          |
 
 ```bash
 npx @vflow/cli ui --directory libs/flow-ui --importAlias @acme/flow-ui
 ```
 
-## Run it again
+## Update the parts
 
-- With `--project`, to add the tokens to another application.
-- With a newer `@vflow/cli`, to add parts that are new. Files you already have stay as they are.
+Run the same command with a newer `@vflow/cli`. It adds the parts that are new and updates the files you have not
+changed. A file you changed is kept, and the command names it:
+
+```bash
+npx @vflow/cli@latest ui --diff       # what an update would change, nothing is written
+npx @vflow/cli@latest ui --overwrite  # replace your changed files too; review the result with git
+```
+
+`index.ts` of the parts lists your exports, so a changed one is never replaced. Run the command with `--project` to
+add the tokens to another application.
 
 The same command is a generator too: with `@vflow/cli` installed, `ng g @vflow/cli:ui` and `nx g @vflow/cli:ui` take
 the same options.

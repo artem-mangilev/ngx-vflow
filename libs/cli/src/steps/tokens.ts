@@ -2,12 +2,13 @@ import { joinPathFragments, logger, type ProjectConfiguration, readJson, type Tr
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { getApplications, resolveApplication } from '../utils/applications';
+import { type CopyResult, syncCopiedFile, type UpdateOptions } from '../utils/updates';
 
 /** The tokens file copied next to the global stylesheet; see libs/ui/src/vflow-ui.css. */
 export const THEME_FILE = 'vflow-ui.css';
 export const THEME_IMPORT = `@import './${THEME_FILE}';`;
 
-export interface TokensOptions {
+export interface TokensOptions extends UpdateOptions {
   /** The application whose global stylesheet gets the tokens. Asked for when the workspace has several. */
   project?: string;
   /** Path of the global stylesheet relative to the workspace root. Found in the application when omitted. */
@@ -24,7 +25,11 @@ export interface TokensOptions {
  * Idempotent, so every generator whose parts need the tokens runs it; with one theme there is nothing to choose. A
  * workspace without applications, such as one that only publishes libraries, is skipped with a hint.
  */
-export async function ensureUiTokens(tree: Tree, options: TokensOptions = {}): Promise<void> {
+export async function ensureUiTokens(
+  tree: Tree,
+  options: TokensOptions = {},
+  results = new Map<string, CopyResult>(),
+): Promise<void> {
   if (!options.project && getApplications(tree).size === 0) {
     logger.warn(`This workspace has no application: add ${THEME_FILE} by running the generator again with --project.`);
     return;
@@ -51,10 +56,11 @@ export async function ensureUiTokens(tree: Tree, options: TokensOptions = {}): P
     );
   }
 
-  // An existing tokens file is the application's code by now and is kept.
+  // Updated like the parts: an existing file the application has changed is kept unless --overwrite.
   const tokens = joinPathFragments(dirname(stylesheet), THEME_FILE);
-  if (tree.exists(tokens)) logger.info(`${tokens} already exists and is kept.`);
-  else tree.write(tokens, readFileSync(join(__dirname, 'templates', THEME_FILE), 'utf-8'));
+  const template = readFileSync(join(__dirname, 'templates', THEME_FILE), 'utf-8');
+  results.set(tokens, syncCopiedFile(tree, tokens, THEME_FILE, template, options));
+  if (options.diff) return;
 
   const css = tree.read(stylesheet, 'utf-8') ?? '';
   const imported = importTheme(css, stylesheet);

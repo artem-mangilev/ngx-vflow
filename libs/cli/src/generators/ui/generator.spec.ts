@@ -251,6 +251,41 @@ describe('ui in Nx', () => {
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('./lib/node.directive'));
   });
 
+  it('reports edited files, replaces them with --overwrite but never the index, and writes nothing with --diff', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    await uiGenerator(tree);
+    const node = 'libs/vflow-ui/src/lib/node.directive.ts';
+    const index = 'libs/vflow-ui/src/index.ts';
+    tree.write(node, '// edited');
+    tree.write(index, "export * from './lib/node.directive';\n");
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+    const info = vi.spyOn(logger, 'info').mockImplementation(() => undefined);
+
+    await uiGenerator(tree, { diff: true });
+    expect(tree.read(node, 'utf-8')).toBe('// edited');
+    expect(info).toHaveBeenCalledWith(expect.stringMatching(/--- libs\/vflow-ui\/src\/lib\/node\.directive\.ts/));
+
+    await uiGenerator(tree);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/2 files with your changes have a newer version: .*node\.directive\.ts.*--overwrite/),
+    );
+
+    await uiGenerator(tree, { overwrite: true });
+    expect(tree.read(node, 'utf-8')).toContain('VuiNode');
+    expect(tree.read(index, 'utf-8')).toBe("export * from './lib/node.directive';\n");
+  });
+
+  it('with --diff on a workspace without the set adds nothing', async () => {
+    const info = vi.spyOn(logger, 'info').mockImplementation(() => undefined);
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
+
+    await uiGenerator(tree, { diff: true });
+
+    expect(info).toHaveBeenCalledWith(expect.stringContaining('not installed'));
+    expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBeUndefined();
+    expect(prompt).not.toHaveBeenCalled();
+  });
+
   it('accepts double-quoted exports and ignores files of the application', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);

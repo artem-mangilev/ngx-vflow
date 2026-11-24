@@ -342,6 +342,9 @@ importers:
       '@nx/devkit':
         specifier: '>=21.0.0'
         version: 24.0.6(nx@24.0.6(@angular-devkit/architect@0.2003.36(chokidar@4.0.3))(@angular-devkit/core@20.3.36(chokidar@4.0.3))(@angular-devkit/schematics@20.3.36(chokidar@4.0.3)))
+      diff:
+        specifier: ^8.0.4
+        version: 8.0.4
       enquirer:
         specifier: ^2.3.6
         version: 2.3.6
@@ -5101,6 +5104,10 @@ packages:
 
   diff@5.2.2:
     resolution: {integrity: sha512-vtcDfH3TOjP8UekytvnHH1o1P4FcUdt4eQ1Y+Abap1tk/OB2MWQvcwS2ClCd1zuIhc3JKOx6p3kod8Vfys3E+A==}
+    engines: {node: '>=0.3.1'}
+
+  diff@8.0.4:
+    resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
     engines: {node: '>=0.3.1'}
 
   direction@2.0.1:
@@ -12294,6 +12301,8 @@ snapshots:
       tslib: 2.8.1
 
   diff@5.2.2: {}
+
+  diff@8.0.4: {}
 
   direction@2.0.1: {}
 

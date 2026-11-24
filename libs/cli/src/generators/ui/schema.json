@@ -20,6 +20,14 @@
     "importAlias": {
       "type": "string",
       "description": "The import alias of the parts on the first run, e.g. @acme/flow-ui. Asked for when omitted."
+    },
+    "diff": {
+      "type": "boolean",
+      "description": "Print what an update would change in the copied files, and write nothing."
+    },
+    "overwrite": {
+      "type": "boolean",
+      "description": "Replace copied files that have your changes with the files of this version."
     }
   },
   "required": []
