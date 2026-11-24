@@ -26,7 +26,7 @@ export interface MinimapNodeStyle {
 export type MinimapNodeStyleRule<N extends Node = Node> =
   MinimapNodeStyle | ((node: N) => MinimapNodeStyle | undefined);
 
-/** Minimap settings of the flows below an injector, see `withMinimapSettings()`. */
+/** Minimap settings of the flows below an injector, see `withMinimap()`. */
 export interface MinimapSettings<N extends Node = Node> {
   /**
    * How the nodes of a component are drawn, by the key the component is registered under with

@@ -6,7 +6,7 @@ import { MinimapNodeStyle, MinimapNodeStyleRule, MinimapSettings } from '../../i
 import { Node } from '../../interfaces/node.interface';
 import { provideVflow } from '../../features/feature';
 import { withNodeComponents } from '../../features/with-entity-components';
-import { VFLOW_MINIMAP_SETTINGS, withMinimapSettings } from '../../features/with-minimap-settings';
+import { VFLOW_MINIMAP_SETTINGS, withMinimap } from '../../features/with-minimap';
 
 /** Stands for every node component of the specs: the minimap reads the key, not the component. */
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
@@ -28,7 +28,7 @@ const NONE = 'rgba(0, 0, 0, 0)';
         brand: TaskNodeComponent,
         section: TaskNodeComponent,
       }),
-      withMinimapSettings(() => inject(StyledNodesHostComponent).settings),
+      withMinimap(() => inject(StyledNodesHostComponent).settings),
     ),
   ],
   styles: `
@@ -217,17 +217,17 @@ describe('minimap node styles', () => {
   });
 });
 
-describe('withMinimapSettings()', () => {
+describe('withMinimap()', () => {
   it('adds the keys of a closer level to the level above, a key it sets replacing the style above', () => {
     const byData = (node: Node) => (node.id === 'a' ? { background: 'red' } : undefined);
     const root = Injector.create({
       providers: provideVflow(
-        withMinimapSettings({ nodeStyles: { task: { background: 'green', borderRadius: 4 }, alert: byData } }),
+        withMinimap({ nodeStyles: { task: { background: 'green', borderRadius: 4 }, alert: byData } }),
       ),
     });
     const closer = Injector.create({
       parent: root,
-      providers: provideVflow(withMinimapSettings({ nodeStyles: { task: { background: 'blue' } } })),
+      providers: provideVflow(withMinimap({ nodeStyles: { task: { background: 'blue' } } })),
     });
 
     const styles = closer.get(VFLOW_MINIMAP_SETTINGS)().nodeStyles!;

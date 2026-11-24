@@ -340,31 +340,6 @@ describe('Graph rendering and interaction regressions', () => {
     expect(connection.gesture()).toBeNull();
   });
 
-  it('reports the last accepted size at resizeEnd after a rejected move', () => {
-    const model = node('resize');
-    const end = vi.fn();
-    const event = new PointerEvent('pointermove');
-    const gesture = startResize(
-      {
-        node: model,
-        position: 'right',
-        bounds: { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
-        keepAspectRatio: false,
-        shouldResize: (resize) => resize.width <= 110,
-        onStart: vi.fn(),
-        onResize: vi.fn(),
-        onEnd: end,
-      },
-      event,
-      { x: 100, y: 25 },
-    );
-    gesture.move(event, { x: 110, y: 25 });
-    gesture.move(event, { x: 120, y: 25 });
-    gesture.end(event);
-    expect(model.width()).toBe(110);
-    expect(end.mock.lastCall![0].width).toBe(110);
-  });
-
   it('grows a node that starts below its min size from the min size instead of shrinking it', () => {
     const model = node('resize-below-min');
     model.width.set(100);

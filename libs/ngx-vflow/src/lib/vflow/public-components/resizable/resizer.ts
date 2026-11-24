@@ -3,7 +3,7 @@ import { clamp } from '../../utils/viewport';
 import { Point } from '../../interfaces/point.interface';
 import { ResizeBounds, getControlDirection, getDimensionsAfterResize, getResizeDirection } from './resizer-utils';
 import { Rect } from '../../interfaces/rect';
-import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeEvent, ShouldResize } from './resizer-types';
+import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeEvent } from './resizer-types';
 
 export interface ResizeOptions {
   node: NodeModel;
@@ -11,7 +11,6 @@ export interface ResizeOptions {
   bounds: ResizeBounds;
   keepAspectRatio: boolean;
   resizeAxis?: ResizeAxis;
-  shouldResize?: ShouldResize;
   onStart: (event: ResizeEvent) => void;
   onResize: (event: ResizeEvent) => void;
   /** Runs only after a change was applied. */
@@ -55,7 +54,7 @@ function getChildExtent(node: NodeModel): CoordinateExtent | undefined {
  * application. The options are read once, at the press.
  */
 export function startResize(options: ResizeOptions, sourceEvent: PointerEvent, pointer: Point): ResizeGesture {
-  const { node, bounds, keepAspectRatio, resizeAxis, shouldResize } = options;
+  const { node, bounds, keepAspectRatio, resizeAxis } = options;
   const direction = getControlDirection(options.position, resizeAxis);
 
   const rawNode = node.rawNode;
@@ -125,10 +124,6 @@ export function startResize(options: ResizeOptions, sourceEvent: PointerEvent, p
         }),
         sourceEvent,
       };
-
-      if (shouldResize?.(resizeEvent) === false) {
-        return;
-      }
 
       const dx = values.x - prev.x;
       const dy = values.y - prev.y;

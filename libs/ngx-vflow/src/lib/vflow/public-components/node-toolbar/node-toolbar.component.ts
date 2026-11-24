@@ -7,46 +7,49 @@ import { VflowNoDragDirective } from '../../public-directives/gesture-exclusions
  *
  * The host is absolutely positioned against the nearest positioned ancestor, normally the node box itself,
  * so it moves, zooms, elevates and culls with the node without any bookkeeping. Put it directly inside the
- * presentation element and keep that element free of `overflow: hidden`. The gap to the node is
- * `--v-node-toolbar-offset` (10px by default). Pointer gestures inside the toolbar never drag the node.
+ * presentation element and keep that element free of `overflow: hidden`. The gap to the node is a `margin` of 10px on
+ * the side facing it; the rules have no specificity, so any CSS of the application changes it. Pointer gestures inside
+ * the toolbar never drag the node.
  */
 @Component({
   selector: 'v-node-toolbar',
   template: `<ng-content />`,
-  styles: [
-    `
-      :host {
-        position: absolute;
-        width: max-content;
-        pointer-events: all;
-        --_gap: var(--v-node-toolbar-offset, 10px);
-      }
+  // Without specificity, so the CSS of the application always wins, the margin included.
+  styles: `
+    :where(:host) {
+      position: absolute;
+      width: max-content;
+      pointer-events: all;
+    }
 
-      :host([data-v-node-toolbar='top']) {
-        bottom: calc(100% + var(--_gap));
-        left: 50%;
-        translate: -50% 0;
-      }
+    :where(:host([data-v-node-toolbar='top'])) {
+      bottom: 100%;
+      left: 50%;
+      margin-bottom: 10px;
+      translate: -50% 0;
+    }
 
-      :host([data-v-node-toolbar='bottom']) {
-        top: calc(100% + var(--_gap));
-        left: 50%;
-        translate: -50% 0;
-      }
+    :where(:host([data-v-node-toolbar='bottom'])) {
+      top: 100%;
+      left: 50%;
+      margin-top: 10px;
+      translate: -50% 0;
+    }
 
-      :host([data-v-node-toolbar='left']) {
-        right: calc(100% + var(--_gap));
-        top: 50%;
-        translate: 0 -50%;
-      }
+    :where(:host([data-v-node-toolbar='left'])) {
+      right: 100%;
+      top: 50%;
+      margin-right: 10px;
+      translate: 0 -50%;
+    }
 
-      :host([data-v-node-toolbar='right']) {
-        left: calc(100% + var(--_gap));
-        top: 50%;
-        translate: 0 -50%;
-      }
-    `,
-  ],
+    :where(:host([data-v-node-toolbar='right'])) {
+      left: 100%;
+      top: 50%;
+      margin-left: 10px;
+      translate: 0 -50%;
+    }
+  `,
   host: {
     '[attr.data-v-node-toolbar]': 'position()',
   },

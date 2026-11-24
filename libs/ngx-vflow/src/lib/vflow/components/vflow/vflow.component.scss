@@ -217,10 +217,10 @@
 }
 
 // `vPanel`: an element of the flow content against a corner or a side of the flow. Without specificity, so the CSS of
-// the application always wins.
+// the application always wins; the gap to the edge is the margin.
 ::ng-deep :where([data-v-panel]) {
   position: absolute;
-  margin: var(--v-panel-offset, 10px);
+  margin: 10px;
 }
 
 ::ng-deep :where([data-v-panel^='top']) {

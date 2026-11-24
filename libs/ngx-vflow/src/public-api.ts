@@ -109,7 +109,7 @@ export { withShortcuts } from './lib/vflow/features/with-shortcuts';
 export { withCurves } from './lib/vflow/features/with-curves';
 export type { BuiltInCurve, CurveKey, VflowCurves } from './lib/vflow/interfaces/curves.interface';
 export { withEdgeComponents, withNodeComponents } from './lib/vflow/features/with-entity-components';
-export { withMinimapSettings } from './lib/vflow/features/with-minimap-settings';
+export { withMinimap } from './lib/vflow/features/with-minimap';
 export type { MinimapNodeStyle, MinimapNodeStyleRule, MinimapSettings } from './lib/vflow/interfaces/minimap.interface';
 export type {
   EdgeComponentKey,
@@ -123,7 +123,7 @@ export { VFLOW_SETTINGS_DEFAULTS, type VflowSettings } from './lib/vflow/interfa
 export * from './lib/vflow/components/vflow/vflow.component';
 export type { ResolvedVflowSettingSignals } from './lib/vflow/components/vflow/resolve-settings';
 export * from './lib/vflow/public-components/resizable/resizable.component';
-export type { ResizeAxis, ResizeEvent, ShouldResize } from './lib/vflow/public-components/resizable/resizer-types';
+export type { ResizeAxis, ResizeEvent } from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
 

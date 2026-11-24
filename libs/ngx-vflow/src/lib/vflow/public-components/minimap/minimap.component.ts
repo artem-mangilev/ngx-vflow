@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, map } from 'rxjs';
 import { bindEntityAccessibility } from '../../directives/entity-accessibility.directive';
-import { VFLOW_MINIMAP_SETTINGS } from '../../features/with-minimap-settings';
+import { VFLOW_MINIMAP_SETTINGS } from '../../features/with-minimap';
 import { createPointerDrag, PointerDragContext } from '../../gestures/pointer-drag';
 import { WHEEL_IDLE_MS, wheelPanDelta } from '../../gestures/wheel';
 import { Point } from '../../interfaces/point.interface';
@@ -48,7 +48,7 @@ const PADDING = 5;
  * </vflow>
  * ```
  *
- * Nodes are filled with `--v-minimap-node`. `withMinimapSettings()` changes how the nodes of a component are drawn.
+ * Nodes are filled with `--v-minimap-node`. `withMinimap()` changes how the nodes of a component are drawn.
  *
  * The nodes are one path per style in flow space, and the transform maps them to the minimap: the bounds of the nodes
  * united with the viewport. While the viewport stays within the nodes the transform does not change, and only the

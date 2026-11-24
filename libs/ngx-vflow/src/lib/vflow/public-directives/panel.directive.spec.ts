@@ -27,18 +27,18 @@ const POSITIONS: PanelPosition[] = [
       right: 30px;
     }
   `,
-  template: `<vflow style="width: 400px; height: 300px" [style.--v-panel-offset]="offset()" [nodes]="[]">
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="[]">
     @for (position of positions; track position) {
-      <div class="box" [vPanel]="position" [attr.data-testid]="position"></div>
+      <div class="box" [style.margin]="margin()" [vPanel]="position" [attr.data-testid]="position"></div>
     }
-    <div class="box" data-testid="moving" [vPanel]="moving()"></div>
+    <div class="box" data-testid="moving" [style.margin]="margin()" [vPanel]="moving()"></div>
     <div class="box mine" data-testid="mine" vPanel="top-right"></div>
     <div class="box" data-testid="unplaced"></div>
   </vflow>`,
 })
 class PanelHostComponent {
   positions = POSITIONS;
-  offset = signal<string | null>(null);
+  margin = signal<string | null>(null);
   moving = signal<PanelPosition>('top-left');
 }
 
@@ -72,11 +72,11 @@ describe('vPanel', () => {
     });
   });
 
-  it('follows the position, the offset token and the styles of the application', async () => {
+  it('follows the position, the margin and the styles of the application', async () => {
     const { fixture, place } = await render();
 
     fixture.componentInstance.moving.set('bottom-center');
-    fixture.componentInstance.offset.set('0px');
+    fixture.componentInstance.margin.set('0px');
     fixture.detectChanges();
     await fixture.whenStable();
 

@@ -93,4 +93,17 @@ describe('VflowNodeToolbarComponent', () => {
       expectations[position](box(), bar);
     }
   });
+
+  it('lets a plain class of the application change the gap', () => {
+    const style = document.createElement('style');
+    style.textContent = '.tight { margin: 2px; }';
+    document.head.append(style);
+
+    toolbarPosition.set('top');
+    fixture.detectChanges();
+    toolbar()!.classList.add('tight');
+
+    expect(box().top - toolbar()!.getBoundingClientRect().bottom).toBeCloseTo(2, 1);
+    style.remove();
+  });
 });

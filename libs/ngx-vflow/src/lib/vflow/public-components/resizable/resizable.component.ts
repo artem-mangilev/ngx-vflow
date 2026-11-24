@@ -22,7 +22,7 @@ import { Point } from '../../interfaces/point.interface';
 import { align } from '../../utils/align-number';
 import { ResizeGesture, startResize } from './resizer';
 import { ResizeBounds } from './resizer-utils';
-import { ControlPosition, ResizeAxis, ResizeEvent, ShouldResize } from './resizer-types';
+import { ControlPosition, ResizeAxis, ResizeEvent } from './resizer-types';
 
 const CONTROL_POSITIONS: ControlPosition[] = [
   'top',
@@ -91,7 +91,6 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
   // eslint-disable-next-line @angular-eslint/no-output-native
   public readonly resize = output<ResizeEvent>();
   public readonly resizeEnd = output<ResizeEvent>();
-  public shouldResize = input<ShouldResize>();
 
   protected readonly controls = CONTROLS;
 
@@ -163,7 +162,6 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
         bounds: this.bounds(),
         keepAspectRatio: this.keepAspectRatio(),
         resizeAxis: this.resizeAxis(),
-        shouldResize: this.shouldResize(),
         onStart: (resizeEvent) => this.resizeStart.emit(resizeEvent),
         onResize: (resizeEvent) => this.resize.emit(resizeEvent),
         onEnd: (resizeEvent) => this.resizeEnd.emit(resizeEvent),

@@ -23,8 +23,8 @@ export type PanelPosition =
  * </vflow>
  * ```
  *
- * The gap to the edge is `--v-panel-offset`, 10px by default. The rules have no specificity, so any CSS of the
- * application adjusts the placement. Elements at the same position overlap: wrap them in one element that carries
+ * The gap to the edge is a `margin` of 10px. The rules have no specificity, so any CSS of the application adjusts the
+ * placement, the margin included. Elements at the same position overlap: wrap them in one element that carries
  * `vPanel` and lay them out there. An element without the directive is positioned by the application.
  */
 @Directive({

@@ -5,7 +5,7 @@ import { withDefaults } from '../utils/with-defaults';
 import { VflowFeature, vflowFeature } from './feature';
 import { FeatureValue, provideMergedFeatureValue } from './merged-feature-value';
 
-/** The minimap settings given with `withMinimapSettings()`, merged over the levels above. */
+/** The minimap settings given with `withMinimap()`, merged over the levels above. */
 export const VFLOW_MINIMAP_SETTINGS = new InjectionToken<Signal<Partial<MinimapSettings>>>('VFLOW_MINIMAP_SETTINGS');
 
 /**
@@ -16,7 +16,7 @@ export const VFLOW_MINIMAP_SETTINGS = new InjectionToken<Signal<Partial<MinimapS
  * ```ts
  * provideVflow(
  *   withNodeComponents({ task: TaskNode, decision: DecisionNode }),
- *   withMinimapSettings<Node<Task>>({
+ *   withMinimap<Node<Task>>({
  *     nodeStyles: {
  *       task: (node) => (node.data?.().failed ? FAILED : undefined),
  *       decision: { background: 'var(--decision)', borderRadius: 999 },
@@ -25,10 +25,10 @@ export const VFLOW_MINIMAP_SETTINGS = new InjectionToken<Signal<Partial<MinimapS
  * );
  * ```
  *
- * A `withMinimapSettings()` closer to the flow adds its keys to one further up; a key it sets replaces the style of
+ * A `withMinimap()` closer to the flow adds its keys to one further up; a key it sets replaces the style of
  * that key above.
  */
-export function withMinimapSettings<N extends Node = Node>(
+export function withMinimap<N extends Node = Node>(
   settings: FeatureValue<MinimapSettings<N>>,
 ): VflowFeature<'minimap'> {
   return vflowFeature('minimap', [
