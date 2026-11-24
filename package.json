@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "nx serve docs",
+    "preview": "nx preview docs",
     "build": "nx run-many -t build",
     "build:dev": "nx run-many -t build --configuration development",
     "test": "nx run-many -t test",
