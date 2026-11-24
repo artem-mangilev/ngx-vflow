@@ -67,12 +67,24 @@ const DOT_GAP = 22;
 /** The least zoom of a flow, which the first fit does not go under either. */
 const MIN_ZOOM = 0.5;
 /**
- * The entrance, in milliseconds from the first frame the reader sees. The nodes are simply there; after a beat the
- * three wires draw themselves from the controls to the gradient, each starting while the one before is still on its
- * way and after a shorter gap, so they read as one wave. A wire delivers its value shortly before its line is whole:
+ * The entrance, in milliseconds from the first frame the reader sees. The nodes fade in one after another, so the
+ * flow does not pop into a page that has been on screen for a while; as they settle the three wires draw themselves
+ * from the controls to the gradient, each starting while the one before is still on its way and after a shorter gap,
+ * so they read as one wave. A wire delivers its value shortly before its line is whole:
  * the color is in the gradient as the wire lands. When the angle has arrived the gradient turns to it, and then starts
  * to turn on its own.
  */
+const NODE_STAGGER = 50;
+/**
+ * The fade of a node, the class `animate.enter` gives it; `hero-node-in` is a keyframe of styles.css. Only the opacity
+ * moves: the flow measures its handles on the screen, and a node that is shifted or scaled would be measured there.
+ */
+const NODE_ENTER = 'animate-[hero-node-in_300ms_var(--ease-out-strong)_backwards]';
+/**
+ * A node enters the document before the flow shows it: the flow lays its nodes out first, hidden. The fade waits for
+ * the flow, or it would be over by the time there is something to see.
+ */
+const NODE_ENTER_HOLD = '[.v-initializing_&]:[animation-play-state:paused]';
 const WIRE_STARTS: Record<InputId, number> = { start: 150, end: 290, angle: 400 };
 const WIRE_DRAW = 500;
 const WIRE_LANDS_BEFORE_END = 80;
@@ -89,9 +101,9 @@ const GLOW_OFFSET = 40;
  * a mouse or a trackpad, while a finger on the canvas scrolls the page. The canvas does not zoom: it is as large as
  * the first screen, where a wheel has to scroll the page.
  *
- * It enters once, by wiring itself up: see `WIRE_STARTS`. The nodes have no entrance of their own, one motion being
- * enough for one scene, and can be used from the first frame; a press or a key ends the entrance at once, and a reader
- * who asked for less motion gets the wired flow at once.
+ * It enters once: the nodes fade in and the flow wires itself up, see `WIRE_STARTS`. The nodes can be used from the
+ * first frame; a press or a key ends the wiring at once, and a reader who asked for less motion gets the wired flow
+ * at once.
  *
  * The nodes are not tab stops: the keyboard reaches the controls inside them and the edges, which Delete removes, and
  * a reader on the way to the rest of the page passes four stops fewer. The flows below the hero keep the whole
@@ -131,7 +143,12 @@ const GLOW_OFFSET = 40;
       <ng-template let-ctx vNode [vNodeOf]="nodes">
         @let data = ctx.data();
         @if (data.kind === 'color') {
-          <article vuiNode class="w-44 text-[13px]">
+          <article
+            vuiNode
+            class="w-44 text-[13px]"
+            [class]="enterHold"
+            [animate.enter]="nodeEnter"
+            [style.animation-delay.ms]="enterDelay(ctx.node.id)">
             <header vuiNodeHeader class="py-vui-2">
               <span vuiTitle>{{ data.title }}</span>
               <span vuiMeta class="font-doc-mono">{{ data.color }}</span>
@@ -153,7 +170,12 @@ const GLOW_OFFSET = 40;
             <span vuiPort handleType="source" position="right" [vuiPortConnected]="feeds().has(ctx.node.id)"></span>
           </article>
         } @else if (data.kind === 'angle') {
-          <article vuiNode class="w-44 text-[13px]">
+          <article
+            vuiNode
+            class="w-44 text-[13px]"
+            [class]="enterHold"
+            [animate.enter]="nodeEnter"
+            [style.animation-delay.ms]="enterDelay(ctx.node.id)">
             <header vuiNodeHeader class="items-center py-vui-2">
               <span vuiTitle>Angle</span>
               <span vuiMeta class="tabular-nums">{{ data.angle }}°</span>
@@ -187,7 +209,12 @@ const GLOW_OFFSET = 40;
             <span vuiPort handleType="source" position="right" [vuiPortConnected]="feeds().has(ctx.node.id)"></span>
           </article>
         } @else {
-          <article vuiNode class="w-60 text-[13px]">
+          <article
+            vuiNode
+            class="w-60 text-[13px]"
+            [class]="enterHold"
+            [animate.enter]="nodeEnter"
+            [style.animation-delay.ms]="enterDelay(ctx.node.id)">
             <!-- The light the gradient casts on the page: a shadow of each color on its side of the card. -->
             <div
               class="pointer-events-none absolute inset-4 -z-1 rounded-vui-surface forced-colors:hidden"
@@ -260,9 +287,12 @@ const GLOW_OFFSET = 40;
 })
 export class HeroFlowComponent {
   protected readonly swatches = SWATCHES;
+  protected readonly enterHold = NODE_ENTER_HOLD;
   /** A touch screen keeps the drag on the canvas for scrolling the page, which has no other place to be scrolled by. */
   protected readonly finePointer = media('(pointer: fine)');
   protected readonly motion = !media('(prefers-reduced-motion: reduce)');
+  /** A reader who asked for less motion gets the nodes at once. */
+  protected readonly nodeEnter = this.motion ? NODE_ENTER : '';
 
   /** The box of the page the nodes are fitted into at the start, and again when the page is resized. */
   readonly slot = input.required<HTMLElement>();
@@ -508,6 +538,11 @@ export class HeroFlowComponent {
         entrance.timers.push(setTimeout(() => this.entering.set(false), landed + ANGLE_SETTLE));
       }),
     );
+  }
+
+  /** How long after the first node a node starts to fade in: they come in the order they are listed. */
+  protected enterDelay(id: string): number {
+    return this.nodes.findIndex((node) => node.id === id) * NODE_STAGGER;
   }
 
   /** The wire of an input has reached the gradient. */

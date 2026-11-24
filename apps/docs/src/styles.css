@@ -67,6 +67,13 @@
   initial-value: 90deg;
 }
 
+/* A node of the flow on the landing page appears: see NODE_ENTER in hero-flow.component.ts. */
+@keyframes hero-node-in {
+  from {
+    opacity: 0;
+  }
+}
+
 @layer base {
   :root {
     /* The curve of something that arrives: fast at first, a long settle. The built-in `ease-out` is weaker. */
