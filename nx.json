@@ -37,7 +37,8 @@
     },
     "changelog": {
       "workspaceChangelog": {
-        "createRelease": false
+        "createRelease": "github",
+        "file": false
       }
     },
     "git": {

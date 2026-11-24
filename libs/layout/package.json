@@ -21,7 +21,7 @@
   },
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
-    "ngx-vflow": "^3.0.0",
+    "ngx-vflow": "^3.0.0-alpha.0",
     "rxjs": "^7.4.0",
     "@dagrejs/dagre": "^3.0.0",
     "elkjs": ">=0.9.0 <0.13.0",

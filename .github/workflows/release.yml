@@ -7,6 +7,10 @@ on:
         description: 'Preview only; do not publish, commit or push'
         type: boolean
         default: true
+      version:
+        description: 'Empty: a stable version from the commits. 3.0.0-alpha: a snapshot of this commit under the alpha dist-tag'
+        type: string
+        default: ''
 
 concurrency:
   group: release
@@ -20,7 +24,8 @@ env:
 
 jobs:
   release:
-    if: github.ref == 'refs/heads/main'
+    # A stable release comes from main; a prerelease pushes nothing, so any branch may publish one.
+    if: github.ref == 'refs/heads/main' || contains(inputs.version, '-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +38,8 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
           cache-dependency-path: '**/pnpm-lock.yaml'
-      - run: pnpm install --frozen-lockfile
+      # This job publishes to npm and pushes to the repository, so no install script of a dependency runs in it.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm lint
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
@@ -42,19 +48,40 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-      # The release commit and tag reach the repository before the packages reach npm: a push that fails then leaves
-      # nothing published, and the next run computes the same version again.
-      - name: Version and changelog of all release packages
+      # A prerelease is a snapshot of its commit, 3.0.0-alpha.<commit count>.g<hash>: nobody numbers it, the count keeps
+      # the versions in order, and the "g" keeps a hash of digits only from being read as a number. It goes under its
+      # own dist-tag, so latest stays the stable version.
+      - name: Resolve version and dist-tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          TAG=latest
+          if [[ "$VERSION" == *-* ]]; then
+            TAG="${VERSION#*-}"
+            TAG="${TAG%%.*}"
+            VERSION="$VERSION.$(git rev-list --count HEAD).g$(git rev-parse --short HEAD)"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+      # Nx commits the versions, tags the commit, pushes both and creates the GitHub release with the changelog. All of
+      # it reaches the repository before the packages reach npm: a push that fails then leaves nothing published.
+      - name: Version, tag and GitHub release of a stable version
+        if: env.TAG == 'latest'
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-        run: pnpm nx release --skip-publish --dry-run="$DRY_RUN"
-      - name: Push release commit and tag
-        if: ${{ !inputs.dry_run }}
-        run: git push --follow-tags origin HEAD:main
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm nx release $VERSION --skip-publish --dry-run="$DRY_RUN"
+      # A snapshot leaves no commit, tag or release: its version goes into the built manifests only.
+      - name: Version of a snapshot
+        if: env.TAG != 'latest'
+        run: for dir in libs/*/dist; do npm pkg set version="$VERSION" --prefix "$dir"; done
+      - name: Show the packages
+        if: ${{ inputs.dry_run }}
+        run: for dir in libs/*/dist; do npm pack --dry-run "./$dir"; done
       # A preview publishes nothing: npm 11 refuses even a dry run of a version that is already published, and a dry
       # run leaves the current version in the manifests.
       - name: Publish all release packages
         if: ${{ !inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm nx release publish
+        run: pnpm nx release publish --tag "$TAG"

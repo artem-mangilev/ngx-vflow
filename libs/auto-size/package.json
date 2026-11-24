@@ -19,7 +19,7 @@
   },
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
-    "ngx-vflow": "^3.0.0"
+    "ngx-vflow": "^3.0.0-alpha.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
