@@ -61,7 +61,7 @@ graph needs templates. There are two working paths:
 
 {% endraw %}
 
-For path B, copy the parts and their tokens with `ng g @vflow/cli:ui` (Tailwind CSS v4 required). See the Design system section for the parts.
+For path B, copy the parts and their tokens with `npx @vflow/cli ui` (Tailwind CSS v4 required). See [@vflow/ui](/packages/ui/overview) for the parts.
 
 | Removed                                                                  | Replacement                                                                                                                                                                    |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

@@ -1,5 +1,6 @@
 import { type GeneratorCallback, joinPathFragments, logger, readNxJson, type Tree } from '@nx/devkit';
 import { readdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import {
   chooseUiInstall,
@@ -108,10 +109,10 @@ async function createNxLibrary(
 ): Promise<GeneratorCallback> {
   let angular: typeof import('@nx/angular/generators');
   try {
-    angular = await import('@nx/angular/generators');
+    angular = await import(fromWorkspace(tree, '@nx/angular/generators'));
   } catch {
     throw new Error(
-      'The ui generator creates an Nx library with @nx/angular. Install it, or run `ng g @vflow/cli:ui`.',
+      'The ui generator creates an Nx library with @nx/angular. Install it, or run the command in an Angular CLI workspace.',
     );
   }
   const { libraryGenerator, UnitTestRunner } = angular;
@@ -178,4 +179,16 @@ function templates(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
     entry.isDirectory() ? templates(join(dir, entry.name)) : [join(dir, entry.name)],
   );
+}
+
+/**
+ * The module as the workspace resolves it: run through npx, @vflow/cli lives outside the workspace, where its
+ * optional peers are not installed. A virtual tree has no files to resolve from, so the name stays as it is.
+ */
+function fromWorkspace(tree: Tree, module: string): string {
+  try {
+    return createRequire(join(tree.root, 'package.json')).resolve(module);
+  } catch {
+    return module;
+  }
 }

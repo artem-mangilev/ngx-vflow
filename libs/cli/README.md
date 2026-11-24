@@ -1,13 +1,12 @@
 # @vflow/cli
 
-Generators for [ngx-vflow](https://github.com/artem-mangilev/ngx-vflow) that copy the vflow UI parts into your
-workspace, in the way of shadcn/ui and spartan-ng: the code becomes yours to edit. They run in Nx and in Angular CLI.
+Copies the [ngx-vflow](https://github.com/artem-mangilev/ngx-vflow) UI parts and their tokens into your workspace,
+in the way of shadcn/ui: the code becomes yours to edit. Runs in Angular CLI and Nx workspaces.
 
-Requires Tailwind CSS v4 in the application.
+Requires Tailwind CSS v4 in the application. In the root of the workspace:
 
 ```bash
-npm i -D @vflow/cli
-ng g @vflow/cli:ui # or: nx g @vflow/cli:ui
+npx @vflow/cli ui
 ```
 
 `ui` adds what is missing and never overwrites your files:
@@ -19,5 +18,5 @@ ng g @vflow/cli:ui # or: nx g @vflow/cli:ui
 
 Run it again with `--project` to add the tokens to another application, or after an update to add new parts.
 
-Nothing in your application imports `@vflow/cli`: the parts and the tokens are copied, so the package is only needed
-while you run the generators.
+Nothing in your application imports `@vflow/cli`: the parts and the tokens are copied. Installed in the workspace,
+the same command is a generator: `ng g @vflow/cli:ui` or `nx g @vflow/cli:ui`.

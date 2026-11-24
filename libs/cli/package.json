@@ -8,6 +8,9 @@
     "directory": "libs/cli"
   },
   "type": "commonjs",
+  "bin": {
+    "vflow": "./src/bin/vflow.js"
+  },
   "generators": "./generators.json",
   "schematics": "./generators.json",
   "dependencies": {

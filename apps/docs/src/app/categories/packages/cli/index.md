@@ -1,32 +1,20 @@
-`@vflow/cli` holds the generators that copy the [@vflow/ui](/packages/ui/overview) parts into your workspace, in the
-way of shadcn/ui and spartan-ng: the code becomes yours to edit. They run in Angular CLI and in Nx.
+`@vflow/cli` copies the [@vflow/ui](/packages/ui/overview) parts and their tokens into your workspace, in the way of
+shadcn/ui: the code becomes yours to edit. It runs with `npx`, so nothing is installed in the workspace.
 
-## Installation
-
-```bash
-npm i -D @vflow/cli
-```
+## The `ui` command
 
 The application needs Tailwind CSS v4
-([setup for Angular](https://tailwindcss.com/docs/installation/framework-guides/angular)). Nothing in your
-application imports `@vflow/cli`: the parts and the tokens are copied, so the package is only needed while you run
-the generators.
-
-## The `ui` generator
+([setup for Angular](https://tailwindcss.com/docs/installation/framework-guides/angular)). In the root of an Angular
+CLI or Nx workspace:
 
 ```bash
-ng g @vflow/cli:ui
-```
-
-```bash
-nx g @vflow/cli:ui
+npx @vflow/cli ui
 ```
 
 `ui` adds what is missing and never overwrites your files:
 
 - `ngx-vflow` in `package.json`;
-- the tokens, `vflow-ui.css`, next to the global stylesheet of an application, imported after
-  `@import 'tailwindcss'`;
+- `vflow-ui.css`, the tokens, next to the global stylesheet of an application, imported after `@import 'tailwindcss'`;
 - the parts under the `@vflow/ui` import alias: an Nx library in Nx, a tsconfig path in Angular CLI.
 
 The first run asks for the folder of the parts and their import alias. A later run finds the parts through that
@@ -42,7 +30,14 @@ tsconfig path, so nothing else is stored.
 | `--importAlias`      | The import alias of the parts on the first run, for example `@acme/flow-ui`. Asked for when omitted |
 | `--buildable`        | Nx only: whether the library of the parts gets a build target on the first run                      |
 
+```bash
+npx @vflow/cli ui --directory libs/flow-ui --importAlias @acme/flow-ui
+```
+
 ## Run it again
 
 - With `--project`, to add the tokens to another application.
-- After an update of `@vflow/cli`, to add parts that are new. Files you already have stay as they are.
+- With a newer `@vflow/cli`, to add parts that are new. Files you already have stay as they are.
+
+The same command is a generator too: with `@vflow/cli` installed, `ng g @vflow/cli:ui` and `nx g @vflow/cli:ui` take
+the same options.
