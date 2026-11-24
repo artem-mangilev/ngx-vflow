@@ -4,7 +4,7 @@
 
 /** The guides, which moved under `/docs`, `/examples` and `/packages`. */
 const GUIDES = {
-  '/cookbook/delete-selected': '/examples/recipes/delete-selected',
+  '/cookbook/delete-selected': '/docs/interactions/deleting',
   '/cookbook/drag-and-drop-nodes': '/examples/recipes/drag-and-drop-nodes',
   '/cookbook/expand-collapse': '/docs/nodes/subflows',
   '/cookbook/force': '/packages/layout',

@@ -1,13 +1,13 @@
 import { NgDocPage } from '@ng-doc/core';
-import RecipesCategory from '../ng-doc.category';
+import InteractionsCategory from '../ng-doc.category';
 import { DeleteSelectedDemoComponent } from './demo/delete-selected-demo.component';
 
-const TestPage: NgDocPage = {
-  title: `Delete selected`,
+const DeletingPage: NgDocPage = {
+  title: `Deleting`,
   mdFile: './index.md',
-  category: RecipesCategory,
+  category: InteractionsCategory,
   demos: { DeleteSelectedDemoComponent },
   order: 2,
 };
 
-export default TestPage;
+export default DeletingPage;

@@ -47,20 +47,8 @@ and keyboard behavior as you would anywhere else, and mark your own decorative S
 
 ## Apply deletion from the keyboard
 
-`Delete` and `Backspace` on a focused node or edge emit `(deleteRequest)`; the library removes nothing. Apply the
-request to your collections:
-
-```html
-<vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
-```
-
-```typescript
-onDeleteRequest(request: DeleteRequest) {
-  const result = removeElements(request, { nodes: this.nodes, edges: this.edges });
-  this.nodes = result.nodes;
-  this.edges = result.edges;
-}
-```
+`Delete` and `Backspace` on a focused node or edge emit `(deleteRequest)`; the library removes nothing. Handle it,
+or keyboard users cannot delete at all; see [Deleting](/docs/interactions/deleting).
 
 ## Translate the labels
 

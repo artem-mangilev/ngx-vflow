@@ -72,7 +72,7 @@ test('custom edge interaction stroke can select without blocking empty canvas', 
 });
 
 test('an edge can be selected by clicking its interaction stroke and deleted from the keyboard', async ({ page }) => {
-  await page.goto('/examples/recipes/delete-selected');
+  await page.goto('/docs/interactions/deleting');
 
   const edges = page.locator('vflow svg[edge]');
   const selected = page.locator('vflow svg[edge][data-v-selected]');

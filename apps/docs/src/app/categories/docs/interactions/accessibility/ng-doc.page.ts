@@ -5,7 +5,7 @@ const page: NgDocPage = {
   title: 'Accessibility',
   mdFile: './index.md',
   category: InteractionsCategory,
-  order: 4,
+  order: 5,
 };
 
 export default page;

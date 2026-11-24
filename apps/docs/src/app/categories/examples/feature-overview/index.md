@@ -9,7 +9,7 @@ Where each part is described:
 - The four curves, the labels, the edge drawn by a component and reconnecting: [Curves](/docs/edges/curves), [Labels](/docs/edges/labels), [Rendering edges](/docs/edges/rendering) and [Connections](/docs/handles/connections).
 - The group, its children and its resizer: [Subflows](/docs/nodes/subflows) and [Resizing](/docs/nodes/resizer).
 - The alignment guides: [Snapping and alignment](/docs/viewport/snapping).
-- The selection box and removing the selection with `Delete`: [Selection](/docs/interactions/selection) and [Delete selected](/examples/recipes/delete-selected).
+- The selection box and removing the selection with `Delete`: [Selection](/docs/interactions/selection) and [Deleting](/docs/interactions/deleting).
 - The minimap and the zoom buttons: [Minimap](/docs/viewport/minimap).
 
 ```typescript group="feature-overview" name="all-features-demo.component.ts" file="./demo/all-features-demo.component.ts"
