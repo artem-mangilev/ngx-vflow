@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/docs/src",
   "prefix": "app",
+  "implicitDependencies": ["ngx-vflow", "routing", "auto-size", "layout"],
   "targets": {
     "libs": {
       "executor": "nx:run-commands",
