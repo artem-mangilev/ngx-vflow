@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -39,7 +39,9 @@ export class AppComponent {
       filter((event) => event instanceof NavigationEnd),
       map((event) => event.urlAfterRedirects),
     ),
-    { initialValue: this.router.url },
+    // Until the first navigation ends the router's own URL is "/", the landing page: a prerendered page of a section
+    // would be laid out as the landing page until then, and jump back. The address of the document is the page.
+    { initialValue: inject(Location).path() },
   );
 
   protected readonly tabs = SECTION_TABS;
