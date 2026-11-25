@@ -58,3 +58,6 @@ Thumbs.db
 
 .claude/worktrees
 .claude/settings.local.json
+
+# Local reference checkouts
+/temp

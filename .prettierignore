@@ -9,4 +9,3 @@ dist
 pnpm-lock.yaml
 # Copies of the built libraries and of the @vflow/ui sources
 apps/docs/libs
-.scratch

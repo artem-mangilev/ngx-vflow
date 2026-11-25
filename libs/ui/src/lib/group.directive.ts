@@ -2,7 +2,7 @@ import { Directive } from '@angular/core';
 
 /**
  * A visual group with a title around other nodes: a tinted surface with a hairline, like a macOS group box. Parent relationships and shared movement
- * stay in graph data (ADR-0003); this directive does not create them. Selection is read from the core node host and
+ * stay in graph data; this directive does not create them. Selection is read from the core node host and
  * colors the edge like `vuiNode`'s.
  */
 @Directive({

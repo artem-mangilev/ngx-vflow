@@ -37,4 +37,16 @@ no Angular CLI workspace.
 - `pnpm build:dev` / `pnpm build`: all libraries in development / production, and the docs.
 - `pnpm lint`, `pnpm test`, `pnpm e2e`: Nx verification targets.
 
-See [release instructions](docs/releasing.md) for shared package versions, dry-runs and adding packages.
+## Releasing
+
+`ngx-vflow`, `@vflow/cli`, `@vflow/routing`, `@vflow/layout` and `@vflow/auto-size` form one Nx Release group (the
+`release` project tag): they always share one version and one `v{version}` tag. Nx picks the bump from conventional
+commits since the last tag (`feat!:` or `BREAKING CHANGE:` is major). `@vflow/ui` is never published.
+
+- `pnpm release:dry-run` previews versions, manifests and the changelog locally.
+- GitHub Actions → `release` on `main`: run with `dry_run=true`, check the packages, then again with
+  `dry_run=false`. It needs the `NPM_TOKEN` secret with publish rights in the `@vflow` scope.
+- `version=3.0.0-alpha` publishes a snapshot of any branch under the `alpha` dist-tag and pushes nothing.
+
+npm has no atomic multi-package publish: if one package fails, publish the missing ones at the same version
+instead of bumping again.

@@ -75,4 +75,4 @@ See the **Design system** ng-doc section for the complete directive/token refere
 ERD/mapping and relationships map recipes. Core is headless: it renders no presentation of its own, so every graph
 uses these parts or your own templates.
 
-Versions and releases are shared with ngx-vflow. See `docs/releasing.md` in the repository.
+`@vflow/ui` is not published to npm: the `@vflow/cli` `ui` generator copies these sources into the application.
