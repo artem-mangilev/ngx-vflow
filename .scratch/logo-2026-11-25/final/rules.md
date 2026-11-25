@@ -38,7 +38,7 @@
 
 ## Надпись
 
-Geist Sans Bold (вес 700), в файлах — в кривых. При знаке высотой 64: кегль 56, трекинг 0, зазор до знака 20, слово выровнено по центру знака. Кернинг — из шрифта.
+Nunito Black (вес 900), в файлах — в кривых. При знаке высотой 64: кегль 54,6, трекинг 0, зазор до знака 20, слово выровнено по центру знака. Кернинг — из шрифта.
 
 ## Нельзя
 
@@ -53,7 +53,7 @@ Geist Sans Bold (вес 700), в файлах — в кривых. При зна
 Из папки `.scratch/logo-2026-11-25`, по порядку:
 
 1. `python3 build-mark.py` — знак, плашки, `favicon.svg`. Размеры фигур и ширина шейки заданы в начале скрипта.
-2. `python build-lockup.py` — связка. Нужны `fonttools` и `brotli`, шрифт берётся из соседнего `vflow-studio`.
+2. `python build-lockup.py` — связка. Нужны `fonttools` и `brotli`, шрифт лежит в `fonts/`.
 3. `node build-raster.mjs` — PNG и ICO, через Chromium из `apps/docs-e2e`.
 
 На сайте документации лежат копии: `apps/docs/src/favicon.svg`, `favicon.ico`, `assets/logo.svg`, `assets/lockup.svg`, `assets/lockup-dark.svg`, `assets/apple-touch-icon.png`, `assets/og.png`. После пересборки их надо скопировать заново.

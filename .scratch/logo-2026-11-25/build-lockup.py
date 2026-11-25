@@ -1,15 +1,16 @@
-# Builds the lockups: the mark of final/mark.svg and the word "vflow" in Geist Sans Bold as outlines.
+# Builds the lockups: the mark of final/mark.svg and the word "vflow" in Nunito Black as outlines.
 # final/lockup.svg in currentColor, final/lockup-light.svg and final/lockup-dark.svg by brief.md.
-# Needs fonttools and brotli (`pip install fonttools brotli`) and the Studio checkout next to this repo, with its dependencies installed, for the font;
-# run it after build-mark.py.
+# Needs fonttools and brotli (`pip install fonttools brotli`); the font is in fonts/. Run it after build-mark.py.
 import re, pathlib
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.boundsPen import BoundsPen
 root = pathlib.Path(__file__).parent
-WORD, SIZE, TRACKING, GAP = 'vflow', 56, 0, 20   # font size on the 64 box of the mark, tracking in em
-font = TTFont(root / '../../../vflow-studio/node_modules/@fontsource/geist-sans/files/geist-sans-latin-700-normal.woff2')
+# Font size on the 64 box of the mark, tracking in em. The size is the one that gives Nunito the x-height of
+# Geist Bold at 56, less 8%: the ascenders of Nunito are taller.
+WORD, SIZE, TRACKING, GAP = 'vflow', 54.6, 0, 20
+font = TTFont(root / 'fonts/nunito-latin-900-normal.woff2')
 glyphs, names = font.getGlyphSet(), [font.getBestCmap()[ord(c)] for c in WORD]
 def kern(a, b):   # the pair adjustment of the font: GPOS pair positioning, glyph pairs and class pairs
     for lookup in font['GPOS'].table.LookupList.Lookup:
