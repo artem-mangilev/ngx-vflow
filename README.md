@@ -1,89 +1,108 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/cover-dark.png">
+  <img alt="vflow: two color nodes and an angle node wired into a gradient node" src=".github/readme/cover-light.png">
+</picture>
+
 <div align="center">
 
-# ngx-vflow
+[![npm version](https://img.shields.io/npm/v/ngx-vflow?color=3282b8)](https://www.npmjs.com/package/ngx-vflow)
+[![npm downloads](https://img.shields.io/npm/dm/ngx-vflow?color=3282b8)](https://www.npmjs.com/package/ngx-vflow)
+[![License](https://img.shields.io/npm/l/ngx-vflow?color=3282b8)](LICENSE)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/RavS5ydTJV)
 
-[![NPM Version](https://img.shields.io/npm/v/ngx-vflow?color=blue)](https://www.npmjs.com/package/ngx-vflow)
-[![License](https://img.shields.io/badge/license-MIT-007EC7.svg)](LICENSE)
-[![Discord](https://img.shields.io/badge/discord-ngx--vflow-5865F2?logo=discord&logoColor=white)](https://discord.gg/RavS5ydTJV)
+**ngx-vflow is an Angular library for building node-based editors and interactive diagrams.**
 
-**A powerful Angular library for building node-based UIs**
-
-[Documentation](https://www.ngx-vflow.org/) • [API Reference](https://www.ngx-vflow.org/api)
+[Quickstart](https://www.ngx-vflow.org/docs/getting-started/quickstart) ·
+[Docs](https://www.ngx-vflow.org/) ·
+[Examples](https://www.ngx-vflow.org/examples/feature-overview) ·
+[Discord](https://discord.gg/RavS5ydTJV)
 
 </div>
 
-<img width="1305" alt="ngx-vflow showcase" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/5cbd3669-10a5-4ecb-9a1f-c9ae4eb5fb5a">
+## Features
 
----
+- **Headless**: nodes, edges and handles are your own Angular templates and components
+- **Connections**: drag from handle to handle, validate, reconnect
+- **Editing**: drag, select, resize, snap, align, delete, keyboard shortcuts
+- **Subflows**: nodes inside nodes
+- **Viewport**: pan, zoom, fit, minimap, backgrounds, panels
+- **Accessible**: nodes and edges are reachable from the keyboard and labeled for screen readers
+- **Fast**: built on signals, with virtualization and lazy loading for large graphs
 
-- **Headless** - Nodes, edges and handles are your own Angular templates and components
-- **Subflows** - Create nested flows with parent-child relationships
-- **Interactive Connections** - Create, validate, and reconnect edges
-- **Rich Interactions** - Dragging, selecting, zooming, panning, and keyboard shortcuts
-- **Precise Control** - Snap to grid, alignment helpers, and custom backgrounds
-- **Navigation** - Built-in minimap
-- **Performance** - Virtualization and lazy loading for large graphs
-- **Reactivity** - Uses Signals to keep internal and external states in sync
-- **Layout Algorithms** - Integration with any layouts
-
-## Installation
+## Quickstart
 
 ```bash
-npm install ngx-vflow --save
+npm i ngx-vflow
 ```
 
-## Version Compatibility
+```ts
+import { Component, signal } from '@angular/core';
+import { Vui } from '@vflow/ui';
+import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
+
+@Component({
+  selector: 'app-flow',
+  imports: [Vflow, Vui],
+  host: { class: 'block h-96' },
+  template: `
+    <vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)">
+      <div *vNode="let ctx of nodes" vuiNode class="px-4 py-2">
+        <span vuiPort handleType="target" position="left"></span>
+        {{ ctx.data().label }}
+        <span vuiPort handleType="source" position="right"></span>
+      </div>
+
+      <svg:g *vEdge>
+        <svg:path vuiEdge />
+      </svg:g>
+    </vflow>
+  `,
+})
+export class FlowComponent {
+  protected readonly nodes = createNodes([
+    { id: 'fetch', point: { x: 40, y: 120 }, data: { label: 'Fetch orders' } },
+    { id: 'remind', point: { x: 280, y: 120 }, data: { label: 'Send reminder' } },
+  ]);
+
+  protected readonly edges = signal<Edge[]>([]);
+
+  protected connect(connection: Connection): void {
+    const edge = { id: crypto.randomUUID(), ...connection };
+
+    this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
+  }
+}
+```
+
+Two nodes you can drag and connect. The look comes from [`@vflow/ui`](https://www.ngx-vflow.org/packages/ui/overview),
+optional Tailwind parts that `npx @vflow/cli ui` copies into your app; without it, style the same elements with your
+own CSS, as the [quickstart](https://www.ngx-vflow.org/docs/getting-started/quickstart) does.
+
+## Packages
+
+| Package                                                            |                                                          |
+| ------------------------------------------------------------------ | -------------------------------------------------------- |
+| [`ngx-vflow`](https://www.ngx-vflow.org/)                          | The engine: canvas, nodes, edges, handles, interactions  |
+| [`@vflow/ui`](https://www.ngx-vflow.org/packages/ui/overview)      | Styled parts copied into your app by `npx @vflow/cli ui` |
+| [`@vflow/routing`](https://www.ngx-vflow.org/packages/routing)     | Edges that route around nodes                            |
+| [`@vflow/layout`](https://www.ngx-vflow.org/packages/layout)       | Automatic layouts: dagre, ELK, d3-force                  |
+| [`@vflow/auto-size`](https://www.ngx-vflow.org/packages/auto-size) | Parent nodes that grow around their children             |
+
+## Compatibility
 
 | ngx-vflow   | Angular   |
 | ----------- | --------- |
-| v0.x        | v16.2.0+  |
-| v1.x        | v17.3.12+ |
-| v2.x        | v19.2.17+ |
 | v3.x (next) | v20.0.0+  |
+| v2.x        | v19.2.17+ |
+| v1.x        | v17.3.12+ |
+| v0.x        | v16.2.0+  |
 
-## Community & Support
+## Community
 
-- Join our [Discord community](https://discord.gg/RavS5ydTJV) for help and discussions
-- Report bugs and request features on [GitHub Issues](https://github.com/artem-mangilev/ngx-vflow/issues)
-- Check out the [documentation](https://www.ngx-vflow.org/) for guides and examples
+Questions go to [Discord](https://discord.gg/RavS5ydTJV), bugs and ideas to
+[GitHub Issues](https://github.com/artem-mangilev/ngx-vflow/issues). To work on the library itself, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
 MIT © [Artem Mangilev](https://github.com/artem-mangilev)
-
-## Development
-
-Use Node 24 (`nvm use`), pnpm (`corepack enable`) and `pnpm install`.
-
-- `libs/ngx-vflow`: engine; `libs/routing`, `libs/auto-size`, `libs/layout`: extension packages.
-- `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
-- `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
-
-The workspace has two Angular versions and one lockfile. Every project declares what it needs in its own
-`package.json`:
-
-- `libs/<name>/package.json`: besides what the package publishes, its `devDependencies` are what it is built and
-  tested with, the oldest supported Angular. The versions the libraries share are the `libs` catalog of
-  [pnpm-workspace.yaml](pnpm-workspace.yaml). A library builds into `libs/<name>/dist`; the packages that extend
-  the core get the built core from `node_modules`, like an application.
-- `apps/docs/package.json`: the Angular version the latest NgDoc needs. The docs never import library sources:
-  `docs:libs` builds the libraries the docs depend on and copies the packages to `apps/docs/libs` (see
-  [apps/docs/scripts/libs.mjs](apps/docs/scripts/libs.mjs)).
-- the root `package.json`: the tools of the repository only (Nx, ESLint, Prettier, the git hooks). No project
-  imports from it.
-
-Both Angular versions share one pnpm store, so a package must never find the Angular it did not ask for: the
-settings in `pnpm-workspace.yaml` make an undeclared import or a missing peer dependency fail instead.
-
-Everything runs through Nx, the docs included: `docs:build` and `docs:serve` are the NgDoc builders of
-`apps/docs/node_modules`, a library builds with the ng-packagr builder of its own `node_modules`, and there is
-no Angular CLI workspace.
-
-- `pnpm start` (`nx serve docs`): the docs dev server. `nx watch` follows the libraries and runs `docs:libs` after
-  every change, so saving a file of a library, of `@vflow/ui` or of the docs reloads the page. Arguments go to the
-  dev server, e.g. `pnpm start --port 4300`. `nx watch` needs the Nx daemon: if it reports that the daemon is not
-  running, `pnpm nx reset` clears a stale marker.
-- `pnpm build:dev` / `pnpm build`: all libraries in development / production, and the docs.
-- `pnpm lint`, `pnpm test`, `pnpm e2e`: Nx verification targets.
-
-See [release instructions](docs/releasing.md) for shared package versions, dry-runs and adding packages.
