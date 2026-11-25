@@ -36,8 +36,8 @@ export function withBlock(text: string): string {
 
 /**
  * `npx @vflow/cli agents`: points the coding agents of the project at the skill in node_modules. Writes the block to
- * AGENTS.md, to an existing CLAUDE.md that does not import AGENTS.md, and a stub skill for Claude Code. Returns what
- * changed.
+ * AGENTS.md, to an existing CLAUDE.md that does not import AGENTS.md, and a stub skill to .claude/skills and
+ * .agents/skills. Returns what changed.
  */
 export function writeAgentFiles(root: string): string[] {
   if (!existsSync(join(root, 'package.json'))) {
@@ -58,6 +58,8 @@ export function writeAgentFiles(root: string): string[] {
   // Claude Code reads AGENTS.md only when the project has no CLAUDE.md, so a CLAUDE.md needs the block too.
   const claude = join(root, 'CLAUDE.md');
   if (existsSync(claude) && !/^@AGENTS\.md\s*$/m.test(readFileSync(claude, 'utf-8'))) write('CLAUDE.md', withBlock);
+  // Claude Code reads .claude/skills only, Codex .agents/skills only; Cursor and Copilot read both.
   write('.claude/skills/ngx-vflow/SKILL.md', () => STUB);
+  write('.agents/skills/ngx-vflow/SKILL.md', () => STUB);
   return changed;
 }

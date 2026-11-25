@@ -4,7 +4,7 @@ export const USAGE = `Usage: npx @vflow/cli <command>
 
 Run it in the root of the workspace.
 
-  agents                       Point AGENTS.md, CLAUDE.md and a Claude Code skill at the docs ngx-vflow ships
+  agents                       Point AGENTS.md, CLAUDE.md and project skills at the docs ngx-vflow ships
   ui [options]                 Copy the @vflow/ui parts and their tokens into an Angular CLI or Nx workspace
 
 Options of ui:

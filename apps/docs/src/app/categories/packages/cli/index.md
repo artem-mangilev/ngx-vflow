@@ -66,7 +66,8 @@ npx @vflow/cli agents
 - a short block in `AGENTS.md` that tells the agent to read the skill before writing code with `ngx-vflow`;
 - the same block in `CLAUDE.md` when the project has one, since Claude Code then reads `CLAUDE.md` instead of
   `AGENTS.md`. A `CLAUDE.md` that imports `@AGENTS.md` is left as it is;
-- `.claude/skills/ngx-vflow/SKILL.md`, a skill that only points at the one in `node_modules`.
+- `ngx-vflow/SKILL.md` in `.claude/skills` and `.agents/skills`, a skill that only points at the one in
+  `node_modules`. Claude Code reads the first folder, Codex the second, Cursor and Copilot both.
 
 The files name a path and hold no docs, so they stay correct when `ngx-vflow` is updated. Commit them. A second run
 replaces the block between its `vflow:start` and `vflow:end` comments and keeps the rest of the file.

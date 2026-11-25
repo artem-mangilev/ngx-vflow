@@ -45,7 +45,9 @@ describe('vflow bin', () => {
       const { log, error } = await load(['agents'], dir);
 
       await vi.waitFor(() => expect(log).toHaveBeenCalledWith(expect.stringContaining('is not installed yet')));
-      expect(log).toHaveBeenCalledWith('UPDATE AGENTS.md\nUPDATE .claude/skills/ngx-vflow/SKILL.md');
+      expect(log).toHaveBeenCalledWith(
+        'UPDATE AGENTS.md\nUPDATE .claude/skills/ngx-vflow/SKILL.md\nUPDATE .agents/skills/ngx-vflow/SKILL.md',
+      );
       expect(error).not.toHaveBeenCalled();
       expect(readFileSync(join(dir, 'AGENTS.md'), 'utf-8')).toContain(
         'node_modules/ngx-vflow/skills/ngx-vflow/SKILL.md',

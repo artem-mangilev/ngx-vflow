@@ -38,10 +38,15 @@ describe('writeAgentFiles', () => {
     expect(() => writeAgentFiles(mkdtempSync(join(tmpdir(), 'vflow-agents-')))).toThrow('No package.json here');
   });
 
-  it('writes AGENTS.md and the stub skill, and no CLAUDE.md, which would hide AGENTS.md from Claude Code', () => {
-    expect(writeAgentFiles(root)).toEqual(['AGENTS.md', '.claude/skills/ngx-vflow/SKILL.md']);
+  it('writes AGENTS.md and the stub skills, and no CLAUDE.md, which would hide AGENTS.md from Claude Code', () => {
+    expect(writeAgentFiles(root)).toEqual([
+      'AGENTS.md',
+      '.claude/skills/ngx-vflow/SKILL.md',
+      '.agents/skills/ngx-vflow/SKILL.md',
+    ]);
     expect(read('AGENTS.md')).toBe(`${BLOCK}\n`);
     expect(read('.claude/skills/ngx-vflow/SKILL.md')).toBe(STUB);
+    expect(read('.agents/skills/ngx-vflow/SKILL.md')).toBe(STUB);
     expect(existsSync(join(root, 'CLAUDE.md'))).toBe(false);
   });
 
