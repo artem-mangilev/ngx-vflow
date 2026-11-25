@@ -1,6 +1,4 @@
 import { easeCubicInOut, interpolateViewport } from './zoom-interpolation';
-import { wheelPanDelta, wheelZoomFactor } from './wheel';
-import { clampZoom, toFlowPoint, translateBy, zoomAround } from './viewport-transform';
 
 /** Values recorded from d3-zoom 3.0 (`interpolateZoom`, `easeCubicInOut`, `defaultWheelDelta`) before its removal. */
 const D3_TRANSITIONS = [
@@ -76,68 +74,29 @@ const D3_TRANSITIONS = [
   },
 ];
 
-describe('viewport math', () => {
-  it('converts pane points to flow points', () => {
-    const state = { x: 30, y: -20, zoom: 2 };
-    expect(toFlowPoint(state, { x: 130, y: 80 })).toEqual({ x: 50, y: 50 });
-  });
-
-  it('zooms around a pane point that stays in place', () => {
-    const state = { x: 10, y: 20, zoom: 1 };
-    const next = zoomAround(state, 2, { x: 110, y: 70 });
-    expect(next).toEqual({ x: -90, y: -30, zoom: 2 });
-    // The flow point under the anchor stays there.
-    expect(toFlowPoint(next, { x: 110, y: 70 })).toEqual(toFlowPoint(state, { x: 110, y: 70 }));
-    expect(zoomAround(state, 1, { x: 5, y: 5 })).toBe(state);
-  });
-
-  it('translates in pane pixels and clamps zoom', () => {
-    expect(translateBy({ x: 1, y: 2, zoom: 3 }, 10, -5)).toEqual({ x: 11, y: -3, zoom: 3 });
-    expect(clampZoom(10, 0.5, 3)).toBe(3);
-    expect(clampZoom(0.1, 0.5, 3)).toBe(0.5);
-  });
-});
-
-describe('wheel', () => {
-  it('matches the d3 wheel zoom factors', () => {
-    expect(wheelZoomFactor({ deltaX: 0, deltaY: -100, deltaMode: 0, ctrlKey: false })).toBeCloseTo(1.148698355, 9);
-    expect(wheelZoomFactor({ deltaX: 0, deltaY: 100, deltaMode: 0, ctrlKey: false })).toBeCloseTo(0.870550563, 9);
-    expect(wheelZoomFactor({ deltaX: 0, deltaY: -3, deltaMode: 1, ctrlKey: false })).toBeCloseTo(1.109569472, 9);
-    expect(wheelZoomFactor({ deltaX: 0, deltaY: 1, deltaMode: 2, ctrlKey: false })).toBeCloseTo(0.5, 9);
-    expect(wheelZoomFactor({ deltaX: 0, deltaY: -10, deltaMode: 0, ctrlKey: true })).toBeCloseTo(1.148698355, 9);
-  });
-
-  it('scroll-pans by pixels, 16-pixel lines and pane-height pages', () => {
-    expect(wheelPanDelta({ deltaX: 30, deltaY: 40, deltaMode: 0, ctrlKey: false }, 500)).toEqual({ x: -30, y: -40 });
-    expect(wheelPanDelta({ deltaX: 0, deltaY: 2, deltaMode: 1, ctrlKey: false }, 500)).toEqual({ x: -0, y: -32 });
-    expect(wheelPanDelta({ deltaX: 1, deltaY: 0, deltaMode: 2, ctrlKey: false }, 500)).toEqual({ x: -500, y: -0 });
-  });
-});
-
 describe('zoom interpolation', () => {
-  it('eases in and out cubically', () => {
-    const values = [
-      [0, 0],
-      [0.1, 0.004],
-      [0.25, 0.0625],
-      [0.5, 0.5],
-      [0.75, 0.9375],
-      [0.9, 0.996],
-      [1, 1],
-    ];
-    for (const [t, expected] of values) expect(easeCubicInOut(t)).toBeCloseTo(expected, 9);
+  it.each([
+    [0, 0],
+    [0.1, 0.004],
+    [0.25, 0.0625],
+    [0.5, 0.5],
+    [0.75, 0.9375],
+    [0.9, 0.996],
+    [1, 1],
+  ])('eases in and out cubically: %d is %d', (t, expected) => {
+    expect(easeCubicInOut(t)).toBeCloseTo(expected, 9);
   });
 
-  it('follows the d3 zoom transition between two viewports', () => {
-    for (const { from, to, anchor, size, frames } of D3_TRANSITIONS) {
-      const interpolate = interpolateViewport(from, to, anchor, size);
-      for (const frame of frames) {
-        const state = interpolate(frame.t);
-        expect(state.x, `x at ${frame.t}`).toBeCloseTo(frame.x, 6);
-        expect(state.y, `y at ${frame.t}`).toBeCloseTo(frame.y, 6);
-        expect(state.zoom, `zoom at ${frame.t}`).toBeCloseTo(frame.zoom, 9);
-      }
-    }
+  it.each(
+    D3_TRANSITIONS.flatMap(({ from, to, anchor, size, frames }) =>
+      frames.map((frame) => ({ from, to, anchor, size, frame })),
+    ),
+  )('follows the d3 zoom transition from $from to $to at $frame.t', ({ from, to, anchor, size, frame }) => {
+    const state = interpolateViewport(from, to, anchor, size)(frame.t);
+
+    expect(state.x).toBeCloseTo(frame.x, 6);
+    expect(state.y).toBeCloseTo(frame.y, 6);
+    expect(state.zoom).toBeCloseTo(frame.zoom, 9);
   });
 
   it('ends exactly on the target', () => {

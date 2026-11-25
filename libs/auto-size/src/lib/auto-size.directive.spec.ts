@@ -20,7 +20,7 @@ import { VxAutoSize } from './auto-size.directive';
         @if (ctx.data().parent) {
           <div class="parent" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
         } @else {
-          <div class="card" [attr.data-card]="ctx.node.id"></div>
+          <div class="card" [attr.data-card]="ctx.node.id" [style.width.px]="ctx.data().cardWidth?.()"></div>
         }
       </ng-template>
     </vflow>
@@ -58,6 +58,12 @@ class AutoSizeHostComponent {
     // The child overflows the right and bottom sides from the start.
     { id: 'tight', point: { x: 600, y: 600 }, width: 100, height: 50, data: { parent: true } },
     { id: 'tight-child', point: { x: 80, y: 10 }, parentId: 'tight', extent: null, data: {} },
+    // Only the height is explicit: the width follows the content.
+    { id: 'tall', point: { x: 950, y: 100 }, height: 100, data: { parent: true } },
+    { id: 'tall-child', point: { x: 20, y: 50 }, parentId: 'tall', extent: null, data: {} },
+    // The card changes its own width after the first layout.
+    { id: 'flex', point: { x: 950, y: 400 }, width: 150, height: 100, data: { parent: true } },
+    { id: 'flex-child', point: { x: 10, y: 10 }, parentId: 'flex', extent: null, data: { cardWidth: signal(100) } },
   ]);
 }
 
@@ -113,8 +119,6 @@ describe('VxAutoSize', () => {
     const fixture = await createFixture();
     const group = node(fixture, 'group');
     const child = node(fixture, 'child');
-    const { vflow } = fixture.componentInstance as unknown as { vflow?: never };
-    void vflow;
 
     await drag(fixture, 'child', [-60, -80]);
 
@@ -139,19 +143,54 @@ describe('VxAutoSize', () => {
     expect(node(fixture, 'inner').height!()).toBe(200);
   });
 
-  it('leaves out the parents the predicate declines and the axes without an explicit size', async () => {
+  it('leaves out the parents the predicate declines', async () => {
     const fixture = await createFixture();
     fixture.componentInstance.shouldResize.set((parent) => parent.id !== 'group');
     await settle(fixture);
 
     await drag(fixture, 'child', [200, 0]);
-    expect(node(fixture, 'group').width!()).toBe(300);
 
-    const wide = node(fixture, 'wide');
+    expect(node(fixture, 'group').width!()).toBe(300);
+  });
+
+  it('keeps growing the parents the predicate accepts', async () => {
+    const fixture = await createFixture();
+    fixture.componentInstance.shouldResize.set((parent) => parent.id !== 'group');
+    await settle(fixture);
+
     await drag(fixture, 'wide-child', [200, 100]);
-    expect(wide.width!()).toBe(360);
+
+    expect(node(fixture, 'wide').width!()).toBe(360);
+  });
+
+  it('leaves an axis without an explicit size alone', async () => {
+    const fixture = await createFixture();
+    const wide = node(fixture, 'wide');
+
+    await drag(fixture, 'wide-child', [200, 100]);
+
     expect(wide.height).toBeUndefined();
     expect(wide.point()).toEqual({ x: 100, y: 500 });
+  });
+
+  it('grows only the explicit height of a parent without a width', async () => {
+    const fixture = await createFixture();
+    const tall = node(fixture, 'tall');
+
+    await drag(fixture, 'tall-child', [100, 100]);
+
+    expect(tall.width).toBeUndefined();
+    expect(tall.height!()).toBe(210);
+  });
+
+  it('grows a parent when a child changes its own size', async () => {
+    const fixture = await createFixture();
+    const cardWidth = node(fixture, 'flex-child').data!().cardWidth as ReturnType<typeof signal<number>>;
+
+    cardWidth.set(300);
+    await settle(fixture);
+
+    expect(node(fixture, 'flex').width!()).toBe(320);
   });
 
   it('grows a parent around its children when the flow is initialized', async () => {
@@ -227,5 +266,16 @@ describe('VxAutoSize', () => {
 
     expect(node(fixture, 'group').width!()).toBe(390);
     expect(node(fixture, 'group').height!()).toBe(255);
+  });
+
+  it('takes the padding of all four sides', async () => {
+    const fixture = await createFixture();
+    fixture.componentInstance.padding.set({ top: 1, right: 2, bottom: 3, left: 4 });
+    await settle(fixture);
+
+    await drag(fixture, 'child', [200, 150]);
+
+    expect(node(fixture, 'group').width!()).toBe(352);
+    expect(node(fixture, 'group').height!()).toBe(253);
   });
 });

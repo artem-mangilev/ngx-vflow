@@ -39,6 +39,8 @@ jobs:
         run: pnpm e2e --grep "NgDoc uses"
         env:
           E2E_CONFIGURATION: production
+      - name: Check the prerendered site
+        run: pnpm e2e:preview
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

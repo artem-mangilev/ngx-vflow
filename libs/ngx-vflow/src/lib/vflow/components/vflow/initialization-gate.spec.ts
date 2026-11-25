@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Directive, viewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
 import { VFLOW_INITIALIZATION_GATE, VflowInitializationGate } from '../../interfaces/initialization-gate.interface';
 import { Vflow } from '../../vflow';
@@ -47,30 +47,35 @@ class GatedHostComponent {
   public initializations = 0;
 }
 
-async function settle(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
-  fixture.detectChanges();
-  for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-  await fixture.whenStable();
-  fixture.detectChanges();
-}
-
 describe('initialization gates', () => {
-  it('keeps the measured flow unpainted and uninitialized until the gate on its element opens', async () => {
-    TestBed.configureTestingModule({ imports: [GatedHostComponent] });
-    const fixture = TestBed.createComponent(GatedHostComponent);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const root = fixture.nativeElement.querySelector('vflow') as HTMLElement;
+  let fixture: ComponentFixture<GatedHostComponent>;
+  let host: GatedHostComponent;
+  let element: HTMLElement;
 
-    expect(host.gate().measured).toBe(true);
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(GatedHostComponent);
+    host = fixture.componentInstance;
+    fixture.detectChanges();
+    element = fixture.nativeElement.querySelector('vflow');
+    await expect.poll(() => host.gate().measured).toBe(true);
+    // A flow without a gate initializes in the task that asks the gate.
+    await fixture.whenStable();
+  });
+
+  it('asks the gate once the nodes are measured', () => {
     expect(host.vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 100, height: 50 });
+  });
+
+  it('keeps the flow uninitialized and unpainted while the gate is closed', () => {
     expect(host.initializations).toBe(0);
-    expect(root.classList.contains('v-initializing')).toBe(true);
+    expect(element.classList.contains('v-initializing')).toBe(true);
+  });
 
+  it('initializes the flow and paints it once the gate opens', async () => {
     host.gate().open();
-    await settle(fixture);
+    await expect.poll(() => host.initializations).toBe(1);
+    fixture.detectChanges();
 
-    expect(host.initializations).toBe(1);
-    expect(root.classList.contains('v-initializing')).toBe(false);
+    expect(element.classList.contains('v-initializing')).toBe(false);
   });
 });

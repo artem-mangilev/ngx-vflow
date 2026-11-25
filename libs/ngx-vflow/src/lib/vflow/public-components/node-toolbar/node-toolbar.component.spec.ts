@@ -4,6 +4,7 @@ import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNode } from '../../interfaces/node.interface';
 import { Position } from '../../types/position.type';
 import { VflowNodeToolbarComponent } from './node-toolbar.component';
+import { pointerDrag } from '../../gestures/pointer-events.testing';
 
 const toolbarPosition = signal<Position | null>(null);
 
@@ -28,6 +29,13 @@ class ToolbarNodeComponent {
 
 describe('VflowNodeToolbarComponent', () => {
   let fixture: ComponentFixture<VflowComponent>;
+  let style: HTMLStyleElement | undefined;
+
+  async function settle() {
+    fixture.detectChanges();
+    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
+    await fixture.whenStable();
+  }
 
   beforeEach(async () => {
     toolbarPosition.set(null);
@@ -36,66 +44,49 @@ describe('VflowNodeToolbarComponent', () => {
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'node', component: ToolbarNodeComponent, point: { x: 20, y: 30 } }),
     ]);
-    fixture.detectChanges();
-    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-    await fixture.whenStable();
+    await settle();
   });
+
+  afterEach(() => style?.remove());
 
   const toolbar = () => fixture.nativeElement.querySelector('v-node-toolbar') as HTMLElement | null;
   const box = () => (fixture.nativeElement.querySelector('.box') as HTMLElement).getBoundingClientRect();
 
   it('renders inside the node in the same change detection pass as the presentation that declares it', () => {
-    expect(toolbar()).toBeNull();
-
     toolbarPosition.set('top');
     fixture.detectChanges();
 
-    const host = toolbar();
-    expect(host).not.toBeNull();
-    expect(host!.querySelector('.tool')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('[data-v-node]')!.contains(host)).toBe(true);
-    // Gestures inside the toolbar must not drag the node.
-    expect(host!.hasAttribute('data-v-no-drag')).toBe(true);
+    expect(toolbar()!.querySelector('.tool')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-v-node]')!.contains(toolbar())).toBe(true);
+  });
 
+  it('is removed with the condition of the presentation', () => {
+    toolbarPosition.set('top');
+    fixture.detectChanges();
     toolbarPosition.set(null);
     fixture.detectChanges();
 
     expect(toolbar()).toBeNull();
   });
 
-  it('hangs 10px outside the chosen side, centered along it', () => {
-    const expectations: Record<Position, (node: DOMRect, bar: DOMRect) => void> = {
-      top: (node, bar) => {
-        expect(node.top - bar.bottom).toBeCloseTo(10, 1);
-        expect(bar.left + bar.width / 2).toBeCloseTo(node.left + node.width / 2, 1);
-      },
-      bottom: (node, bar) => {
-        expect(bar.top - node.bottom).toBeCloseTo(10, 1);
-        expect(bar.left + bar.width / 2).toBeCloseTo(node.left + node.width / 2, 1);
-      },
-      left: (node, bar) => {
-        expect(node.left - bar.right).toBeCloseTo(10, 1);
-        expect(bar.top + bar.height / 2).toBeCloseTo(node.top + node.height / 2, 1);
-      },
-      right: (node, bar) => {
-        expect(bar.left - node.right).toBeCloseTo(10, 1);
-        expect(bar.top + bar.height / 2).toBeCloseTo(node.top + node.height / 2, 1);
-      },
-    };
+  it.each<[Position, (node: DOMRect, bar: DOMRect) => [number, number]]>([
+    ['top', (node, bar) => [node.top - bar.bottom, bar.left + bar.width / 2 - (node.left + node.width / 2)]],
+    ['bottom', (node, bar) => [bar.top - node.bottom, bar.left + bar.width / 2 - (node.left + node.width / 2)]],
+    ['left', (node, bar) => [node.left - bar.right, bar.top + bar.height / 2 - (node.top + node.height / 2)]],
+    ['right', (node, bar) => [bar.left - node.right, bar.top + bar.height / 2 - (node.top + node.height / 2)]],
+  ])('hangs 10px outside the %s side, centered along it', (position, measure) => {
+    toolbarPosition.set(position);
+    fixture.detectChanges();
 
-    for (const position of Object.keys(expectations) as Position[]) {
-      toolbarPosition.set(position);
-      fixture.detectChanges();
-
-      const bar = toolbar()!.getBoundingClientRect();
-      expect(bar.width).toBe(30);
-      expect(bar.height).toBe(20);
-      expectations[position](box(), bar);
-    }
+    const bar = toolbar()!.getBoundingClientRect();
+    const [gap, offCenter] = measure(box(), bar);
+    expect([bar.width, bar.height]).toEqual([30, 20]);
+    expect(gap).toBeCloseTo(10, 1);
+    expect(offCenter).toBeCloseTo(0, 1);
   });
 
   it('lets a plain class of the application change the gap', () => {
-    const style = document.createElement('style');
+    style = document.createElement('style');
     style.textContent = '.tight { margin: 2px; }';
     document.head.append(style);
 
@@ -104,6 +95,37 @@ describe('VflowNodeToolbarComponent', () => {
     toolbar()!.classList.add('tight');
 
     expect(box().top - toolbar()!.getBoundingClientRect().bottom).toBeCloseTo(2, 1);
-    style.remove();
+  });
+
+  it('does not drag the node from a press inside the toolbar', async () => {
+    toolbarPosition.set('top');
+    await settle();
+    const drags: unknown[] = [];
+    fixture.componentInstance.nodeDragStart.subscribe((event) => drags.push(event));
+
+    const tool = toolbar()!.querySelector('.tool')!;
+    const { left, top } = tool.getBoundingClientRect();
+    pointerDrag(tool, { x: left + 5, y: top + 5 }, [
+      { x: left + 30, y: top + 5 },
+      { x: left + 60, y: top + 25 },
+    ]);
+    await settle();
+
+    expect(drags).toEqual([]);
+    expect(fixture.componentInstance.getNodeRect('node')).toMatchObject({ x: 20, y: 30 });
+  });
+
+  it('drags the node from a press on the node outside the toolbar', async () => {
+    toolbarPosition.set('top');
+    await settle();
+
+    const { left, top } = box();
+    pointerDrag(fixture.nativeElement.querySelector('.box'), { x: left + 5, y: top + 5 }, [
+      { x: left + 30, y: top + 5 },
+      { x: left + 60, y: top + 25 },
+    ]);
+    await settle();
+
+    expect(fixture.componentInstance.getNodeRect('node')).toMatchObject({ x: 75, y: 50 });
   });
 });

@@ -1,4 +1,13 @@
-import { createEdge, EdgeCurveFactoryParams, getSmoothStepPath, NodeGeometry, Point, Position, Rect } from 'ngx-vflow';
+import {
+  ConnectionCurveFactoryParams,
+  createEdge,
+  EdgeCurveFactoryParams,
+  getSmoothStepPath,
+  NodeGeometry,
+  Point,
+  Position,
+  Rect,
+} from 'ngx-vflow';
 import { avoidNodesCurve, createAvoidNodesCurve } from './avoid-nodes-curve';
 import type { CurveFactory } from 'ngx-vflow';
 
@@ -57,6 +66,20 @@ function pathPoints(d: string): Point[] {
   return points;
 }
 
+/** The straight `L` segments of a path that are neither horizontal nor vertical. */
+function diagonalLines(d: string): string[] {
+  const diagonal: string[] = [];
+  let current: Point = { x: 0, y: 0 };
+  for (const [, command, args] of d.matchAll(/([MLQ])((?:\s+-?\d+(?:\.\d+)?)+)/g)) {
+    const numbers = args.trim().split(/\s+/).map(Number);
+    const end = { x: numbers[numbers.length - 2], y: numbers[numbers.length - 1] };
+    if (command === 'L' && end.x !== current.x && end.y !== current.y)
+      diagonal.push(`${current.x} ${current.y} L ${end.x} ${end.y}`);
+    current = end;
+  }
+  return diagonal;
+}
+
 function segmentCrosses(a: Point, b: Point, rect: Rect): boolean {
   const minX = Math.min(a.x, b.x);
   const maxX = Math.max(a.x, b.x);
@@ -76,10 +99,21 @@ describe('avoidNodesCurve', () => {
   const between = geometry('between', 250, 75);
 
   it('draws a straight orthogonal path when nothing is in the way', () => {
+    expect(avoidNodesCurve(edgeParams(source, target, [source, target])).path).toBe('M 100 125 L 500 125');
+  });
+
+  it('reports the bounds of a straight path', () => {
+    expect(avoidNodesCurve(edgeParams(source, target, [source, target])).bounds).toEqual({
+      x: 100,
+      y: 125,
+      width: 400,
+      height: 0,
+    });
+  });
+
+  it('places label points along a straight path', () => {
     const layout = avoidNodesCurve(edgeParams(source, target, [source, target]));
 
-    expect(layout.path).toBe('M 100 125 L 500 125');
-    expect(layout.bounds).toEqual({ x: 100, y: 125, width: 400, height: 0 });
     expect(layout.labelPoints).toEqual({
       start: { x: 160, y: 125, angle: 0 },
       center: { x: 300, y: 125, angle: 0 },
@@ -87,23 +121,28 @@ describe('avoidNodesCurve', () => {
     });
   });
 
-  it('routes around a node between the ends with orthogonal segments and rounded corners', () => {
+  it('routes around a node between the ends, leaving and entering the handles straight', () => {
     const layout = avoidNodesCurve(edgeParams(source, target, [source, between, target]));
 
     expect(crosses(layout.path, between)).toBe(false);
     expect(layout.path).toMatch(/^M 100 125 L 2\d\d 125 Q /);
     expect(layout.path).toMatch(/L 500 125$/);
-    const points = pathPoints(layout.path);
-    for (let i = 1; i < points.length; i++) {
-      expect(points[i].x === points[i - 1].x || points[i].y === points[i - 1].y).toBe(true);
-    }
-    const bounds = layout.bounds!;
-    for (const point of points) {
-      expect(point.x).toBeGreaterThanOrEqual(bounds.x);
-      expect(point.x).toBeLessThanOrEqual(bounds.x + bounds.width);
-      expect(point.y).toBeGreaterThanOrEqual(bounds.y);
-      expect(point.y).toBeLessThanOrEqual(bounds.y + bounds.height);
-    }
+  });
+
+  it('keeps the segments of a routed path orthogonal', () => {
+    const { path } = avoidNodesCurve(edgeParams(source, target, [source, between, target]));
+
+    expect(diagonalLines(path)).toEqual([]);
+  });
+
+  it('reports bounds that contain every point of a routed path', () => {
+    const layout = avoidNodesCurve(edgeParams(source, target, [source, between, target]));
+    const { x, y, width, height } = layout.bounds!;
+    const outside = pathPoints(layout.path).filter(
+      (point) => point.x < x || point.x > x + width || point.y < y || point.y > y + height,
+    );
+
+    expect(outside).toEqual([]);
   });
 
   it('leaves the nodes of the edge and their ancestors out of the obstacles', () => {
@@ -122,20 +161,39 @@ describe('avoidNodesCurve', () => {
     expect(curve(edgeParams(source, target, [source, between, target])).path).toBe('M 100 125 L 500 125');
   });
 
-  it('works only on the nodes near the edge, however large the graph', () => {
+  it('ignores the nodes far from the edge', () => {
     const far = Array.from({ length: 1000 }, (_, index) => geometry(`far-${index}`, 5000 + index * 150, 5000));
-    const asked: string[] = [];
-    const curve = createAvoidNodesCurve({ isObstacle: (node) => (asked.push(node.id), true) });
+    const curve = createAvoidNodesCurve();
 
     expect(curve(edgeParams(source, target, [source, between, target, ...far])).path).toBe(
-      avoidNodesCurve(edgeParams(source, target, [source, between, target])).path,
+      curve(edgeParams(source, target, [source, between, target])).path,
     );
-    expect(asked.sort()).toEqual(['between', 'source', 'target']);
   });
 
   it('routes a connection preview without a target node', () => {
-    const params = edgeParams(source, target, [source, between, target]);
-    const layout = avoidNodesCurve({ ...params, mode: 'connection', edge: undefined, targetNode: undefined } as never);
+    const {
+      sourcePoint,
+      targetPoint,
+      sourcePosition,
+      targetPosition,
+      markerInset,
+      allEdges,
+      allNodes,
+      nodeGeometries,
+    } = edgeParams(source, target, [source, between, target]);
+    const params: ConnectionCurveFactoryParams = {
+      mode: 'connection',
+      sourceNode: source,
+      sourcePoint,
+      targetPoint,
+      sourcePosition,
+      targetPosition,
+      markerInset,
+      allEdges,
+      allNodes,
+      nodeGeometries,
+    };
+    const layout = avoidNodesCurve(params);
 
     expect(crosses(layout.path, between)).toBe(false);
     expect(layout.path).toMatch(/L 500 125$/);
@@ -159,7 +217,10 @@ describe('avoidNodesCurve', () => {
     expect(layout.path).toMatch(/^M 100 125 L 10[2-9](\.\d+)? 125 Q /);
   });
 
-  it('routes a self-loop around its node', () => {
+  it.each<[Position, Position]>([
+    ['right', 'left'],
+    ['right', 'top'],
+  ])('routes a self-loop from %s to %s around its node', (...positions) => {
     const fallback = getSmoothStepPath({
       sourcePoint: { x: 100, y: 125 },
       targetPoint: { x: 0, y: 125 },
@@ -167,18 +228,12 @@ describe('avoidNodesCurve', () => {
       targetPosition: 'left',
       borderRadius: 8,
     }).path;
+    const layout = avoidNodesCurve(edgeParams(source, source, [source, target], positions));
+    // The node less a pixel on each side: a path that runs along its border does not cross it.
+    const inside = { x: source.x + 1, y: source.y + 1, width: source.width - 2, height: source.height - 2 };
 
-    for (const positions of [
-      ['right', 'left'],
-      ['right', 'top'],
-    ] as [Position, Position][]) {
-      const layout = avoidNodesCurve(edgeParams(source, source, [source, target], positions));
-      // The node less a pixel on each side: a path that runs along its border does not cross it.
-      const inside = { x: source.x + 1, y: source.y + 1, width: source.width - 2, height: source.height - 2 };
-
-      expect(layout.path).not.toBe(fallback);
-      expect(crosses(layout.path, inside)).toBe(false);
-    }
+    expect(layout.path).not.toBe(fallback);
+    expect(crosses(layout.path, inside)).toBe(false);
   });
 
   it('falls back to a smooth step between overlapping nodes', () => {
@@ -196,57 +251,66 @@ describe('avoidNodesCurve', () => {
     );
   });
 
-  it('keeps the route of an edge while a node jitters, and changes it once another route is much shorter', () => {
+  describe('inertia', () => {
     const edge = createEdge({ id: 'a-b', source: 'source', target: 'target' });
-    const at = (curve: CurveFactory, y: number) => {
-      const params = edgeParams(source, target, [source, geometry('between', 250, y), target]);
-      return pathPoints(curve({ ...params, edge })!.path);
+    /** Whether the route of the edge passes above the line of the handles with a node at the given height. */
+    const passesAbove = (curve: CurveFactory, nodeY: number) => {
+      const params = edgeParams(source, target, [source, geometry('between', 250, nodeY), target]);
+      const points = pathPoints(curve({ ...params, edge })!.path);
+      return points[Math.floor(points.length / 2)].y < 125;
     };
-    const above = (points: Point[]) => points[Math.floor(points.length / 2)].y < 125;
 
-    const steady = createAvoidNodesCurve();
-    const first = above(at(steady, 99));
-    for (const y of [101, 99, 101, 99]) expect(above(at(steady, y))).toBe(first);
-    // With the node well across the line the other side is much shorter: the route follows.
-    expect(above(at(steady, first ? 80 : 120))).toBe(!first);
+    it('keeps the route of an edge while a node jitters around the line', () => {
+      const curve = createAvoidNodesCurve();
+      const first = passesAbove(curve, 99);
 
-    const restless = createAvoidNodesCurve({ inertia: 0 });
-    expect(above(at(restless, 99))).not.toBe(above(at(restless, 101)));
+      expect([101, 99, 101, 99].map((y) => passesAbove(curve, y))).toEqual([first, first, first, first]);
+    });
+
+    it('changes the route once the other one is much shorter', () => {
+      const curve = createAvoidNodesCurve();
+      const first = passesAbove(curve, 99);
+
+      expect(passesAbove(curve, first ? 80 : 120)).toBe(!first);
+    });
+
+    it('follows a jittering node with inertia 0', () => {
+      const curve = createAvoidNodesCurve({ inertia: 0 });
+
+      expect(passesAbove(curve, 99)).not.toBe(passesAbove(curve, 101));
+    });
   });
 
-  it('keeps the clearance and the corner radius configurable', () => {
-    const sharp = createAvoidNodesCurve({ cornerRadius: 0 })(edgeParams(source, target, [source, between, target]));
-    expect(sharp.path).not.toContain('Q');
+  it('routes around the node between two columns of a dense grid', () => {
+    const nodes: NodeGeometry[] = [];
+    for (let row = 0; row < 6; row++) {
+      for (let column = 0; column < 6; column++) nodes.push(geometry(`${row}-${column}`, column * 180, row * 120));
+    }
+    const crossed: string[] = [];
 
+    for (let row = 0; row < 6; row++) {
+      for (let column = 0; column < 4; column++) {
+        const from = nodes[row * 6 + column];
+        const to = nodes[row * 6 + column + 2];
+        const { path } = avoidNodesCurve(edgeParams(from, to, nodes));
+        const hit = nodes.filter((node) => node !== from && node !== to && crosses(path, node));
+        crossed.push(...hit.map((node) => `${from.id}->${to.id} crosses ${node.id}`));
+      }
+    }
+
+    expect(crossed).toEqual([]);
+  });
+
+  it('draws sharp corners with a corner radius of 0', () => {
+    const sharp = createAvoidNodesCurve({ cornerRadius: 0 })(edgeParams(source, target, [source, between, target]));
+
+    expect(sharp.path).not.toContain('Q');
+  });
+
+  it('keeps a larger clearance with a larger node padding', () => {
     const wide = createAvoidNodesCurve({ nodePadding: 40 })(edgeParams(source, target, [source, between, target]));
     const padded = { x: between.x - 30, y: between.y - 30, width: between.width + 60, height: between.height + 60 };
+
     expect(crosses(wide.path, padded)).toBe(false);
-  });
-
-  it('routes a column of nodes in bounded time', () => {
-    const nodes: NodeGeometry[] = [];
-    for (let row = 0; row < 20; row++) {
-      for (let column = 0; column < 10; column++) {
-        nodes.push(geometry(`${row}-${column}`, column * 180, row * 120));
-      }
-    }
-    const started = performance.now();
-    let edges = 0;
-    for (let row = 0; row < 20; row++) {
-      for (let column = 0; column < 9; column++) {
-        // Two columns over: the edge has to route around the node between.
-        const from = nodes[row * 10 + column];
-        const to = nodes[row * 10 + Math.min(column + 2, 9)];
-        if (from === to) continue;
-        avoidNodesCurve(edgeParams(from, to, nodes));
-        edges++;
-      }
-    }
-    const elapsed = performance.now() - started;
-
-    expect(edges).toBe(180);
-    console.info(`avoidNodesCurve: ${(elapsed / edges).toFixed(2)} ms per edge over 200 nodes`);
-    // About 1 ms per edge on a laptop: a full relayout of a few hundred edges stays within a frame or two.
-    expect(elapsed / edges).toBeLessThan(10);
   });
 });

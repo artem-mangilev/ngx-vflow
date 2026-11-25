@@ -1,12 +1,15 @@
-import { PointerDragContext, createPointerDrag } from './pointer-drag';
+import { PointerDrag, PointerDragContext, createPointerDrag } from './pointer-drag';
 import { dispatchPointer } from './pointer-events.testing';
 
 describe('createPointerDrag', () => {
   let element: HTMLElement;
   let parent: HTMLElement;
   let calls: string[];
+  let drag: PointerDrag | undefined;
 
   beforeEach(() => {
+    // A drag swallows the click that follows it until a timer of zero runs.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     parent = document.createElement('div');
     element = document.createElement('div');
     parent.append(element);
@@ -14,150 +17,261 @@ describe('createPointerDrag', () => {
     calls = [];
   });
 
-  afterEach(async () => {
+  afterEach(() => {
+    drag?.destroy();
+    drag = undefined;
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     parent.remove();
-    // A drag swallows the next click until the following macrotask; let it expire before the next test.
-    await new Promise((resolve) => setTimeout(resolve));
   });
 
   function create(options: Parameters<typeof createPointerDrag>[1] = {}) {
     const record = (name: string) => (context: PointerDragContext) => calls.push(`${name}:${context.point.x}`);
-    return createPointerDrag(element, {
+    drag = createPointerDrag(element, {
       onStart: record('start'),
       onMove: record('move'),
       onEnd: record('end'),
       onCancel: record('cancel'),
       ...options,
     });
+    return drag;
   }
 
-  const wait = () => new Promise((resolve) => setTimeout(resolve));
+  const press = (x = 0, init: { pointerType?: 'mouse' | 'touch' } = {}) =>
+    dispatchPointer(element, 'pointerdown', { x, ...init });
+  const move = (x: number, init: { pointerId?: number; pointerType?: 'mouse' | 'touch' } = {}) =>
+    dispatchPointer(window, 'pointermove', { x, ...init });
+  const release = (x: number, init: { pointerType?: 'mouse' | 'touch' } = {}) =>
+    dispatchPointer(window, 'pointerup', { x, ...init });
 
-  it('starts on the press without a threshold and follows only its own pointer', () => {
+  function clicks() {
+    const counter = { count: 0 };
+    element.addEventListener('click', () => counter.count++);
+    return counter;
+  }
+
+  it('starts on the press without a threshold', () => {
+    create();
+
+    press(10);
+
+    expect(calls).toEqual(['start:10']);
+  });
+
+  it('follows only the pointer that pressed', () => {
+    create();
+    press(10);
+
+    move(20, { pointerId: 2 });
+    move(30);
+
+    expect(calls).toEqual(['start:10', 'move:30']);
+  });
+
+  it('ends on the release and stops tracking the press', () => {
     const drag = create();
-    dispatchPointer(element, 'pointerdown', { x: 10 });
-    dispatchPointer(window, 'pointermove', { x: 20, pointerId: 2 });
-    dispatchPointer(window, 'pointermove', { x: 30 });
-    dispatchPointer(window, 'pointerup', { x: 30 });
-    expect(calls).toEqual(['start:10', 'move:30', 'end:30']);
+    press(10);
+
+    release(30);
+
+    expect(calls).toEqual(['start:10', 'end:30']);
     expect(drag.pressed).toBe(false);
-    drag.destroy();
   });
 
-  it('starts past the threshold with the crossing move and never ends a drag that did not start', () => {
-    const drag = create({ threshold: () => 5 });
-    dispatchPointer(element, 'pointerdown', { x: 10 });
-    dispatchPointer(window, 'pointermove', { x: 15 });
-    dispatchPointer(window, 'pointerup', { x: 15 });
+  it('does not start or end a drag that stays within the threshold', () => {
+    create({ threshold: () => 5 });
+
+    press(10);
+    move(15);
+    release(15);
+
     expect(calls).toEqual([]);
-    dispatchPointer(element, 'pointerdown', { x: 10 });
-    dispatchPointer(window, 'pointermove', { x: 16 });
-    dispatchPointer(window, 'pointermove', { x: 20 });
-    dispatchPointer(window, 'pointerup', { x: 20 });
-    expect(calls).toEqual(['start:16', 'move:20', 'end:20']);
-    drag.destroy();
   });
 
-  it('stops an accepted press from propagating and leaves a rejected one alone', () => {
+  it('starts with the move that crosses the threshold', () => {
+    create({ threshold: () => 5 });
+
+    press(10);
+    move(16);
+    move(20);
+
+    expect(calls).toEqual(['start:16', 'move:20']);
+  });
+
+  it('stops an accepted press from propagating, without preventing its default', () => {
     let reached = 0;
     parent.addEventListener('pointerdown', () => reached++);
-    let accept = false;
-    const drag = create({ filter: () => accept });
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointerup', { x: 0 });
-    accept = true;
-    const press = dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointerup', { x: 0 });
+    create({ filter: () => true });
+
+    const accepted = press();
+
+    expect(reached).toBe(0);
+    expect(accepted.defaultPrevented).toBe(false);
+  });
+
+  it('leaves a press the filter rejects alone', () => {
+    let reached = 0;
+    parent.addEventListener('pointerdown', () => reached++);
+    create({ filter: () => false });
+
+    press();
+
     expect(reached).toBe(1);
-    expect(press.defaultPrevented).toBe(false);
-    drag.destroy();
+    expect(calls).toEqual([]);
   });
 
   it('keeps the compatibility mousedown of an accepted press inside the element on request', () => {
     let mousedowns = 0;
     parent.addEventListener('mousedown', () => mousedowns++);
-    const drag = create({ stopCompatibilityEvents: true });
-    dispatchPointer(element, 'pointerdown', { x: 0 });
+    create({ stopCompatibilityEvents: true });
+
+    press();
     element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    dispatchPointer(window, 'pointerup', { x: 0 });
+
+    expect(mousedowns).toBe(0);
+  });
+
+  it('lets a mousedown outside a press through', () => {
+    let mousedowns = 0;
+    parent.addEventListener('mousedown', () => mousedowns++);
+    create({ stopCompatibilityEvents: true });
+    press();
+    release(0);
+
     element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
     expect(mousedowns).toBe(1);
-    drag.destroy();
   });
 
-  it('suppresses the click after a mouse drag beyond the click distance only', async () => {
-    let clicks = 0;
-    element.addEventListener('click', () => clicks++);
-    const drag = create({ clickDistance: () => 3 });
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointermove', { x: 2 });
-    dispatchPointer(window, 'pointerup', { x: 2 });
-    element.click();
-    expect(clicks).toBe(1);
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointermove', { x: 5 });
-    dispatchPointer(window, 'pointerup', { x: 5 });
-    element.click();
-    expect(clicks).toBe(1);
-    await wait();
-    element.click();
-    expect(clicks).toBe(2);
-    // A touch drag does not produce a click to suppress.
-    dispatchPointer(element, 'pointerdown', { x: 0, pointerType: 'touch' });
-    dispatchPointer(window, 'pointermove', { x: 5, pointerType: 'touch' });
-    dispatchPointer(window, 'pointerup', { x: 5, pointerType: 'touch' });
-    element.click();
-    expect(clicks).toBe(3);
-    drag.destroy();
+  describe('click suppression', () => {
+    beforeEach(() => create({ clickDistance: () => 3 }));
+
+    it('keeps the click of a mouse drag within the click distance', () => {
+      const counter = clicks();
+      press();
+      move(2);
+      release(2);
+
+      element.click();
+
+      expect(counter.count).toBe(1);
+    });
+
+    it('suppresses the click of a mouse drag beyond the click distance', () => {
+      const counter = clicks();
+      press();
+      move(5);
+      release(5);
+
+      element.click();
+
+      expect(counter.count).toBe(0);
+    });
+
+    it('lets clicks through again once the click that follows the drag has passed', () => {
+      const counter = clicks();
+      press();
+      move(5);
+      release(5);
+
+      vi.runAllTimers();
+      element.click();
+
+      expect(counter.count).toBe(1);
+    });
+
+    it('suppresses nothing after a touch drag, which produces no click', () => {
+      const counter = clicks();
+      press(0, { pointerType: 'touch' });
+      move(5, { pointerType: 'touch' });
+      release(5, { pointerType: 'touch' });
+
+      element.click();
+
+      expect(counter.count).toBe(1);
+    });
   });
 
-  it('captures the pointer only once it moves beyond the click distance', () => {
-    const capture = vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined);
-    const drag = create({ capture: true, clickDistance: () => 3 });
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointermove', { x: 2 });
-    // The drag follows the pointer from the press, yet a release here still clicks the pressed element.
-    expect(calls).toEqual(['start:0', 'move:2']);
-    expect(capture).not.toHaveBeenCalled();
-    dispatchPointer(window, 'pointermove', { x: 5 });
-    expect(capture).toHaveBeenCalledExactlyOnceWith(1);
-    dispatchPointer(window, 'pointermove', { x: 1 });
-    expect(capture).toHaveBeenCalledTimes(1);
-    dispatchPointer(window, 'pointerup', { x: 1 });
-    drag.destroy();
+  describe('pointer capture', () => {
+    let capture: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      // Synthetic pointers cannot be captured: the browser call is the boundary.
+      capture = vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined);
+      create({ capture: true, clickDistance: () => 3 });
+    });
+
+    it('follows the pointer within the click distance without capturing it', () => {
+      press();
+      move(2);
+
+      expect(calls).toEqual(['start:0', 'move:2']);
+      expect(capture).not.toHaveBeenCalled();
+    });
+
+    it('captures the pointer once it moves beyond the click distance', () => {
+      press();
+      move(5);
+
+      expect(capture).toHaveBeenCalledExactlyOnceWith(1);
+    });
+
+    it('captures the pointer once per press', () => {
+      press();
+      move(5);
+      move(1);
+      move(6);
+
+      expect(capture).toHaveBeenCalledOnce();
+    });
   });
 
-  it('cancels on pointercancel, window blur and destroy, and ends a mouse drag without pressed buttons', () => {
+  it.each<[string, (drag: PointerDrag) => void, string]>([
+    ['pointercancel', () => dispatchPointer(window, 'pointercancel', { x: 1 }), 'cancel:1'],
+    // Without an event of its own, the cancellation reports the press.
+    ['a lost window focus', () => window.dispatchEvent(new Event('blur')), 'cancel:0'],
+    ['destroy', (drag) => drag.destroy(), 'cancel:0'],
+  ])('cancels on %s and ignores later moves', (_, cancel, cancelled) => {
     const drag = create();
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    dispatchPointer(window, 'pointercancel', { x: 1 });
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    window.dispatchEvent(new Event('blur'));
-    dispatchPointer(element, 'pointerdown', { x: 0 });
+    press();
+
+    cancel(drag);
+    move(9);
+
+    expect(calls).toEqual(['start:0', cancelled]);
+  });
+
+  it('ends a mouse drag at a move without pressed buttons', () => {
+    create();
+    press();
+
     window.dispatchEvent(
       new PointerEvent('pointermove', { pointerId: 1, pointerType: 'mouse', clientX: 7, buttons: 0 }),
     );
-    dispatchPointer(element, 'pointerdown', { x: 0 });
-    drag.destroy();
-    dispatchPointer(window, 'pointermove', { x: 9 });
-    expect(calls).toEqual(['start:0', 'cancel:1', 'start:0', 'cancel:0', 'start:0', 'end:7', 'start:0', 'cancel:0']);
+
+    expect(calls).toEqual(['start:0', 'end:7']);
   });
 
   it('prevents text selection and native drag while pressed', () => {
-    const drag = create();
-    dispatchPointer(element, 'pointerdown', { x: 0 });
+    create();
+    press();
     const selectstart = new Event('selectstart', { bubbles: true, cancelable: true });
     const dragstart = new Event('dragstart', { bubbles: true, cancelable: true });
+
     element.dispatchEvent(selectstart);
     element.dispatchEvent(dragstart);
-    dispatchPointer(window, 'pointerup', { x: 0 });
-    const after = new Event('selectstart', { bubbles: true, cancelable: true });
-    element.dispatchEvent(after);
-    expect([selectstart.defaultPrevented, dragstart.defaultPrevented, after.defaultPrevented]).toEqual([
-      true,
-      true,
-      false,
-    ]);
-    drag.destroy();
+
+    expect([selectstart.defaultPrevented, dragstart.defaultPrevented]).toEqual([true, true]);
+  });
+
+  it('allows text selection again after the release', () => {
+    create();
+    press();
+    release(0);
+    const selectstart = new Event('selectstart', { bubbles: true, cancelable: true });
+
+    element.dispatchEvent(selectstart);
+
+    expect(selectstart.defaultPrevented).toBe(false);
   });
 });

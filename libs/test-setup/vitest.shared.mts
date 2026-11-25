@@ -44,6 +44,17 @@ export function defineAngularTestConfig(projectRoot: string, include: string[]):
       setupFiles: [resolve(setupRoot, 'test-setup.ts')],
       // Like Jasmine, restore every spy after its test.
       restoreMocks: true,
+      // Off unless a run asks for it (`--coverage`, the `coverage` configuration of the test target): the sources of
+      // the project, without its specs and the helpers of specs.
+      coverage: {
+        provider: 'v8',
+        include: ['src/**/*.ts'],
+        exclude: ['**/*.spec.ts', '**/*.testing.ts', '**/public-api.ts', '**/index.ts'],
+        reporter: ['text-summary', 'json-summary'],
+        reportsDirectory: resolve(workspaceRoot, 'coverage', basename(projectRoot)),
+        // A floor under every library, not a target: each of them is well above it.
+        thresholds: { lines: 90, statements: 90, functions: 90, branches: 85 },
+      },
       browser: {
         enabled: true,
         provider: 'playwright',

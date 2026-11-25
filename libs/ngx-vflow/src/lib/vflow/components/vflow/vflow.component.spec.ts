@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { Node, createNodes } from '../../interfaces/node.interface';
 import { createEdges } from '../../interfaces/edge.interface';
 import { NodeDragEvent } from '../../interfaces/node-drag-event.interface';
@@ -135,31 +136,38 @@ class DragHostComponent {
   public readonly positions: NodePositionChange[][] = [];
 }
 
-async function settle(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
+/** Renders the fixture and waits for the first layout of its flow. */
+async function render<T>(fixture: ComponentFixture<T>) {
   fixture.detectChanges();
-  for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-  await fixture.whenStable();
-  fixture.detectChanges();
+  const flow = fixture.debugElement.query(By.directive(VflowComponent)).componentInstance as VflowComponent;
+  await new Promise<void>((resolve) => flow.initialized.subscribe(() => resolve()));
+  await update(fixture);
+  return fixture;
 }
+
+async function update<T>(fixture: ComponentFixture<T>) {
+  fixture.detectChanges();
+  await fixture.whenStable();
+}
+
+/** One animation frame: a browser delivers pointer events of a slow pointer in frames of their own. */
+const frame = () => new Promise(requestAnimationFrame);
 
 describe('VflowComponent', () => {
   describe('rendered node rectangles', () => {
-    async function createFixture() {
-      TestBed.configureTestingModule({
-        imports: [NodeRectHostComponent],
-      });
-      const fixture = TestBed.createComponent(NodeRectHostComponent);
-      await settle(fixture);
-      return fixture;
-    }
+    const createFixture = () => render(TestBed.createComponent(NodeRectHostComponent));
 
-    it('returns the measured size of a content-sized node without writing it into the node', async () => {
+    it('returns the measured size of a content-sized node', async () => {
       const fixture = await createFixture();
-      const { vflow, nodes } = fixture.componentInstance;
 
-      expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 200, height: 100 });
-      expect(nodes[0].width).toBeUndefined();
-      expect(nodes[0].height).toBeUndefined();
+      expect(fixture.componentInstance.vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 200, height: 100 });
+    });
+
+    it('does not write the measured size into the node', async () => {
+      const fixture = await createFixture();
+      const [a] = fixture.componentInstance.nodes;
+
+      expect([a.width, a.height]).toEqual([undefined, undefined]);
     });
 
     it('returns a nested node in flow space', async () => {
@@ -179,63 +187,83 @@ describe('VflowComponent', () => {
       expect(fixture.componentInstance.vflow().getNodeRect('missing')).toBeUndefined();
     });
 
-    it('bounds the measured nodes, all of them by default', async () => {
+    it.each([
+      ['the given nodes', ['a', 'b'], { x: 0, y: 0, width: 600, height: 100 }],
+      ['every node by default', undefined, { x: 0, y: 0, width: 610, height: 120 }],
+      ['no unknown node', ['missing'], { x: 0, y: 0, width: 0, height: 0 }],
+    ])('bounds %s', async (_, ids, bounds) => {
+      const fixture = await createFixture();
+
+      expect(fixture.componentInstance.vflow().getNodesBounds(ids)).toEqual(bounds);
+    });
+  });
+
+  describe('a size signal added to a node object', () => {
+    async function addWidth() {
+      const fixture = await render(TestBed.createComponent(LateSignalHostComponent));
+      const { node, nodes } = fixture.componentInstance;
+      const card = fixture.nativeElement.querySelector('.card');
+      node.width = signal(320);
+      nodes.update((list) => [...list]);
+      await update(fixture);
+      return { fixture, card };
+    }
+
+    it('is read once the same object comes in a new array', async () => {
+      const { fixture } = await addWidth();
+
+      expect(fixture.componentInstance.vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 320, height: 100 });
+    });
+
+    it('keeps the view of the node', async () => {
+      const { fixture, card } = await addWidth();
+
+      expect(fixture.nativeElement.querySelector('.card')).toBe(card);
+    });
+
+    it('is followed afterwards', async () => {
+      const { fixture } = await addWidth();
+
+      fixture.componentInstance.node.width!.set(260);
+      await update(fixture);
+
+      expect(fixture.componentInstance.vflow().getNodeRect('a')?.width).toBe(260);
+    });
+  });
+
+  describe('nodes at a point', () => {
+    const createFixture = () => render(TestBed.createComponent(VflowTestHostComponent));
+
+    it('returns the application nodes, topmost first, with points in node space', async () => {
+      const fixture = await createFixture();
+      const { child, parent, vflow } = fixture.componentInstance;
+
+      const hits = vflow().getNodesAtPoint({ x: 115, y: 125 });
+
+      expect(hits).toEqual([
+        { node: child, nodeSpacePoint: { x: 5, y: 5 } },
+        { node: parent, nodeSpacePoint: { x: 15, y: 25 } },
+      ]);
+      expect(hits[0].node).toBe(child);
+    });
+
+    it('returns a snapshot that does not follow a later move of the node', async () => {
+      const fixture = await createFixture();
+      const { child, vflow } = fixture.componentInstance;
+      const [hit] = vflow().getNodesAtPoint({ x: 115, y: 125 });
+
+      child.point.set({ x: 20, y: 30 });
+
+      expect(hit.nodeSpacePoint).toEqual({ x: 5, y: 5 });
+    });
+
+    it('is not changed by a write to a point it returned', async () => {
       const fixture = await createFixture();
       const { vflow } = fixture.componentInstance;
 
-      expect(vflow().getNodesBounds(['a', 'b'])).toEqual({ x: 0, y: 0, width: 600, height: 100 });
-      expect(vflow().getNodesBounds()).toEqual({ x: 0, y: 0, width: 610, height: 120 });
-      expect(vflow().getNodesBounds(['missing'])).toEqual({ x: 0, y: 0, width: 0, height: 0 });
-    });
-  });
+      vflow().getNodesAtPoint({ x: 115, y: 125 })[0].nodeSpacePoint.x = 999;
 
-  it('reads a size signal added to a node object once the same object comes in a new array', async () => {
-    TestBed.configureTestingModule({
-      imports: [LateSignalHostComponent],
-    });
-    const fixture = TestBed.createComponent(LateSignalHostComponent);
-    await settle(fixture);
-    const { vflow, node, nodes } = fixture.componentInstance;
-    const card = fixture.nativeElement.querySelector('.card');
-    expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 200, height: 100 });
-
-    node.width = signal(320);
-    nodes.update((list) => [...list]);
-    await settle(fixture);
-
-    expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 320, height: 100 });
-    // The same object keeps its model and its view.
-    expect(fixture.nativeElement.querySelector('.card')).toBe(card);
-
-    node.width.set(260);
-    await settle(fixture);
-    expect(vflow().getNodeRect('a')?.width).toBe(260);
-  });
-
-  it('returns application nodes with snapshot node-space points in topmost-first order', async () => {
-    TestBed.configureTestingModule({
-      imports: [VflowTestHostComponent],
-    });
-    const fixture = TestBed.createComponent(VflowTestHostComponent);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const { child, parent } = fixture.componentInstance;
-    const hits = fixture.componentInstance.vflow().getNodesAtPoint({ x: 115, y: 125 });
-
-    expect(hits.map(({ node }) => node.id)).toEqual(['child', 'parent']);
-    expect(hits[0].node).toBe(child);
-    expect(hits[0].nodeSpacePoint).toEqual({ x: 5, y: 5 });
-    expect(hits[1].node).toBe(parent);
-    expect(hits[1].nodeSpacePoint).toEqual({ x: 15, y: 25 });
-
-    child.point.set({ x: 20, y: 30 });
-    expect(hits[0].nodeSpacePoint).toEqual({ x: 5, y: 5 });
-
-    hits[0].nodeSpacePoint.x = 999;
-    expect(fixture.componentInstance.vflow().getNodesAtPoint({ x: 125, y: 135 })[0].nodeSpacePoint).toEqual({
-      x: 5,
-      y: 5,
+      expect(vflow().getNodesAtPoint({ x: 115, y: 125 })[0].nodeSpacePoint).toEqual({ x: 5, y: 5 });
     });
   });
 
@@ -244,21 +272,34 @@ describe('VflowComponent', () => {
       const fixture = TestBed.createComponent(NodeRectHostComponent);
       // An offset of the flow on the page must not shift the conversions.
       fixture.nativeElement.style.cssText = 'display: block; margin: 37px 0 0 23px';
-      await settle(fixture);
-      return fixture;
+      return render(fixture);
     }
 
-    it('converts between client and flow coordinates where nodes are drawn', async () => {
+    async function zoomedCard() {
       const fixture = await createFixture();
       const vflow = fixture.componentInstance.vflow();
       await vflow.setViewport({ x: 50, y: 20, zoom: 2 });
-      await settle(fixture);
-      const card = fixture.nativeElement.querySelectorAll('.card')[1].getBoundingClientRect();
-
+      await update(fixture);
       // Node b is at (400, 0) and 200 × 100 in flow units.
+      const card = fixture.nativeElement.querySelectorAll('.card')[1].getBoundingClientRect() as DOMRect;
+      return { vflow, card };
+    }
+
+    it('converts a flow point to the client point where it is drawn', async () => {
+      const { vflow, card } = await zoomedCard();
+
       expect(vflow.flowToClientPosition({ x: 400, y: 0 })).toEqual({ x: card.left, y: card.top });
+    });
+
+    it('converts a client point to the flow point drawn there', async () => {
+      const { vflow, card } = await zoomedCard();
+
       expect(vflow.clientToFlowPosition({ x: card.right, y: card.bottom })).toEqual({ x: 600, y: 100 });
     });
+
+    function clientCenter(vflow: VflowComponent, rect: { x: number; y: number; width: number; height: number }) {
+      return vflow.flowToClientPosition({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
+    }
 
     it('fits the nodes into the view, centered and inside the padding', async () => {
       const fixture = await createFixture();
@@ -269,130 +310,162 @@ describe('VflowComponent', () => {
       const bounds = vflow.getNodesBounds();
       const topLeft = vflow.flowToClientPosition(bounds);
       const bottomRight = vflow.flowToClientPosition({ x: bounds.x + bounds.width, y: bounds.y + bounds.height });
+      const center = clientCenter(vflow, bounds);
 
-      expect((topLeft.x + bottomRight.x) / 2).toBeCloseTo(root.left + root.width / 2, 0);
-      expect((topLeft.y + bottomRight.y) / 2).toBeCloseTo(root.top + root.height / 2, 0);
+      expect(center.x).toBeCloseTo(root.left + root.width / 2, 0);
+      expect(center.y).toBeCloseTo(root.top + root.height / 2, 0);
       expect(topLeft.x).toBeGreaterThanOrEqual(root.left);
       expect(bottomRight.x).toBeLessThanOrEqual(root.right);
+    });
 
+    it('zooms out further for a greater padding', async () => {
+      const fixture = await createFixture();
+      const vflow = fixture.componentInstance.vflow();
+      await vflow.fitView({ padding: 0.2 });
       const zoom = vflow.viewport().zoom;
+
       await vflow.fitView({ padding: 0.5 });
+
       expect(vflow.viewport().zoom).toBeLessThan(zoom);
+    });
+
+    it('centers the given nodes', async () => {
+      const fixture = await createFixture();
+      const vflow = fixture.componentInstance.vflow();
+      const root = (fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement).getBoundingClientRect();
 
       await vflow.fitView({ nodes: ['a'] });
-      const a = vflow.getNodeRect('a')!;
-      const center = vflow.flowToClientPosition({ x: a.x + a.width / 2, y: a.y + a.height / 2 });
+      const center = clientCenter(vflow, vflow.getNodeRect('a')!);
+
       expect(center.x).toBeCloseTo(root.left + root.width / 2, 0);
       expect(center.y).toBeCloseTo(root.top + root.height / 2, 0);
     });
   });
 
   describe('graph queries', () => {
-    it('returns the nodes of the application that a node overlaps partially', async () => {
-      const fixture = TestBed.createComponent(NodeRectHostComponent);
-      await settle(fixture);
-      const vflow = fixture.componentInstance.vflow();
+    it('returns the application object of a node that another node overlaps partially', async () => {
+      const fixture = await render(TestBed.createComponent(NodeRectHostComponent));
       const [, b] = fixture.componentInstance.nodes;
 
       // The child is at (410, 20) in the flow and sticks out of its parent b at (400, 0).
-      expect(vflow.getIntersectingNodes('child')).toEqual([b]);
-      expect(vflow.getIntersectingNodes('child')[0]).toBe(b);
-      expect(vflow.getIntersectingNodes('child', { partially: false })).toEqual([]);
-      expect(vflow.getIntersectingNodes('a')).toEqual([]);
+      const [overlapped] = fixture.componentInstance.vflow().getIntersectingNodes('child');
+
+      expect(overlapped).toBe(b);
     });
 
-    it('returns the nodes that wholly contain a node', async () => {
-      const fixture = TestBed.createComponent(VflowTestHostComponent);
-      await settle(fixture);
+    it('returns no node that overlaps only partially when partial overlaps are excluded', async () => {
+      const fixture = await render(TestBed.createComponent(NodeRectHostComponent));
+
+      expect(fixture.componentInstance.vflow().getIntersectingNodes('child', { partially: false })).toEqual([]);
+    });
+
+    it('returns no node for a node that overlaps none', async () => {
+      const fixture = await render(TestBed.createComponent(NodeRectHostComponent));
+
+      expect(fixture.componentInstance.vflow().getIntersectingNodes('a')).toEqual([]);
+    });
+
+    it('returns the nodes that wholly contain a node when partial overlaps are excluded', async () => {
+      const fixture = await render(TestBed.createComponent(VflowTestHostComponent));
       const { parent, vflow } = fixture.componentInstance;
 
       expect(vflow().getIntersectingNodes('child', { partially: false })).toEqual([parent]);
       expect(vflow().getIntersectingNodes('parent', { partially: false })).toEqual([]);
     });
 
-    it('returns the edges of the application that lost a node or a handle', async () => {
-      const fixture = TestBed.createComponent(HandlesHostComponent);
-      await settle(fixture);
+    it('returns the application objects of the edges that lost a node or a handle', async () => {
+      const fixture = await render(TestBed.createComponent(HandlesHostComponent));
       const { vflow, edges } = fixture.componentInstance;
 
-      expect(vflow().detachedEdges()).toEqual([edges[1]]);
-      expect(vflow().detachedEdges()[0]).toBe(edges[1]);
+      const detached = vflow().detachedEdges();
+
+      expect(detached).toHaveLength(1);
+      expect(detached[0]).toBe(edges[1]);
     });
   });
 
-  it('reports a pointer drag of a node and snaps the node to the grid', async () => {
-    const fixture = TestBed.createComponent(DragHostComponent);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
-    const { left, top } = card.getBoundingClientRect();
+  describe('pointer drag of a node', () => {
+    async function drag(selectAll = false) {
+      const fixture = await render(TestBed.createComponent(DragHostComponent));
+      const host = fixture.componentInstance;
+      if (selectAll) {
+        host.nodes.forEach((node) => node.selected?.set(true));
+        await update(fixture);
+      }
+      const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
+      const { left, top } = card.getBoundingClientRect();
 
-    // Each pointer event comes in a frame of its own, as in a browser.
-    dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
-    await settle(fixture);
-    for (const dx of [10, 25, 33]) {
-      dispatchMouse(window, 'mousemove', { x: left + 5 + dx, y: top + 5 });
-      await settle(fixture);
+      dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
+      await frame();
+      for (const dx of [10, 25, 33]) {
+        dispatchMouse(window, 'mousemove', { x: left + 5 + dx, y: top + 5 });
+        await frame();
+      }
+      const release = dispatchMouse(window, 'mouseup', { x: left + 38, y: top + 5 });
+      await update(fixture);
+      return { host, release };
     }
-    const release = dispatchMouse(window, 'mouseup', { x: left + 38, y: top + 5 });
-    await settle(fixture);
 
-    const [a] = host.nodes;
-    const kinds = host.drags.map(([kind]) => kind);
-    expect(kinds[0]).toBe('start');
-    expect(kinds.at(-1)).toBe('end');
-    expect(kinds.filter((kind) => kind === 'drag').length).toBeGreaterThan(0);
-    expect(host.drags.every(([, event]) => event.node === a)).toBe(true);
-    expect(host.drags.every(([, event]) => event.nodes.length === 1 && event.nodes[0] === a)).toBe(true);
-    expect(host.drags.every(([, event]) => event.sourceEvent.type.startsWith('pointer'))).toBe(true);
-    expect(host.drags.at(-1)?.[1].sourceEvent).toBe(release);
+    it('reports the start, every move and the end of the drag', async () => {
+      const { host } = await drag();
 
-    const { x, y } = a.point();
-    expect(x % 20).toBe(0);
-    expect(Math.abs(x - 33)).toBeLessThan(20);
-    expect(y).toBe(0);
-    expect(host.nodes[1].point()).toEqual({ x: 200, y: 0 });
-    expect(host.positions.flat().at(-1)).toEqual({ type: 'position', id: 'a', point: { x, y } });
-  });
+      expect(host.drags.map(([kind]) => kind)).toEqual(['start', 'drag', 'drag', 'drag', 'end']);
+    });
 
-  it('reports every drag event when pointer events come within one frame', async () => {
-    const fixture = TestBed.createComponent(DragHostComponent);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
-    const { left, top } = card.getBoundingClientRect();
+    it('reports the dragged node and the pointer events in the drag events', async () => {
+      const { host, release } = await drag();
+      const [a] = host.nodes;
 
-    // No flush between the events: a fast pointer or an automated drag.
-    dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
-    dispatchMouse(window, 'mousemove', { x: left + 15, y: top + 5 });
-    dispatchMouse(window, 'mousemove', { x: left + 25, y: top + 5 });
-    dispatchMouse(window, 'mouseup', { x: left + 25, y: top + 5 });
-    await settle(fixture);
+      expect(
+        host.drags.every(([, event]) => event.node === a && event.nodes.length === 1 && event.nodes[0] === a),
+      ).toBe(true);
+      expect(host.drags.every(([, event]) => event.sourceEvent.type.startsWith('pointer'))).toBe(true);
+      expect(host.drags.at(-1)?.[1].sourceEvent).toBe(release);
+    });
 
-    expect(host.drags.map(([kind]) => kind)).toEqual(['start', 'drag', 'drag', 'end']);
-  });
+    it('snaps the dragged node to the grid, up to the next cell', async () => {
+      const { host } = await drag();
 
-  it('reports every node a drag of a selection moves', async () => {
-    const fixture = TestBed.createComponent(DragHostComponent);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    host.nodes.forEach((node) => node.selected?.set(true));
-    await settle(fixture);
-    const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
-    const { left, top } = card.getBoundingClientRect();
+      // Moved by 33 on a 20 grid.
+      expect(host.nodes[0].point()).toEqual({ x: 40, y: 0 });
+      expect(host.nodes[1].point()).toEqual({ x: 200, y: 0 });
+    });
 
-    dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
-    await settle(fixture);
-    dispatchMouse(window, 'mousemove', { x: left + 45, y: top + 5 });
-    await settle(fixture);
-    dispatchMouse(window, 'mouseup', { x: left + 45, y: top + 5 });
-    await settle(fixture);
+    it('reports the snapped point in nodesChanges.position', async () => {
+      const { host } = await drag();
 
-    const [a, b] = host.nodes;
-    expect(host.drags.length).toBeGreaterThan(0);
-    expect(host.drags.every(([, event]) => event.node === a)).toBe(true);
-    expect(
-      host.drags.every(([, event]) => event.nodes.length === 2 && event.nodes.includes(a) && event.nodes.includes(b)),
-    ).toBe(true);
+      await expect
+        .poll(() => host.positions.flat().at(-1))
+        .toEqual({ type: 'position', id: 'a', point: { x: 40, y: 0 } });
+    });
+
+    it('reports every node that a drag of a selection moves', async () => {
+      const { host } = await drag(true);
+      const [a, b] = host.nodes;
+
+      expect(host.drags.length).toBeGreaterThan(0);
+      expect(
+        host.drags.every(
+          ([, event]) =>
+            event.node === a && event.nodes.length === 2 && event.nodes.includes(a) && event.nodes.includes(b),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports every drag event when pointer events come within one frame', async () => {
+      const fixture = await render(TestBed.createComponent(DragHostComponent));
+      const host = fixture.componentInstance;
+      const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
+      const { left, top } = card.getBoundingClientRect();
+
+      // No frame between the events: a fast pointer or an automated drag.
+      dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
+      dispatchMouse(window, 'mousemove', { x: left + 15, y: top + 5 });
+      dispatchMouse(window, 'mousemove', { x: left + 25, y: top + 5 });
+      dispatchMouse(window, 'mouseup', { x: left + 25, y: top + 5 });
+      await update(fixture);
+
+      expect(host.drags.map(([kind]) => kind)).toEqual(['start', 'drag', 'drag', 'end']);
+    });
   });
 });

@@ -4,6 +4,7 @@ import { animationFrameScheduler } from 'rxjs';
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
 import { createEdge, Edge } from '../../interfaces/edge.interface';
 import { createNode, Node } from '../../interfaces/node.interface';
+import { ViewportState } from '../../interfaces/viewport.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { dispatchMouse } from '../../gestures/pointer-events.testing';
@@ -28,20 +29,20 @@ class AutoPanHostComponent {
   @Input() autoPan: boolean | AutoPanSettings = true;
   @Input() nodes: Node[] = [];
   @Input() edges: Edge[] = [];
-  @Input() view: [number, number] = [400, 300];
   @ViewChild(VflowComponent) flow!: VflowComponent;
 }
 
-describe('public auto-pan settings', () => {
+type MouseType = 'mousedown' | 'mousemove' | 'mouseup';
+
+describe('auto-pan', () => {
   let fixture: ComponentFixture<AutoPanHostComponent>;
   let frames: Map<number, FrameRequestCallback>;
   let now: number;
   let nextId: number;
 
+  // Animation frames run on a mocked clock: a test advances it frame by frame.
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [AutoPanHostComponent],
-    });
+    TestBed.configureTestingModule({ imports: [AutoPanHostComponent] });
     frames = new Map();
     now = 0;
     nextId = 0;
@@ -62,69 +63,86 @@ describe('public auto-pan settings', () => {
     fixture = TestBed.createComponent(AutoPanHostComponent);
     Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'node', point: { x: 100, y: 100 }, data: { text: 'Node' } }),
-      createNode({ id: 'target', point: { x: 250, y: 100 }, data: { text: 'Target' } }),
+      createNode({ id: 'node', point: { x: 100, y: 100 } }),
+      createNode({ id: 'target', point: { x: 250, y: 100 } }),
     ]);
     fixture.componentRef.setInput('edges', [
       createEdge({ id: 'edge', source: 'node', target: 'target', reconnectable: true }),
     ]);
     fixture.componentRef.setInput('autoPan', autoPan);
     fixture.detectChanges();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    fixture.detectChanges();
-    TestBed.flushEffects();
-    await frame(0);
+    await fixture.whenStable();
+    // The flow reveals its nodes once it has measured itself and them.
+    await expect
+      .poll(() => getComputedStyle(fixture.nativeElement.querySelector('[data-v-node]')).visibility)
+      .toBe('visible');
+    frame(0);
   }
 
-  function mouse(target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number, y: number) {
+  function flow() {
+    return fixture.componentInstance.flow;
+  }
+
+  function rootRect() {
+    return (fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement).getBoundingClientRect();
+  }
+
+  function mouse(target: EventTarget, type: MouseType, x: number, y: number) {
     dispatchMouse(target, type, { x, y });
   }
 
-  function drag(x = 0, y = 150) {
-    const root = fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement;
-    const rect = root.getBoundingClientRect();
-    mouse(fixture.nativeElement.querySelector('[node]'), 'mousedown', rect.left + 110, rect.top + 110);
-    mouse(window, 'mousemove', rect.left + x, rect.top + y);
+  function render() {
     fixture.detectChanges();
     TestBed.flushEffects();
+  }
+
+  /** Moves the pointer to a point of the flow, as the document sees it. */
+  function pointTo(x: number, y: number) {
+    const rect = rootRect();
     document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + x, clientY: rect.top + y }));
   }
 
-  async function frame(ms = 1000 / 60) {
+  /** Presses `target` in the middle of the flow and moves the pointer to the flow point (x, y). */
+  function press(target: Element, x: number, y: number) {
+    const rect = rootRect();
+    mouse(target, 'mousedown', rect.left + 200, rect.top + 150);
+    render();
+    pointTo(x, y);
+  }
+
+  /** Drags the first node to the flow point (x, y). */
+  function drag(x = 0, y = 150) {
+    const rect = rootRect();
+    mouse(fixture.nativeElement.querySelector('[data-v-node]'), 'mousedown', rect.left + 110, rect.top + 110);
+    mouse(window, 'mousemove', rect.left + x, rect.top + y);
+    render();
+    pointTo(x, y);
+  }
+
+  function release() {
+    mouse(window, 'mouseup', 0, 150);
+    render();
+  }
+
+  function frame(ms = 1000 / 60) {
     now += ms;
     const callbacks = [...frames.values()];
     frames.clear();
     callbacks.forEach((callback) => callback(now));
-    fixture.detectChanges();
-    TestBed.flushEffects();
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    fixture.detectChanges();
-    TestBed.flushEffects();
+    render();
   }
-
-  it('pans while dragging with boolean true', async () => {
-    await setup(true);
-    drag();
-    await frame();
-    await frame();
-    expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
-  });
 
   it('reports the viewport change of an auto-pan once, when the drag ends', async () => {
     await setup(true);
-    const ends: unknown[] = [];
-    const subscription = fixture.componentInstance.flow.viewportChangeEnd.subscribe((end) => ends.push(end));
+    const ends: ViewportState[] = [];
+    flow().viewportChangeEnd.subscribe((end) => ends.push(end));
     drag();
-    await frame();
-    await frame();
-    await frame();
-    expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
+    frame();
+    frame();
+    frame();
     expect(ends).toEqual([]);
-
-    mouse(window, 'mouseup', 0, 150);
-    await frame();
-    expect(ends).toEqual([fixture.componentInstance.flow.viewport()]);
-    subscription.unsubscribe();
+    release();
+    expect(ends).toEqual([flow().viewport()]);
   });
 
   it('measures the edges from inside the border of the pane, as the pane gestures do', async () => {
@@ -132,164 +150,165 @@ describe('public auto-pan settings', () => {
     (fixture.nativeElement.querySelector('.v-pane') as HTMLElement).style.borderLeft = '30px solid';
     // 60 px from the outer edge of the pane is 30 px inside its border: within the margin.
     drag(60);
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBeGreaterThan(0);
+    frame(100);
+    expect(flow().viewport().x).toBeGreaterThan(0);
   });
 
-  it('can disable node dragging auto-pan independently', async () => {
-    await setup({ nodeDrag: false });
-    drag();
-    await frame();
-    expect(fixture.componentInstance.flow.viewport().x).toBe(0);
-  });
-  it('uses elapsed time and configured speed and margin in viewport pixels', async () => {
+  it('pans by the configured speed in viewport pixels per second, eased by the depth into the margin', async () => {
     await setup({ speed: 120, margin: 100 });
     drag(50);
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(3, 8);
-    await frame(50);
-    await frame(50);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(6, 8);
+    frame(100);
+    expect(flow().viewport().x).toBeCloseTo(3, 8);
   });
 
-  for (const field of ['speed', 'margin']) {
-    for (const value of [-1, NaN, Infinity, -Infinity]) {
-      it(`falls back for invalid ${field}: ${value}`, async () => {
-        await setup({ [field]: value });
-        drag(24);
-        await frame(100);
-        expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(15, 8);
-      });
-    }
-  }
+  it('keeps panning by elapsed time on later frames', async () => {
+    await setup({ speed: 120, margin: 100 });
+    drag(50);
+    frame(100);
+    frame(50);
+    frame(50);
+    expect(flow().viewport().x).toBeCloseTo(6, 8);
+  });
 
-  for (const options of [false, { speed: 0 }, { margin: 0 }, { nodeDrag: false, connectionDrag: false }]) {
-    it(`disables auto-pan for ${JSON.stringify(options)}`, async () => {
-      await setup(options);
-      drag();
-      await frame(100);
-      expect(fixture.componentInstance.flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+  it.each([
+    ...[-1, NaN, Infinity, -Infinity].map((value) => ({ field: 'speed', value })),
+    ...[-1, NaN, Infinity, -Infinity].map((value) => ({ field: 'margin', value })),
+  ])('falls back to the default for $field $value', async ({ field, value }) => {
+    await setup({ [field]: value });
+    drag(24);
+    frame(100);
+    expect(flow().viewport().x).toBeCloseTo(15, 8);
+  });
+
+  it.each<boolean | AutoPanSettings>([
+    false,
+    { speed: 0 },
+    { margin: 0 },
+    { nodeDrag: false },
+    { nodeDrag: false, connectionDrag: false },
+  ])('does not pan a node drag with %o', async (options) => {
+    await setup(options);
+    drag();
+    frame(100);
+    expect(flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+  });
+
+  it.each([
+    { x: 0, y: 150, expected: { x: 60, y: 0 } },
+    { x: 400, y: 150, expected: { x: -60, y: 0 } },
+    { x: 200, y: 0, expected: { x: 0, y: 60 } },
+    { x: 200, y: 300, expected: { x: 0, y: -60 } },
+    { x: 0, y: 0, expected: { x: 60, y: 60 } },
+    { x: 48, y: 150, expected: { x: 0, y: 0 } },
+    { x: 200, y: 150, expected: { x: 0, y: 0 } },
+  ])('pans by $expected with the pointer at ($x, $y) and default options', async ({ x, y, expected }) => {
+    await setup({});
+    drag(x, y);
+    frame(100);
+    expect(flow().viewport()).toEqual({ ...expected, zoom: 1 });
+  });
+
+  describe.each([
+    { name: 'connection creation', selector: '[data-v-handle][data-v-handle-type="source"]' },
+    { name: 'reconnection', selector: '[data-v-reconnect-handle]' },
+  ])('during $name', ({ selector }) => {
+    it.each([
+      { connectionDrag: true, x: 60 },
+      { connectionDrag: false, x: 0 },
+    ])('pans by $x with connectionDrag $connectionDrag', async ({ connectionDrag, x }) => {
+      await setup({ nodeDrag: false, connectionDrag });
+      press(fixture.nativeElement.querySelector(selector), 0, 150);
+      frame(100);
+      expect(flow().viewport().x).toBe(x);
     });
-  }
 
-  for (const [x, y, expectedX, expectedY] of [
-    [0, 150, 60, 0],
-    [400, 150, -60, 0],
-    [200, 0, 0, 60],
-    [200, 300, 0, -60],
-    [0, 0, 60, 60],
-    [48, 150, 0, 0],
-    [200, 150, 0, 0],
-  ]) {
-    it(`pans at viewport point (${x}, ${y}) with omitted options`, async () => {
-      await setup({});
-      drag(x, y);
-      await frame(100);
-      expect(fixture.componentInstance.flow.viewport()).toEqual({ x: expectedX, y: expectedY, zoom: 1 });
+    it('stops panning once the drag ends', async () => {
+      await setup({ nodeDrag: false, connectionDrag: true });
+      press(fixture.nativeElement.querySelector(selector), 0, 150);
+      frame(100);
+      mouse(document, 'mouseup', rootRect().left, rootRect().top + 150);
+      render();
+      frame(100);
+      expect(flow().viewport().x).toBe(60);
     });
-  }
-
-  for (const reconnect of [false, true]) {
-    for (const enabled of [false, true]) {
-      it(`${enabled ? 'enables' : 'disables'} auto-pan for ${reconnect ? 'reconnection' : 'connection creation'}`, async () => {
-        await setup({ nodeDrag: false, connectionDrag: enabled });
-        const target = fixture.nativeElement.querySelector(
-          reconnect ? '[data-v-reconnect-handle]' : '[data-v-handle][data-v-handle-type="source"]',
-        );
-        expect(target).not.toBeNull();
-        const rect = fixture.nativeElement.querySelector('[data-v-root]').getBoundingClientRect();
-        mouse(target, 'mousedown', rect.left + 200, rect.top + 150);
-        fixture.detectChanges();
-        TestBed.flushEffects();
-        document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left, clientY: rect.top + 150 }));
-        await frame(100);
-        expect(fixture.componentInstance.flow.viewport().x).toBe(enabled ? 60 : 0);
-        mouse(document, 'mouseup', rect.left, rect.top + 150);
-        fixture.detectChanges();
-        TestBed.flushEffects();
-        await frame(100);
-        expect(fixture.componentInstance.flow.viewport().x).toBe(enabled ? 60 : 0);
-      });
-    }
-  }
+  });
 
   it('reads the options object when it is bound, not when it mutates later', async () => {
     const options = { speed: 120, margin: 100 };
     await setup(options);
     options.speed = 600;
     drag(50);
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(3, 8);
+    frame(100);
+    expect(flow().viewport().x).toBeCloseTo(3, 8);
   });
 
   it('stops when the binding disables auto-pan during a drag', async () => {
     await setup(true);
     drag();
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBe(60);
+    frame(100);
     fixture.componentRef.setInput('autoPan', false);
-    fixture.detectChanges();
-    TestBed.flushEffects();
-    await frame(100);
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBe(60);
+    render();
+    frame(100);
+    frame(100);
+    expect(flow().viewport().x).toBe(60);
   });
 
   it('starts when a later binding enables auto-pan during a drag', async () => {
     await setup(false);
     drag(50);
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBe(0);
+    frame(100);
     fixture.componentRef.setInput('autoPan', { speed: 120, margin: 100 });
-    fixture.detectChanges();
-    TestBed.flushEffects();
-    await frame(0);
-    const rect = (fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement).getBoundingClientRect();
-    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 50, clientY: rect.top + 150 }));
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(3, 8);
+    render();
+    frame(0);
+    pointTo(50, 150);
+    frame(100);
+    expect(flow().viewport().x).toBeCloseTo(3, 8);
   });
 
-  it('keeps viewport-pixel speed at non-unit zoom and stops after drag ends', async () => {
-    await setup({ connectionDrag: false });
-    fixture.componentInstance.flow.setViewport({ x: 0, y: 0, zoom: 2 });
-    await frame(0);
+  it('pans by viewport pixels at a zoom other than 1', async () => {
+    await setup(true);
+    flow().setViewport({ x: 0, y: 0, zoom: 2 });
+    frame(0);
     drag();
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport()).toEqual({ x: 60, y: 0, zoom: 2 });
-    mouse(window, 'mouseup', 0, 150);
-    fixture.detectChanges();
-    TestBed.flushEffects();
-    await frame(100);
-    expect(fixture.componentInstance.flow.viewport()).toEqual({ x: 60, y: 0, zoom: 2 });
+    frame(100);
+    expect(flow().viewport()).toEqual({ x: 60, y: 0, zoom: 2 });
   });
+
+  it('stops panning once the node drag ends', async () => {
+    await setup(true);
+    drag();
+    frame(100);
+    release();
+    frame(100);
+    expect(flow().viewport().x).toBe(60);
+  });
+
   it('travels the same distance at 60 Hz and 120 Hz', async () => {
     await setup(true);
     drag();
-    for (let i = 0; i < 4; i++) await frame(1000 / 60);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(40, 8);
-    for (let i = 0; i < 8; i++) await frame(1000 / 120);
-    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(80, 8);
+    for (let i = 0; i < 4; i++) frame(1000 / 60);
+    const at60Hz = flow().viewport().x;
+    for (let i = 0; i < 8; i++) frame(1000 / 120);
+    expect(at60Hz).toBeCloseTo(40, 8);
+    expect(flow().viewport().x - at60Hz).toBeCloseTo(40, 8);
   });
 });
 
 describe('auto-pan with real browser frames', () => {
   it('moves stationary neighbouring nodes in one direction while a node is held at the left edge', async () => {
-    TestBed.configureTestingModule({
-      imports: [AutoPanHostComponent],
-    });
+    TestBed.configureTestingModule({ imports: [AutoPanHostComponent] });
     const fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'dragged', point: { x: 100, y: 100 }, data: { text: 'Dragged' } }),
-      createNode({ id: 'neighbour', point: { x: 250, y: 100 }, data: { text: 'Neighbour' } }),
+      createNode({ id: 'dragged', point: { x: 100, y: 100 } }),
+      createNode({ id: 'neighbour', point: { x: 250, y: 100 } }),
     ]);
     fixture.detectChanges();
     await fixture.whenStable();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const root = fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement;
-    const nodes = fixture.nativeElement.querySelectorAll('[node]') as NodeListOf<HTMLElement>;
-    const rect = root.getBoundingClientRect();
-    const mouse = (target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number) =>
+    const nodes = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
+    // The nodes are revealed once measured.
+    await expect.poll(() => getComputedStyle(nodes[1]).visibility).toBe('visible');
+    const rect = (fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement).getBoundingClientRect();
+    const mouse = (target: EventTarget, type: MouseType, x: number) =>
       dispatchMouse(target, type, { x: rect.left + x, y: rect.top + 150 });
     const positions: number[] = [];
     try {

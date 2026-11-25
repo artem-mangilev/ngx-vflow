@@ -28,7 +28,7 @@ import { Connection, Edge, EdgeChange, NodeChange, Vflow, createEdge, createEdge
         <dt class="text-vui-muted font-mono text-xs/5">(nodesChanges)</dt>
         <dd class="m-0 min-w-0 truncate">{{ nodeChanges() }}</dd>
         <dt class="text-vui-muted font-mono text-xs/5">(edgesChanges)</dt>
-        <dd class="m-0 min-w-0 truncate">{{ edgeChanges() }}</dd>
+        <dd class="m-0 min-w-0 truncate" data-testid="edge-changes">{{ edgeChanges() }}</dd>
       </dl>
     </div>
   </docs-demo>`,

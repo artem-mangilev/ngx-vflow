@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Provider, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Provider } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Vflow } from '../../vflow';
@@ -6,8 +6,7 @@ import { VflowComponent } from './vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 import { Curve, createEdges } from '../../interfaces/edge.interface';
 import { CurveFactory } from '../../interfaces/curve-factory.interface';
-import { CurveKey } from '../../interfaces/curves.interface';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { BuiltInCurve, CurveKey } from '../../interfaces/curves.interface';
 import { provideVflow } from '../../features/feature';
 import { withCurves } from '../../features/with-curves';
 
@@ -37,7 +36,6 @@ class HostComponent {
     { id: 'a', point: { x: 0, y: 0 } },
     { id: 'b', point: { x: 200, y: 100 } },
   ]);
-  readonly curve = signal<Curve>('custom');
   readonly edges = createEdges([{ id: 'ab', source: 'a', target: 'b', curve: 'custom' }]);
 }
 
@@ -49,33 +47,51 @@ describe('curves of vflow through withCurves', () => {
     TestBed.overrideComponent(HostComponent, { set: { providers: hostProviders } });
     fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+    const flow = fixture.debugElement.query(By.directive(VflowComponent)).componentInstance as VflowComponent;
+    await new Promise<void>((resolve) => flow.initialized.subscribe(() => resolve()));
+    fixture.detectChanges();
     await fixture.whenStable();
+  }
+
+  function setCurve(curve: Curve) {
+    fixture.componentInstance.edges[0].curve.set(curve);
     fixture.detectChanges();
   }
 
-  const edgeModel = () =>
-    fixture.debugElement.query(By.directive(VflowComponent)).injector.get(FlowEntitiesService).edges()[0];
-  const path = () => edgeModel().path().path;
+  /** The rendered path of the edge, which its interaction stroke follows. */
+  const path = () =>
+    (fixture.nativeElement as HTMLElement).querySelector('svg[edge] path[data-v-interactive-edge]')!.getAttribute('d');
 
   afterEach(() => fixture?.destroy());
 
-  it('lays out an edge with the factory registered under its key and follows a change of the key', async () => {
+  it('lays out an edge with the factory registered under its key', async () => {
     await render(provideVflow(withCurves({ custom: horizontal, other: diagonal })));
-    expect(path()).toMatch(/^M .* H .* V .*$/);
 
-    fixture.componentInstance.edges[0].curve.set('other');
-    expect(path()).toMatch(/^M .* L .*$/);
-    fixture.componentInstance.edges[0].curve.set('bezier');
-    expect(path()).toMatch(/C/);
-    fixture.componentInstance.edges[0].curve.set('custom');
     expect(path()).toMatch(/^M .* H .* V .*$/);
+  });
+
+  it('follows a change of the key to another registered one', async () => {
+    await render(provideVflow(withCurves({ custom: horizontal, other: diagonal })));
+
+    setCurve('other');
+
+    expect(path()).toMatch(/^M .* L .*$/);
+  });
+
+  it('follows a change of the key to a built-in name', async () => {
+    await render(provideVflow(withCurves({ custom: horizontal, other: diagonal })));
+
+    setCurve('bezier');
+
+    expect(path()).toMatch(/C/);
   });
 
   it('adds the keys of a host-level registration to those of the root', async () => {
     await render(provideVflow(withCurves({ other: diagonal })), provideVflow(withCurves({ custom: horizontal })));
-
     expect(path()).toMatch(/^M .* H .* V .*$/);
-    fixture.componentInstance.edges[0].curve.set('other');
+
+    setCurve('other');
+
     expect(path()).toMatch(/^M .* L .*$/);
   });
 
@@ -94,10 +110,9 @@ describe('curves of vflow through withCurves', () => {
     );
   });
 
-  it('types a key as any string until the registry interface is augmented, with the built-in names kept', () => {
-    const key: CurveKey = 'anything';
-    const curves: Curve[] = [key, 'bezier', 'smooth-step', diagonal];
-
-    expect(curves.length).toBe(4);
+  it('checks types: a key is any string until the registry interface is augmented, the built-in names stay', () => {
+    expectTypeOf<CurveKey>().toEqualTypeOf<string & {}>();
+    expectTypeOf<BuiltInCurve>().toExtend<Curve>();
+    expectTypeOf<'anything'>().toExtend<Curve>();
   });
 });

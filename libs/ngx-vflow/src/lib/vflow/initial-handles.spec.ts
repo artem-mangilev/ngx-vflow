@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
-import { createNode } from './interfaces/node.interface';
+import { Node, createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
-import { DraggableService } from './services/draggable.service';
-import { FlowEntitiesService } from './services/flow-entities.service';
-import { AfterRenderBatchService } from './services/after-render-batch.service';
 import { VflowHandleDirective } from './public-directives/handle.directive';
 import { VflowEdgeLabelTemplateDirective } from './public-directives/template.directive';
+import { dispatchMouse } from './gestures/pointer-events.testing';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */
 @Component({
@@ -45,222 +43,237 @@ class GrowingNodeComponent {
   readonly extra = extraHandle;
 }
 
-describe('Initial handle placement', () => {
-  it('keeps a shown node visible when a handle is added, and shows the new handle only once placed', async () => {
-    extraHandle.set(false);
-    const fixture = TestBed.createComponent(VflowComponent);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', component: GrowingNodeComponent, point: { x: 0, y: 0 } }),
-    ]);
-    fixture.detectChanges();
-    const node = () => fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
-    for (let i = 0; i < 8 && getComputedStyle(node()).visibility !== 'visible'; i++) {
-      await new Promise(requestAnimationFrame);
-    }
-    expect(getComputedStyle(node()).visibility).toBe('visible');
+/** The vertical center of the 48px tall nodes, where a handle on the right side is placed. */
+const CENTER = '24px';
 
-    extraHandle.set(true);
-    fixture.detectChanges();
-    const frames: { node: string; handle: string; top: string }[] = [];
-    for (let i = 0; i < 6; i++) {
-      const handle = node().querySelector('[data-v-handle][data-v-handle-position="right"]') as HTMLElement | null;
-      frames.push({
-        node: getComputedStyle(node()).visibility,
-        handle: handle ? getComputedStyle(handle).visibility : 'absent',
-        top: handle?.style.top ?? '',
+const frame = () => new Promise(requestAnimationFrame);
+
+/** Records one sample per animation frame: what the browser paints in each of them. */
+async function sampleFrames<T>(count: number, sample: () => T): Promise<T[]> {
+  const samples: T[] = [];
+  for (let i = 0; i < count; i++) {
+    samples.push(sample());
+    await frame();
+  }
+  return samples;
+}
+
+function createFlow(nodes: Node[]): ComponentFixture<VflowComponent> {
+  const fixture = TestBed.createComponent(VflowComponent);
+  Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
+  fixture.componentRef.setInput('nodes', nodes);
+  return fixture;
+}
+
+async function initialized(fixture: ComponentFixture<VflowComponent>) {
+  const done = new Promise<void>((resolve) => fixture.componentInstance.initialized.subscribe(() => resolve()));
+  fixture.detectChanges();
+  await done;
+  await fixture.whenStable();
+}
+
+const rightHandle = (node: Element) =>
+  node.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]');
+
+describe('Initial handle placement', () => {
+  beforeEach(() => extraHandle.set(false));
+
+  describe('a handle added to a shown node', () => {
+    async function addHandle() {
+      const fixture = createFlow([createNode({ id: 'a', component: GrowingNodeComponent, point: { x: 0, y: 0 } })]);
+      await initialized(fixture);
+      const node = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
+
+      extraHandle.set(true);
+      fixture.detectChanges();
+
+      return sampleFrames(6, () => {
+        const handle = rightHandle(node);
+        return {
+          node: getComputedStyle(node).visibility,
+          handle: handle ? getComputedStyle(handle).visibility : 'absent',
+          top: handle?.style.top ?? '',
+        };
       });
-      await new Promise(requestAnimationFrame);
     }
-    expect(
-      frames.every((frame) => frame.node === 'visible'),
-      JSON.stringify(frames),
-    ).toBe(true);
-    expect(
-      frames.filter((frame) => frame.handle === 'visible' && frame.top !== '24px'),
-      JSON.stringify(frames),
-    ).toEqual([]);
-    expect(frames.at(-1)?.handle).toBe('visible');
+
+    it('keeps the node visible', async () => {
+      const frames = await addHandle();
+
+      expect(frames.map((frame) => frame.node)).toEqual(Array(6).fill('visible'));
+    });
+
+    it('shows the new handle only once it is placed', async () => {
+      const frames = await addHandle();
+
+      expect(frames.filter((frame) => frame.handle === 'visible' && frame.top !== CENTER)).toEqual([]);
+      expect(frames.at(-1)).toEqual({ node: 'visible', handle: 'visible', top: CENTER });
+    });
   });
 
   it('keeps an edge visible when another handle is added to one of its nodes', async () => {
-    extraHandle.set(false);
-    const fixture = TestBed.createComponent(VflowComponent);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('nodes', [
+    const fixture = createFlow([
       createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
       createNode({ id: 'b', component: GrowingNodeComponent, point: { x: 150, y: 0 } }),
     ]);
     fixture.componentRef.setInput('edges', [
       createEdge({ id: 'ab', source: 'a', target: 'b', component: LabelEdgeComponent }),
     ]);
-    fixture.detectChanges();
-    const edge = () => fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
-    for (let i = 0; i < 8 && getComputedStyle(edge()).visibility !== 'visible'; i++) {
-      await new Promise(requestAnimationFrame);
-    }
-    expect(getComputedStyle(edge()).visibility).toBe('visible');
+    await initialized(fixture);
+    const edge = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
 
     extraHandle.set(true);
     fixture.detectChanges();
-    const frames: string[] = [];
-    for (let i = 0; i < 6; i++) {
-      frames.push(getComputedStyle(edge()).visibility);
-      await new Promise(requestAnimationFrame);
-    }
-    expect(frames, JSON.stringify(frames)).toEqual(Array(6).fill('visible'));
+    const frames = await sampleFrames(6, () => getComputedStyle(edge).visibility);
+
+    expect(frames).toEqual(Array(6).fill('visible'));
   });
 
-  for (const count of [1, 1024]) {
-    it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
-      const fixture = TestBed.createComponent(VflowComponent);
-      Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-      fixture.componentRef.setInput(
-        'nodes',
-        Array.from({ length: count }, (_, i) =>
-          createNode({
-            id: String(i),
-            component: SmallCustomNodeComponent,
-            point: { x: (i % 32) * 150, y: Math.floor(i / 32) * 100 },
-          }),
-        ),
-      );
-      fixture.detectChanges();
-      const capture = async (phase: string) => {
-        const frames: { visibility: string; top: string }[] = [];
-        for (let i = 0; i < 8; i++) {
-          await new Promise(requestAnimationFrame);
-          const node = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
-          const handle = node?.querySelector('[data-v-handle][data-v-handle-position="right"]') as HTMLElement | null;
-          if (handle) frames.push({ visibility: getComputedStyle(node).visibility, top: handle.style.top });
-        }
-        const visible = frames.filter((frame) => frame.visibility === 'visible');
-        expect(visible.length).toBeGreaterThan(0);
-        expect(
-          visible.filter((frame) => frame.top !== '24px'),
-          phase + ': ' + JSON.stringify(frames),
-        ).toEqual([]);
-      };
-      await capture('initial mount');
-      fixture.componentRef.setInput('virtualization', true);
-      fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 10000, y: 10000 });
-      fixture.detectChanges();
-      await fixture.whenStable();
-      expect(fixture.nativeElement.querySelectorAll('[data-v-node]').length).toBe(count);
-      expect(
-        [...fixture.nativeElement.querySelectorAll('[data-v-node]')].every(
-          (node) => getComputedStyle(node).display === 'none',
-        ),
-      ).toBe(true);
-      fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
-      await capture('CSS restore');
-    }, 10000);
+  function grid(count: number) {
+    return createFlow(
+      Array.from({ length: count }, (_, i) =>
+        createNode({
+          id: String(i),
+          component: SmallCustomNodeComponent,
+          point: { x: (i % 32) * 150, y: Math.floor(i / 32) * 100 },
+        }),
+      ),
+    );
   }
 
-  it('does not show an edge before its custom endpoints are measured', async () => {
-    const fixture = TestBed.createComponent(VflowComponent);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput(
-      'nodes',
+  /** The frames in which the first node is visible, with the place of its right handle. */
+  async function visibleFrames(fixture: ComponentFixture<VflowComponent>) {
+    const frames = await sampleFrames(8, () => {
+      const node = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
+      return { visibility: getComputedStyle(node).visibility, top: rightHandle(node)?.style.top ?? '' };
+    });
+    return frames.filter((frame) => frame.visibility === 'visible');
+  }
+
+  it.each([1, 1024])('never shows an unplaced custom handle on the first render of %i nodes', async (count) => {
+    const fixture = grid(count);
+    fixture.detectChanges();
+
+    const visible = await visibleFrames(fixture);
+
+    expect(visible.length).toBeGreaterThan(0);
+    expect(visible.filter((frame) => frame.top !== CENTER)).toEqual([]);
+  });
+
+  it.each([1, 1024])(
+    'never shows an unplaced custom handle when %i nodes come back from virtualization',
+    async (count) => {
+      const fixture = grid(count);
+      await initialized(fixture);
+      fixture.componentRef.setInput('virtualization', true);
+      fixture.componentInstance.setViewport({ x: 10000, y: 10000, zoom: 1 });
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const hosts = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[data-v-node]'));
+      expect(hosts.map((host) => getComputedStyle(host).display)).toEqual(Array(count).fill('none'));
+
+      fixture.componentInstance.setViewport({ x: 0, y: 0, zoom: 1 });
+      const visible = await visibleFrames(fixture);
+
+      expect(visible.length).toBeGreaterThan(0);
+      expect(visible.filter((frame) => frame.top !== CENTER)).toEqual([]);
+    },
+  );
+
+  function connectedPair() {
+    const fixture = createFlow(
       ['a', 'b'].map((id, i) => createNode({ id, component: SmallCustomNodeComponent, point: { x: i * 150, y: 0 } })),
     );
     fixture.componentRef.setInput('edges', [
-      createEdge({
-        id: 'ab',
-        source: 'a',
-        target: 'b',
-        component: LabelEdgeComponent,
-      }),
+      createEdge({ id: 'ab', source: 'a', target: 'b', component: LabelEdgeComponent }),
     ]);
+    return fixture;
+  }
+
+  it('does not show an edge or its label before its custom endpoints are measured', async () => {
+    const fixture = connectedPair();
     fixture.detectChanges();
-    const sample = () => {
-      const nodes = Array.from(fixture.nativeElement.querySelectorAll('[data-v-node]')) as HTMLElement[];
-      const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge], [edgeLabelHost]')) as Element[];
-      if (nodes.some((node) => getComputedStyle(node).visibility === 'hidden')) {
-        expect(
-          paths.filter((path) => getComputedStyle(path).visibility === 'visible'),
-          'visible edge while an endpoint is hidden',
-        ).toEqual([]);
-      }
-    };
-    sample();
-    for (let i = 0; i < 8; i++) {
-      await new Promise(requestAnimationFrame);
-      sample();
-    }
-    expect(fixture.debugElement.injector.get(FlowEntitiesService).edges()[0].path().path).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('[edgeLabelHost]')?.textContent).toContain('Connection');
-    // An offscreen endpoint retains measured geometry for an edge crossing the viewport.
+    const root = fixture.nativeElement as HTMLElement;
+
+    const frames = await sampleFrames(8, () => ({
+      endpointHidden: Array.from(root.querySelectorAll('[data-v-node]')).some(
+        (node) => getComputedStyle(node).visibility === 'hidden',
+      ),
+      edgeShown: Array.from(root.querySelectorAll('svg[edge], [edgeLabelHost]')).some(
+        (edge) => getComputedStyle(edge).visibility === 'visible',
+      ),
+    }));
+
+    expect(frames.filter((frame) => frame.endpointHidden && frame.edgeShown)).toEqual([]);
+    expect(frames.at(-1)).toEqual({ endpointHidden: false, edgeShown: true });
+  });
+
+  it('draws the edge and its label once the endpoints are measured', async () => {
+    const fixture = connectedPair();
+    await initialized(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+
+    expect(root.querySelector('svg[edge] path[data-v-interactive-edge]')!.getAttribute('d')).toMatch(/^M/);
+    expect(root.querySelector('[edgeLabelHost]')?.textContent).toContain('Connection');
+  });
+
+  it('keeps an edge visible when virtualization hides one of its measured endpoints', async () => {
+    const fixture = connectedPair();
+    await initialized(fixture);
+
     fixture.componentRef.setInput('virtualization', true);
-    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -120, y: 0 });
+    fixture.componentInstance.setViewport({ x: -120, y: 0, zoom: 1 });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(fixture.nativeElement.querySelectorAll('[data-v-node]').length).toBe(2);
-    expect(getComputedStyle(fixture.nativeElement.querySelector('[data-v-node]')).display).toBe('none');
-    const edge = fixture.nativeElement.querySelector('svg[edge]');
-    expect(edge).not.toBeNull();
-    expect(getComputedStyle(edge).visibility).toBe('visible');
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(getComputedStyle(root.querySelector('[data-v-node]')!).display).toBe('none');
+    expect(getComputedStyle(root.querySelector('svg[edge]')!).visibility).toBe('visible');
   });
 
-  it('keeps custom handles centered when zoom changes before a queued measurement', async () => {
-    const fixture = TestBed.createComponent(VflowComponent);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
-    ]);
-    fixture.detectChanges();
-    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-    const batching = fixture.debugElement.injector.get(AfterRenderBatchService);
-    const read = batching.read.bind(batching);
-    let zoomed = false;
-    vi.spyOn(batching, 'read').mockImplementation((callback) =>
-      read(() => {
-        if (!zoomed) {
-          zoomed = true;
-          fixture.nativeElement.querySelector('.v-pane').dispatchEvent(
-            new WheelEvent('wheel', {
-              deltaY: -200,
-              clientX: 100,
-              clientY: 100,
-              bubbles: true,
-              cancelable: true,
-            }),
-          );
-        }
-        callback();
-      }),
-    );
-    const anchor = fixture.nativeElement.querySelector('[data-v-handle]').parentElement as HTMLElement;
-    anchor.style.height = '96px';
-    for (let i = 0; i < 8; i++) await new Promise(requestAnimationFrame);
-    expect(zoomed).toBe(true);
-    const handle = fixture.nativeElement.querySelector(
-      '[data-v-handle][data-v-handle-position="right"]',
-    ) as HTMLElement;
-    expect(parseFloat(handle.style.top)).toBeCloseTo(48, 1);
+  it('keeps a custom handle centered when the zoom changes while its new place is being measured', async () => {
+    const fixture = createFlow([createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } })]);
+    await initialized(fixture);
+    const handle = rightHandle(fixture.nativeElement)!;
+
+    handle.parentElement!.style.height = '96px';
+    // The wheel zoom is eased over the next frames, the same frames that measure the taller node.
+    fixture.nativeElement
+      .querySelector('.v-pane')
+      .dispatchEvent(
+        new WheelEvent('wheel', { deltaY: -200, clientX: 100, clientY: 100, bubbles: true, cancelable: true }),
+      );
+
+    await expect.poll(() => fixture.componentInstance.viewport().zoom).toBeGreaterThan(1);
+    await expect.poll(() => parseFloat(handle.style.top)).toBeCloseTo(48, 1);
   });
 
-  it('does not rewrite unchanged custom handle accessibility during node movement', async () => {
-    const fixture = TestBed.createComponent(VflowComponent);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
-    ]);
+  it('does not rewrite the attributes of a custom handle while its node is dragged', async () => {
+    const fixture = createFlow([createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } })]);
+    fixture.componentRef.setInput('nodeDragThreshold', 0);
+    fixture.componentRef.setInput('autoPan', false);
+    await initialized(fixture);
+    const node = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
+    const handle = rightHandle(node)!;
+    const writes: MutationRecord[] = [];
+    const observer = new MutationObserver((records) => writes.push(...records));
+    observer.observe(handle, { attributes: true });
+    const card = handle.parentElement!;
+    const { left, top } = card.getBoundingClientRect();
+
+    dispatchMouse(card, 'mousedown', { x: left + 20, y: top + 20 });
+    for (const dx of [10, 20, 30]) {
+      dispatchMouse(window, 'mousemove', { x: left + 20 + dx, y: top + 20 });
+      fixture.detectChanges();
+      await frame();
+    }
+    dispatchMouse(window, 'mouseup', { x: left + 50, y: top + 20 });
     fixture.detectChanges();
     await fixture.whenStable();
-    await new Promise((resolve) => setTimeout(resolve, 40));
-    const handle = fixture.nativeElement.querySelector(
-      '[data-v-handle][data-v-handle-position="right"]',
-    ) as HTMLElement;
-    const attributes = vi.spyOn(handle, 'setAttribute');
-    const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
-    const draggable = fixture.debugElement.injector.get(DraggableService);
-    const event = new PointerEvent('pointermove');
-    draggable.dragging.set(true);
-    draggable.events$.next({ type: 'start', node: model, nodes: [model], event });
-    fixture.detectChanges();
-    draggable.events$.next({ type: 'move', node: model, nodes: [model], event });
-    fixture.detectChanges();
-    expect(attributes.mock.calls.filter(([name]) => name === 'aria-label')).toEqual([]);
+    writes.push(...observer.takeRecords());
+    observer.disconnect();
+
+    expect(fixture.componentInstance.nodes()[0].point()).not.toEqual({ x: 0, y: 0 });
+    expect(writes.map((record) => record.attributeName)).toEqual([]);
   });
 });

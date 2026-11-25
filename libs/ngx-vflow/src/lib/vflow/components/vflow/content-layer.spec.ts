@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, viewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
 import { createNodes } from '../../interfaces/node.interface';
 import { VflowComponent } from './vflow.component';
@@ -30,33 +30,54 @@ class HostComponent {
 }
 
 describe('content of the flow', () => {
-  it('renders an element of the content above the pane, positioned against the flow, with the flow injected', async () => {
-    const fixture = TestBed.createComponent(HostComponent);
+  let fixture: ComponentFixture<HostComponent>;
+  let root: HTMLElement;
+  let element: HTMLElement;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(HostComponent);
     document.body.append(fixture.nativeElement);
     fixture.detectChanges();
-    await fixture.whenStable();
-    const host = fixture.componentInstance;
-    const root = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('[data-v-root]')!;
-    const element = root.querySelector<HTMLElement>('app-zoom-button')!;
+    await new Promise<void>((resolve) => fixture.componentInstance.flow().initialized.subscribe(() => resolve()));
+    root = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('[data-v-root]')!;
+    element = root.querySelector<HTMLElement>('app-zoom-button')!;
+  });
 
-    expect(host.button().flow).toBe(host.flow());
-    expect(element).not.toBeNull();
-
-    const flowRect = root.getBoundingClientRect();
-    const rect = element.getBoundingClientRect();
-    expect(rect.left - flowRect.left).toBeCloseTo(10, 0);
-    expect(flowRect.bottom - rect.bottom).toBeCloseTo(10, 0);
-
-    // The button takes the pointer; elsewhere the pointer reaches the pane.
-    const button = element.querySelector('button')!;
-    expect(document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)).toBe(button);
-    expect(document.elementFromPoint(flowRect.right - 20, flowRect.top + 20)?.closest('.v-pane')).not.toBeNull();
-
-    button.click();
-    fixture.detectChanges();
-    expect(host.flow().viewport().zoom).toBeGreaterThan(1);
-
+  afterEach(() => {
     fixture.destroy();
     fixture.nativeElement.remove();
+  });
+
+  it('gives an element of the content the flow it is placed in', () => {
+    expect(fixture.componentInstance.button().flow).toBe(fixture.componentInstance.flow());
+  });
+
+  it('positions an element of the content against the flow', () => {
+    const flowRect = root.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
+
+    expect(rect.left - flowRect.left).toBeCloseTo(10, 0);
+    expect(flowRect.bottom - rect.bottom).toBeCloseTo(10, 0);
+  });
+
+  it('renders an element of the content above the pane, where it takes the pointer', () => {
+    const rect = element.getBoundingClientRect();
+
+    expect(document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)).toBe(
+      element.querySelector('button'),
+    );
+  });
+
+  it('leaves the pointer to the pane outside the elements of the content', () => {
+    const flowRect = root.getBoundingClientRect();
+
+    expect(document.elementFromPoint(flowRect.right - 20, flowRect.top + 20)?.closest('.v-pane')).not.toBeNull();
+  });
+
+  it('lets an element of the content drive the flow', () => {
+    element.querySelector('button')!.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.flow().viewport().zoom).toBeGreaterThan(1);
   });
 });

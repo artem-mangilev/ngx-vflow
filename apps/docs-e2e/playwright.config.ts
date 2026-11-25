@@ -11,6 +11,10 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+// `E2E_TARGET=preview` tests the prerendered production build served as GitHub Pages serves it, on a port of its own.
+const preview = process.env['E2E_TARGET'] === 'preview';
+const baseURL = process.env['E2E_BASE_URL'] ?? (preview ? 'http://localhost:4310' : 'http://localhost:4200');
+
 export default defineConfig({
   testDir: '.',
   /* Run tests in files in parallel */
@@ -27,7 +31,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env['E2E_BASE_URL'] ?? 'http://localhost:4200',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -73,16 +77,24 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: [
-    {
-      // `nx serve docs`: builds the libraries the docs depend on and serves the docs on top of them.
-      command: `pnpm start --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
-      cwd: '../..',
-      timeout: 300_000,
-      url: `${process.env['E2E_BASE_URL'] ?? 'http://localhost:4200'}/`,
-      reuseExistingServer: !process.env['CI'],
-      // Nx stops the tasks it started, the library watcher among them, when it is asked to stop: a kill of the
-      // process group, the default, leaves the watcher running.
-      gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
-    },
+    preview
+      ? {
+          command: 'node apps/docs/scripts/preview.mjs',
+          cwd: '../..',
+          env: { PORT: new URL(baseURL).port },
+          url: `${baseURL}/`,
+          reuseExistingServer: !process.env['CI'],
+        }
+      : {
+          // `nx serve docs`: builds the libraries the docs depend on and serves the docs on top of them.
+          command: `pnpm start --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
+          cwd: '../..',
+          timeout: 300_000,
+          url: `${baseURL}/`,
+          reuseExistingServer: !process.env['CI'],
+          // Nx stops the tasks it started, the library watcher among them, when it is asked to stop: a kill of the
+          // process group, the default, leaves the watcher running.
+          gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
+        },
   ],
 });

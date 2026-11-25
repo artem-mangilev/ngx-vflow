@@ -8,6 +8,7 @@ import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { provideVflow } from '../../features/feature';
 import { withShortcuts } from '../../features/with-shortcuts';
 import { ZOOM_STEP } from '../../services/viewport.service';
+import { WHEEL_IDLE_MS } from '../../gestures/wheel';
 
 /** Flow-space bounds of the nodes of the host below: nested group bounds, not child-local coordinates. */
 const NODES = { x: 10000, y: -5000, width: 800, height: 400 };
@@ -72,13 +73,12 @@ describe('minimap navigation through the public viewport API', () => {
     await settle();
     flow = host.flow();
     find();
-    // Synthetic pointer events cannot acquire native capture; real capture is covered by Playwright.
-    vi.spyOn(minimap, 'setPointerCapture').mockImplementation(() => {});
-    vi.spyOn(minimap, 'hasPointerCapture').mockReturnValue(true);
-    vi.spyOn(minimap, 'releasePointerCapture').mockImplementation(() => {});
   });
 
-  afterEach(() => window.dispatchEvent(new Event('blur')));
+  afterEach(() => {
+    vi.useRealTimers();
+    window.dispatchEvent(new Event('blur'));
+  });
 
   function find() {
     minimap = fixture.nativeElement.querySelector('v-minimap');
@@ -182,51 +182,58 @@ describe('minimap navigation through the public viewport API', () => {
     expect(getComputedStyle(minimap).borderTopWidth).toBe('0px');
   });
 
-  it('retains the read-only default and lets the pointer through to the pane', async () => {
+  it('lets the pointer through to the pane while read-only', async () => {
     expect(getComputedStyle(svg).pointerEvents).toBe('none');
     expect(getComputedStyle(minimap).pointerEvents).toBe('none');
+
     await click();
+
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+  });
+
+  it('centers the viewport on the clicked point when pannable', async () => {
     host.pannable.set(true);
     await settle();
     expect(getComputedStyle(svg).pointerEvents).toBe('auto');
     const expected = centeredOn(40, 30);
+
     await click();
+
     expectViewport(expected);
+  });
+
+  it('keeps the selection of the graph on a click', async () => {
+    host.pannable.set(true);
+    await settle();
+
+    await click();
+
     expect(host.nodes[0].selected()).toBe(true);
   });
 
-  it('keeps the viewport inside the minimap wherever the camera is', async () => {
-    const [width, height] = [120, 90];
-    for (const viewport of [
-      { x: 0, y: 0, zoom: 1 },
-      // Far from the nodes on every side, zoomed in and out.
-      { x: 60000, y: -40000, zoom: 2 },
-      { x: -90000, y: 70000, zoom: 0.5 },
-      // On the nodes at the largest zoom: the viewport is a small part of the graph.
-      { x: -10300 * 2 + 200, y: 4800 * 2 + 150, zoom: 2 },
-    ]) {
-      flow.setViewport(viewport);
-      await settle();
-      const map = transform();
-      const visible = view();
-      const marked = hole();
+  it.each([
+    { camera: 'at the origin', viewport: { x: 0, y: 0, zoom: 1 } },
+    { camera: 'far from the nodes, zoomed in', viewport: { x: 60000, y: -40000, zoom: 2 } },
+    { camera: 'far from the nodes, zoomed out', viewport: { x: -90000, y: 70000, zoom: 0.5 } },
+    // The viewport is a small part of the graph.
+    { camera: 'on the nodes at the largest zoom', viewport: { x: -10300 * 2 + 200, y: 4800 * 2 + 150, zoom: 2 } },
+  ])('marks the viewport inside the minimap with the camera $camera', async ({ viewport }) => {
+    flow.setViewport(viewport);
+    await settle();
+    const map = transform();
+    const visible = view();
+    const marked = hole();
+    const center = viewportOnCanvas();
 
-      expect(marked.x).toBeGreaterThanOrEqual(0);
-      expect(marked.y).toBeGreaterThanOrEqual(0);
-      expect(marked.x + marked.width).toBeLessThanOrEqual(width);
-      expect(marked.y + marked.height).toBeLessThanOrEqual(height);
-      // The mask is cut on device pixels, so the edges are within a pixel of the exact rectangle.
-      const expected = {
-        width: Math.max(8, visible.width * map.zoom),
-        height: Math.max(8, visible.height * map.zoom),
-      };
-      const center = viewportOnCanvas();
-      expect(Math.abs(marked.x + marked.width / 2 - center[0])).toBeLessThan(1);
-      expect(Math.abs(marked.y + marked.height / 2 - center[1])).toBeLessThan(1);
-      expect(Math.abs(marked.width - expected.width)).toBeLessThan(2);
-      expect(Math.abs(marked.height - expected.height)).toBeLessThan(2);
-    }
+    expect(marked.x).toBeGreaterThanOrEqual(0);
+    expect(marked.y).toBeGreaterThanOrEqual(0);
+    expect(marked.x + marked.width).toBeLessThanOrEqual(120);
+    expect(marked.y + marked.height).toBeLessThanOrEqual(90);
+    // The mask is cut on device pixels, so the edges are within a pixel of the exact rectangle.
+    expect(Math.abs(marked.x + marked.width / 2 - center[0])).toBeLessThan(1);
+    expect(Math.abs(marked.y + marked.height / 2 - center[1])).toBeLessThan(1);
+    expect(Math.abs(marked.width - Math.max(8, visible.width * map.zoom))).toBeLessThan(2);
+    expect(Math.abs(marked.height - Math.max(8, visible.height * map.zoom))).toBeLessThan(2);
   });
 
   it('marks a viewport that is tiny against the graph with a rectangle large enough to find', async () => {
@@ -243,187 +250,347 @@ describe('minimap navigation through the public viewport API', () => {
     expect(Math.abs(marked.y + marked.height / 2 - center[1])).toBeLessThan(1);
   });
 
-  it('centers clicks at non-unit zoom and after resizing without building the node paths again on navigation', async () => {
+  const paths = () => Array.from(svg.querySelectorAll('path'), (path) => path.getAttribute('d'));
+
+  it('centers the viewport on a click at non-unit zoom', async () => {
     host.pannable.set(true);
     flow.setViewport({ x: 0, y: 0, zoom: 1.5 });
     await settle();
-    const paths = () => Array.from(svg.querySelectorAll('path'), (path) => path.getAttribute('d'));
-    const built = paths();
-    let expected = centeredOn(60, 40);
+    const expected = centeredOn(60, 40);
+
     await click(60, 40);
+
     expectViewport(expected);
-    for (let i = 0; i < 5; i++) {
-      flow.setViewport({ ...flow.viewport(), x: flow.viewport().x - 400 });
+  });
+
+  it('keeps the node paths while the camera moves', async () => {
+    const built = paths();
+
+    for (let i = 1; i <= 5; i++) {
+      flow.setViewport({ x: -400 * i, y: 0, zoom: 1.5 });
       await settle();
     }
+
     // The paths are in flow space: the camera changes how they are painted, not what they are.
     expect(paths()).toEqual(built);
+  });
+
+  it('keeps the node paths when the flow resizes', async () => {
+    const built = paths();
 
     host.size.set([800, 600]);
     await settle();
+
     expect(svg.getBoundingClientRect().width).toBe(160);
     expect(paths()).toEqual(built);
-    expected = centeredOn(80, 60);
+  });
+
+  it('centers the viewport on a click after the flow resizes', async () => {
+    host.pannable.set(true);
+    host.size.set([800, 600]);
+    await settle();
+    const expected = centeredOn(80, 60);
+
     await click(80, 60);
+
     expectViewport(expected);
   });
 
-  it('drags the viewport by the pointer movement, captures drags outside the minimap and cancels without a click', async () => {
-    host.pannable.set(true);
-    await settle();
-    await click(100, 20);
-    const start = flow.viewport();
-    const zoom = transform().zoom;
-    const [x, y] = viewportOnCanvas();
-    pointer('pointerdown', x, y);
-    await settle();
-    expectViewport(start);
-    // Within the click distance of the flow nothing moves.
-    pointer('pointermove', x + 3, y);
-    await settle();
-    expectViewport(start);
-    // Beyond it the viewport follows the whole movement since the press, also outside the minimap.
-    pointer('pointermove', x - 30, y - 100);
-    await settle();
-    expectViewport({ x: start.x + 30 / zoom, y: start.y + 100 / zoom, zoom: 1 });
-    expect(minimap.setPointerCapture).toHaveBeenCalledWith(1);
-    const dragged = flow.viewport();
-    pointer('pointercancel', x - 30, y - 100);
-    pointer('pointerup', x, y);
-    await settle();
-    expect(flow.viewport()).toEqual(dragged);
-    expect(minimap.releasePointerCapture).toHaveBeenCalledWith(1);
-    pointer('pointerdown', 40, 30);
-    host.pannable.set(false);
-    await settle();
-    const before = flow.viewport();
-    pointer('pointermove', 80, 30);
-    await settle();
-    expect(flow.viewport()).toEqual(before);
-  });
-
-  it('reports the end of a viewport change once per drag and once per series of wheel events', async () => {
-    host.pannable.set(true);
-    host.zoomable.set(true);
-    await settle();
-    const ends: unknown[] = [];
-    const subscription = flow.viewportChangeEnd.subscribe((end) => ends.push(end));
-
-    const [x, y] = viewportOnCanvas();
-    pointer('pointerdown', x, y);
-    for (let step = 1; step <= 5; step++) {
-      pointer('pointermove', x - step * 10, y);
+  describe('a drag', () => {
+    beforeEach(async () => {
+      host.pannable.set(true);
       await settle();
-    }
-    expect(ends).toEqual([]);
-    pointer('pointerup', x - 50, y);
-    await settle();
-    expect(ends).toEqual([flow.viewport()]);
+      // The viewport away from the edge of the minimap, so a drag of it has room.
+      await click(100, 20);
+    });
 
-    for (let i = 0; i < 3; i++) await wheel();
-    expect(ends.length).toBe(1);
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    expect(ends).toEqual([ends[0], flow.viewport()]);
-    subscription.unsubscribe();
+    it('leaves the viewport in place within the click distance of the flow', async () => {
+      const start = flow.viewport();
+      const [x, y] = viewportOnCanvas();
+
+      pointer('pointerdown', x, y);
+      pointer('pointermove', x + 3, y);
+      await settle();
+
+      expectViewport(start);
+    });
+
+    it('moves the viewport by the whole pointer movement since the press, also outside the minimap', async () => {
+      const start = flow.viewport();
+      const zoom = transform().zoom;
+      const [x, y] = viewportOnCanvas();
+
+      pointer('pointerdown', x, y);
+      pointer('pointermove', x + 3, y);
+      pointer('pointermove', x - 30, y - 100);
+      await settle();
+
+      expectViewport({ x: start.x + 30 / zoom, y: start.y + 100 / zoom, zoom: 1 });
+    });
+
+    it('captures the pointer and releases it at the end', async () => {
+      // Synthetic pointers cannot acquire native capture, so the boundary is stubbed.
+      const capture = vi.spyOn(minimap, 'setPointerCapture').mockImplementation(() => {});
+      vi.spyOn(minimap, 'hasPointerCapture').mockReturnValue(true);
+      const release = vi.spyOn(minimap, 'releasePointerCapture').mockImplementation(() => {});
+      const [x, y] = viewportOnCanvas();
+
+      pointer('pointerdown', x, y);
+      pointer('pointermove', x - 30, y);
+      expect(capture).toHaveBeenCalledWith(1);
+      pointer('pointerup', x - 30, y);
+
+      expect(release).toHaveBeenCalledWith(1);
+    });
+
+    it('ends on pointercancel without moving on the release that follows', async () => {
+      const [x, y] = viewportOnCanvas();
+      pointer('pointerdown', x, y);
+      pointer('pointermove', x - 30, y - 100);
+      await settle();
+      const dragged = flow.viewport();
+
+      pointer('pointercancel', x - 30, y - 100);
+      pointer('pointerup', x, y);
+      await settle();
+
+      expect(flow.viewport()).toEqual(dragged);
+    });
+
+    it('stops moving the viewport once pannable turns off', async () => {
+      pointer('pointerdown', 40, 30);
+      host.pannable.set(false);
+      await settle();
+      const before = flow.viewport();
+
+      pointer('pointermove', 80, 30);
+      await settle();
+
+      expect(flow.viewport()).toEqual(before);
+    });
+
+    it('drags the viewport with a single touch', async () => {
+      const start = flow.viewport();
+      const zoom = transform().zoom;
+      const [x, y] = viewportOnCanvas();
+
+      pointer('pointerdown', x, y, { pointerType: 'touch' });
+      pointer('pointermove', x + 20, y, { pointerType: 'touch' });
+      pointer('pointerup', x + 20, y, { pointerType: 'touch' });
+      await settle();
+
+      expectViewport({ x: start.x - 20 / zoom, y: start.y, zoom: 1 });
+    });
   });
 
-  it('gates pan by buttons, selection and activation keys, and supports single-pointer touch', async () => {
-    host.pannable.set(true);
-    host.panOnDrag.set([1]);
-    host.keyboardShortcuts.set({ modifiers: { panActivation: ['Space'] } });
-    await settle();
-    await click(100, 20);
-    expect(flow.viewport().x).toBe(0);
-    let expected = centeredOn(100, 20);
-    await click(100, 20, { button: 1 });
-    expectViewport(expected);
-    host.panOnDrag.set(false);
-    fixture.detectChanges();
-    const gated = flow.viewport();
-    await click(60, 30, { pointerType: 'touch' });
-    expect(flow.viewport()).toEqual(gated);
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
-    expected = centeredOn(60, 30);
-    await click(60, 30, { pointerType: 'touch' });
-    expectViewport(expected);
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', code: 'ShiftLeft' }));
-    const selecting = flow.viewport();
-    await click(100, 20);
-    expect(flow.viewport()).toEqual(selecting);
-    document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', code: 'ShiftLeft' }));
-    // A touch that presses the viewport and moves drags it.
-    const zoom = transform().zoom;
-    const [x, y] = viewportOnCanvas();
-    pointer('pointerdown', x, y, { pointerType: 'touch' });
-    pointer('pointermove', x + 20, y, { pointerType: 'touch' });
-    pointer('pointerup', x + 20, y, { pointerType: 'touch' });
-    await settle();
-    expectViewport({ x: selecting.x - 20 / zoom, y: selecting.y, zoom: 1 });
+  describe('the end of a viewport change', () => {
+    let ends: unknown[];
+
+    beforeEach(async () => {
+      host.pannable.set(true);
+      host.zoomable.set(true);
+      await settle();
+      ends = [];
+      flow.viewportChangeEnd.subscribe((end) => ends.push(end));
+    });
+
+    it('is reported once per drag, at the release', async () => {
+      const [x, y] = viewportOnCanvas();
+      pointer('pointerdown', x, y);
+      for (let step = 1; step <= 5; step++) {
+        pointer('pointermove', x - step * 10, y);
+        await settle();
+      }
+      expect(ends).toEqual([]);
+
+      pointer('pointerup', x - 50, y);
+      await settle();
+
+      expect(ends).toEqual([flow.viewport()]);
+    });
+
+    it('is reported once per series of wheel events, once they stop', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      for (let i = 0; i < 3; i++) await wheel();
+      vi.advanceTimersByTime(WHEEL_IDLE_MS - 1);
+      expect(ends).toEqual([]);
+
+      vi.advanceTimersByTime(1);
+
+      expect(ends).toEqual([flow.viewport()]);
+    });
   });
 
-  it('zooms around the main center by half a key step, clamps to limits and respects wheel/pinch policy', async () => {
+  describe('gestures the flow settings gate', () => {
+    beforeEach(async () => {
+      host.pannable.set(true);
+      host.keyboardShortcuts.set({ modifiers: { panActivation: ['Space'] } });
+      await settle();
+    });
+
+    it('pans only with a button that panOnDrag lists', async () => {
+      host.panOnDrag.set([1]);
+      await settle();
+      await click(100, 20);
+      expect(flow.viewport().x).toBe(0);
+      const expected = centeredOn(100, 20);
+
+      await click(100, 20, { button: 1 });
+
+      expectViewport(expected);
+    });
+
+    it('does not pan with a finger while panOnDrag is false', async () => {
+      host.panOnDrag.set(false);
+      await settle();
+
+      await click(60, 30, { pointerType: 'touch' });
+
+      expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+    });
+
+    it('pans with a finger while panOnDrag is false and the pan activation key is held', async () => {
+      host.panOnDrag.set(false);
+      await settle();
+      document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
+      const expected = centeredOn(60, 30);
+
+      await click(60, 30, { pointerType: 'touch' });
+
+      expectViewport(expected);
+    });
+
+    it('does not pan while the selection modifier is held', async () => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', code: 'ShiftLeft' }));
+
+      await click(100, 20);
+
+      expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+    });
+  });
+
+  describe('wheel zoom', () => {
     const step = Math.sqrt(ZOOM_STEP);
-    host.zoomable.set(true);
-    flow.setViewport({ x: -10200, y: 4950, zoom: 1 });
-    await settle();
-    expect((await wheel()).defaultPrevented).toBe(true);
-    expect(flow.viewport().zoom).toBeCloseTo(step);
-    for (let i = 0; i < 10; i++) await wheel();
-    expect(flow.viewport().zoom).toBe(2);
-    expect(flow.viewport().x).toBeCloseTo(-20600);
-    expect(flow.viewport().y).toBeCloseTo(9750);
-    for (let i = 0; i < 20; i++) await wheel(10);
-    expect(flow.viewport().zoom).toBe(0.5);
-    host.zoomOnScroll.set(false);
-    fixture.detectChanges();
-    await wheel();
-    expect(flow.viewport().zoom).toBe(0.5);
-    await wheel(-10, { ctrlKey: true });
-    expect(flow.viewport().zoom).toBeCloseTo(0.5 * step);
-    host.zoomOnPinch.set(false);
-    fixture.detectChanges();
-    await wheel(-10, { ctrlKey: true });
-    expect(flow.viewport().zoom).toBeCloseTo(0.5 * step);
+
+    beforeEach(async () => {
+      host.zoomable.set(true);
+      flow.setViewport({ x: -10200, y: 4950, zoom: 1 });
+      await settle();
+    });
+
+    it('zooms by half a key step around the middle of the pane and keeps the page from scrolling', async () => {
+      // The flow point in the middle of the 400×300 pane.
+      const middle = { x: 200 + 10200, y: 150 - 4950 };
+
+      expect((await wheel()).defaultPrevented).toBe(true);
+
+      expectViewport({ x: 200 - middle.x * step, y: 150 - middle.y * step, zoom: step });
+    });
+
+    it('stops at maxZoom', async () => {
+      for (let i = 0; i < 10; i++) await wheel();
+
+      expect(flow.viewport().zoom).toBe(2);
+    });
+
+    it('stops at minZoom', async () => {
+      for (let i = 0; i < 10; i++) await wheel(10);
+
+      expect(flow.viewport().zoom).toBe(0.5);
+    });
+
+    it('ignores the wheel while zoomOnScroll is off', async () => {
+      host.zoomOnScroll.set(false);
+      await settle();
+
+      await wheel();
+
+      expect(flow.viewport().zoom).toBe(1);
+    });
+
+    it('zooms on a pinch while zoomOnScroll is off', async () => {
+      host.zoomOnScroll.set(false);
+      await settle();
+
+      await wheel(-10, { ctrlKey: true });
+
+      expect(flow.viewport().zoom).toBeCloseTo(step);
+    });
+
+    it('ignores a pinch while zoomOnPinch is off', async () => {
+      host.zoomOnPinch.set(false);
+      await settle();
+
+      await wheel(-10, { ctrlKey: true });
+
+      expect(flow.viewport().zoom).toBe(1);
+    });
   });
 
-  it('gives scroll pan priority and allows zoom activation without bypassing the minimap switches', async () => {
-    host.pannable.set(true);
-    host.zoomable.set(true);
-    host.panOnScroll.set(true);
-    host.keyboardShortcuts.set({ modifiers: { zoomActivation: ['KeyZ'] } });
-    await settle();
-    const zoom = transform().zoom;
-    await wheel(10, { deltaX: 5 });
-    expectViewport({ x: -5 / zoom, y: -10 / zoom, zoom: 1 });
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ' }));
-    await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
-    host.zoomable.set(false);
-    await settle();
-    await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
+  describe('with panOnScroll', () => {
+    beforeEach(async () => {
+      host.pannable.set(true);
+      host.zoomable.set(true);
+      host.panOnScroll.set(true);
+      host.keyboardShortcuts.set({ modifiers: { zoomActivation: ['KeyZ'] } });
+      await settle();
+    });
+
+    it('pans by the wheel', async () => {
+      const zoom = transform().zoom;
+
+      await wheel(10, { deltaX: 5 });
+
+      expectViewport({ x: -5 / zoom, y: -10 / zoom, zoom: 1 });
+    });
+
+    it('zooms while the zoom activation key is held', async () => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ' }));
+
+      await wheel();
+
+      expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
+    });
+
+    it('does not zoom with the zoom activation key when not zoomable', async () => {
+      host.zoomable.set(false);
+      await settle();
+      document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ' }));
+
+      await wheel();
+
+      expect(flow.viewport().zoom).toBe(1);
+    });
   });
 
-  it('leaves the flow with its host and navigates again when shown back', async () => {
-    host.pannable.set(true);
-    host.zoomable.set(true);
-    await settle();
-    expect(fixture.nativeElement.querySelector('.v-minimap svg')).toBe(svg);
-    host.show.set(false);
-    await settle();
-    expect(fixture.nativeElement.querySelector('.v-minimap')).toBeNull();
-    // The detached minimap no longer owns wheel input.
-    expect((await wheel()).defaultPrevented).toBe(false);
-    expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
-    host.show.set(true);
-    await settle();
-    find();
-    expect(svg).not.toBeNull();
-    const expected = centeredOn(100, 20);
-    await click(100, 20);
-    expectViewport(expected);
-    await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
+  describe('removed with its condition', () => {
+    beforeEach(async () => {
+      host.pannable.set(true);
+      host.zoomable.set(true);
+      await settle();
+      host.show.set(false);
+      await settle();
+    });
+
+    it('leaves the flow and its wheel input', async () => {
+      expect(fixture.nativeElement.querySelector('.v-minimap')).toBeNull();
+      // The detached minimap no longer owns wheel input.
+      expect((await wheel()).defaultPrevented).toBe(false);
+      expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+    });
+
+    it('navigates again when shown back', async () => {
+      host.show.set(true);
+      await settle();
+      find();
+      const expected = centeredOn(100, 20);
+
+      await click(100, 20);
+      expectViewport(expected);
+      await wheel();
+
+      expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP) * expected.zoom);
+    });
   });
 });
 

@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from './fixtures';
 
 /** Samples of the path in client space. */
-async function samples(path: import('@playwright/test').Locator, count: number) {
+async function samples(path: Locator, count: number) {
   return path.evaluate((element: SVGPathElement, count: number) => {
     const matrix = element.getScreenCTM()!;
     const length = element.getTotalLength();
@@ -16,15 +16,13 @@ test('an edge routes around the nodes between its ends and keeps clear of them w
   page,
 }) => {
   await page.goto('/packages/routing');
-
-  const flow = page.locator('vflow').first();
-  await expect(flow.locator('[data-v-node]')).toHaveCount(7);
-  const path = flow.locator('svg[edge]').first().locator('path').first();
-  // The first edge runs from Source to Publish, around Clean and Enrich between them.
+  const flow = page.locator('vflow').filter({ has: page.locator('[data-v-edge="source-publish"]') });
+  // The edge runs from Source to Publish, around Clean and Enrich between them.
+  const path = flow.locator('[data-v-edge="source-publish"] [data-v-interactive-edge]');
   const clean = flow.locator('[data-v-node="clean"]');
   const enrich = flow.locator('[data-v-node="enrich"]');
 
-  const clearOf = async (node: import('@playwright/test').Locator) => {
+  const clearOf = async (node: Locator) => {
     const box = (await node.boundingBox())!;
     const points = await samples(path, 200);
     return points.every(

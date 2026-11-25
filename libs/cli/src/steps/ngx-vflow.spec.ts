@@ -18,7 +18,10 @@ describe('ngx-vflow step', () => {
     expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBe(`^${version}`);
   });
 
-  it.each(['dependencies', 'devDependencies'])('keeps ngx-vflow already in %s', (field) => {
+  it.each([
+    ['dependencies', 'devDependencies'],
+    ['devDependencies', 'dependencies'],
+  ])('keeps ngx-vflow already in %s and does not add it to %s', (field, other) => {
     const range = `~${major}.0.0`;
     updateJson(tree, 'package.json', (json) => ({ ...json, [field]: { ...json[field], 'ngx-vflow': range } }));
 
@@ -26,17 +29,19 @@ describe('ngx-vflow step', () => {
 
     const json = readJson(tree, 'package.json');
     expect(json[field]['ngx-vflow']).toBe(range);
-    expect(field === 'dependencies' ? json.devDependencies['ngx-vflow'] : json.dependencies['ngx-vflow']).toBe(
-      undefined,
-    );
+    expect(json[other]['ngx-vflow']).toBeUndefined();
   });
 
-  it('refuses ngx-vflow of an older major and keeps one without a version number', () => {
+  it('refuses ngx-vflow of an older major', () => {
     updateJson(tree, 'package.json', (json) => ({ ...json, dependencies: { 'ngx-vflow': `^${major - 1}.4.0` } }));
-    expect(() => ensureNgxVflow(tree)).toThrow(`need ngx-vflow ${major}`);
 
+    expect(() => ensureNgxVflow(tree)).toThrow(`need ngx-vflow ${major}`);
+  });
+
+  it('keeps ngx-vflow whose range has no version number', () => {
     updateJson(tree, 'package.json', (json) => ({ ...json, dependencies: { 'ngx-vflow': 'latest' } }));
-    ensureNgxVflow(tree);
+
+    expect(ensureNgxVflow(tree)).toBeUndefined();
     expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBe('latest');
   });
 });

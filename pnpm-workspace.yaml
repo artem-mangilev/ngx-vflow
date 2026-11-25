@@ -20,6 +20,8 @@ catalogs:
     '@angular/platform-server': 20.3.30
     '@schematics/angular': ^20.3.0
     '@vitest/browser': ~3.2.4
+    # Its peers are the exact versions of vitest and @vitest/browser in the lockfile.
+    '@vitest/coverage-v8': 3.2.7
     'happy-dom': ^20.14.5
     'jsdom': ^29.1.1
     'ng-packagr': ^20.3.0

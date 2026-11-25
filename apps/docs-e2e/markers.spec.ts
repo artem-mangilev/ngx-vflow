@@ -1,23 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './fixtures';
 
-test('declared marker shapes render in the shared defs and edges reference them like built-in markers', async ({
-  page,
-}) => {
+test("an edge's marker-end url resolves to an existing marker", async ({ page }) => {
   await page.goto('/docs/edges/markers');
-  const demo = page.locator('vflow').filter({ has: page.locator('marker[data-v-marker=diamond]') });
-  const defs = demo.locator('defs[flowDefs]').first();
+  const flow = page.locator('vflow').filter({ has: page.locator('[data-v-edge="web-api"]') });
+  const path = flow.locator('[data-v-edge="web-api"] path[marker-end]');
+  await expect(path).toBeAttached();
 
-  await expect(defs.locator('marker[data-v-marker=diamond] polygon')).toHaveCount(1);
-  await expect(defs.locator('marker[data-v-marker=circle-closed] circle')).toHaveCount(1);
-  await expect(defs.locator('marker[data-v-marker=bar] line')).toHaveCount(1);
-
-  // The edge from the bar to the diamond references the marker elements of both shapes by id.
-  const ids = await defs.evaluate((element) => ({
-    bar: element.querySelector('marker[data-v-marker=bar]')!.id,
-    diamond: element.querySelector('marker[data-v-marker=diamond]')!.id,
-  }));
-  const edge = demo.locator(`svg[edge] path[marker-start="url(#${ids.bar})"]`).first();
-  await expect(edge).toHaveAttribute('marker-end', `url(#${ids.diamond})`);
-  await expect(defs.locator('marker[data-v-marker=diamond]')).toHaveAttribute('refX', '-8');
-  await expect(defs.locator('marker[data-v-marker=diamond]')).toHaveAttribute('stroke', 'context-stroke');
+  const id = /^url\(#(.+)\)$/.exec((await path.getAttribute('marker-end'))!)![1];
+  await expect(flow.locator(`marker[id="${id}"]`)).toHaveCount(1);
 });

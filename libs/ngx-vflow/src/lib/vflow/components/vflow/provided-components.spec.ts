@@ -9,7 +9,7 @@ import { injectNode } from '../../utils/inject-node';
 import { injectEdge } from '../../utils/inject-edge';
 import { provideVflow } from '../../features/feature';
 import { withEdgeComponents, withNodeComponents } from '../../features/with-entity-components';
-import { NodeComponentKey } from '../../interfaces/entity-components.interface';
+import { EdgeComponentKey, NodeComponentKey } from '../../interfaces/entity-components.interface';
 
 @Component({
   selector: 'task-node',
@@ -115,8 +115,8 @@ describe('component registries of vflow', () => {
     task.done.emit('reviewed');
 
     const [event] = fixture.componentInstance.events;
-    expect(event.component).toBe(TaskNode);
-    expect(isComponentNodeEvent(event, TaskNode) && event.eventName === 'done' && event.eventPayload).toBe('reviewed');
+    expect(isComponentNodeEvent(event, TaskNode)).toBe(true);
+    expect(event).toEqual({ nodeId: 'a', component: TaskNode, eventName: 'done', eventPayload: 'reviewed' });
   });
 
   it('adds the keys of a host-level registration to those of the root', async () => {
@@ -145,10 +145,9 @@ describe('component registries of vflow', () => {
     );
   });
 
-  it('types a key as any string until the registry interface is augmented', () => {
-    const key: NodeComponentKey = 'anything';
-    const node: Node = { id: 'a', point: null as never, component: key };
-
-    expect(node.component).toBe('anything');
+  it('checks types: a key is any string until the registry interface is augmented', () => {
+    expectTypeOf<NodeComponentKey>().toEqualTypeOf<string>();
+    expectTypeOf<EdgeComponentKey>().toEqualTypeOf<string>();
+    expectTypeOf<'anything'>().toExtend<NonNullable<Node['component']>>();
   });
 });

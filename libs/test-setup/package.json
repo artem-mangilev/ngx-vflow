@@ -12,6 +12,7 @@
     "@angular/core": "catalog:libs",
     "@angular/platform-browser": "catalog:libs",
     "@vitest/browser": "catalog:libs",
+    "@vitest/coverage-v8": "catalog:libs",
     "playwright": "catalog:libs",
     "rxjs": "catalog:libs",
     "tslib": "^2.3.0",

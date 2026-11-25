@@ -33,6 +33,7 @@
     "@angular/core": "catalog:libs",
     "@angular/platform-browser": "catalog:libs",
     "@vitest/browser": "catalog:libs",
+    "@vitest/coverage-v8": "catalog:libs",
     "ng-packagr": "catalog:libs",
     "ngx-vflow": "workspace:*",
     "playwright": "catalog:libs",

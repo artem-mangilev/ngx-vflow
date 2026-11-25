@@ -20,8 +20,13 @@ import { FILTERS, Picture } from './image-lab';
       @case ('blend') {
         <!-- Isolated, so blending stays inside the stack instead of mixing with the node behind it. -->
         <div class="relative isolate size-full" data-testid="blend">
-          <app-picture [picture]="p.a" [width]="width()" />
-          <app-picture class="absolute inset-0" [picture]="p.b" [width]="width()" [style.mix-blend-mode]="p.mode" />
+          <app-picture data-testid="blend-a" [picture]="p.a" [width]="width()" />
+          <app-picture
+            data-testid="blend-b"
+            class="absolute inset-0"
+            [picture]="p.b"
+            [width]="width()"
+            [style.mix-blend-mode]="p.mode" />
         </div>
       }
     }

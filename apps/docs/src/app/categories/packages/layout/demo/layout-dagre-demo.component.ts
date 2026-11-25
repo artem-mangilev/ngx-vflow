@@ -8,7 +8,7 @@ import { pipelineEdges, pipelineNodes } from './graph';
 type RankDirection = 'LR' | 'TB' | 'RL' | 'BT';
 
 @Component({
-  template: `<docs-demo>
+  template: `<docs-demo data-testid="dagre-demo">
     <div docsDemoBar>
       <p>Direction</p>
       <div role="group" aria-label="Direction" class="inline-flex gap-1">

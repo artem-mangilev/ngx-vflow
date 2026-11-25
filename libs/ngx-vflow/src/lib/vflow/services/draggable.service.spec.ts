@@ -11,45 +11,55 @@ import { NodeModel } from '../models/node.model';
 import { createNode } from '../interfaces/node.interface';
 import { KeyboardService } from './keyboard.service';
 import { ResizeObserverService } from './resize-observer.service';
-import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
+import { PointerInit, dispatchPointer } from '../gestures/pointer-events.testing';
 import { AlignmentService } from './alignment.service';
 import { FlowRenderingService } from './flow-rendering.service';
+
+type PaneBox = { left: number; top: number; width: number; height: number };
 
 describe('DraggableService', () => {
   let service: DraggableService;
   let entitiesService: FlowEntitiesService;
   let viewportService: ViewportService;
-  let observedPane: Element | null;
-  let paneResizeCallback: ((entry: ResizeObserverEntry) => void) | null;
-  let dragPanes: HTMLElement[];
-  let panePositionCallback: IntersectionObserverCallback | null;
-  let intersectionObserverMock: {
-    observe: Mock;
-    disconnect: Mock;
-  };
+  let resizeCallback: ResizeObserverCallback;
+  let resizeObserver: { observe: Mock; unobserve: Mock; disconnect: Mock };
+  let positionCallback: IntersectionObserverCallback | null;
+  let positionObserver: { observe: Mock; disconnect: Mock };
+  let originalResizeObserver: typeof ResizeObserver;
   let originalIntersectionObserver: typeof IntersectionObserver;
-  const resizeObserverMock = {
-    addObserver(element: Element, callback: (entry: ResizeObserverEntry) => void) {
-      observedPane = element;
-      paneResizeCallback = callback;
-    },
-    removeObserver(element: Element, callback: (entry: ResizeObserverEntry) => void) {
-      if (observedPane === element && paneResizeCallback === callback) {
-        observedPane = null;
-        paneResizeCallback = null;
-      }
-    },
-  };
-  const keyboardServiceMock = {
-    selectionActive: false,
-    bypassActive: false,
-    isActiveModifier(action: 'selection' | 'multiSelection' | 'alignmentBypass') {
-      if (action === 'alignmentBypass') return this.bypassActive;
-      return action === 'selection' ? this.selectionActive : false;
-    },
-  };
+  let panes: HTMLElement[];
 
   beforeEach(() => {
+    // A drag swallows the click that follows it until a timer of zero runs.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+
+    // The browser observers are the boundary: the specs report resizes and position changes themselves.
+    originalResizeObserver = window.ResizeObserver;
+    resizeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
+    window.ResizeObserver = class {
+      constructor(callback: ResizeObserverCallback) {
+        resizeCallback = callback;
+      }
+      observe = resizeObserver.observe;
+      unobserve = resizeObserver.unobserve;
+      disconnect = resizeObserver.disconnect;
+    } as unknown as typeof ResizeObserver;
+
+    originalIntersectionObserver = window.IntersectionObserver;
+    positionCallback = null;
+    positionObserver = { observe: vi.fn(), disconnect: vi.fn() };
+    window.IntersectionObserver = class {
+      constructor(callback: IntersectionObserverCallback) {
+        positionCallback = callback;
+      }
+      observe = positionObserver.observe;
+      disconnect = positionObserver.disconnect;
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+    } as unknown as typeof IntersectionObserver;
+
     TestBed.configureTestingModule({
       providers: [
         DraggableService,
@@ -58,66 +68,26 @@ describe('DraggableService', () => {
         ViewportService,
         NodeRenderingService,
         AlignmentService,
-        { provide: FlowRenderingService, useValue: { pane: signal<HTMLElement | null>(null) } },
-        { provide: ResizeObserverService, useValue: resizeObserverMock },
-        {
-          provide: KeyboardService,
-          useValue: keyboardServiceMock,
-        },
+        FlowRenderingService,
+        ResizeObserverService,
+        KeyboardService,
       ],
     });
 
     service = TestBed.inject(DraggableService);
     entitiesService = TestBed.inject(FlowEntitiesService);
     viewportService = TestBed.inject(ViewportService);
-    keyboardServiceMock.selectionActive = false;
-    keyboardServiceMock.bypassActive = false;
-    observedPane = null;
-    paneResizeCallback = null;
-    dragPanes = [];
-    panePositionCallback = null;
-    intersectionObserverMock = {
-      observe: vi.fn(),
-      disconnect: vi.fn(),
-    };
-    originalIntersectionObserver = window.IntersectionObserver;
-    class IntersectionObserverMock {
-      public readonly root = null;
-      public readonly rootMargin = '';
-      public readonly thresholds = [1];
-
-      constructor(callback: IntersectionObserverCallback) {
-        panePositionCallback = callback;
-      }
-
-      public observe(target: Element) {
-        intersectionObserverMock.observe(target);
-      }
-
-      public disconnect() {
-        intersectionObserverMock.disconnect();
-      }
-
-      public unobserve() {}
-
-      public takeRecords() {
-        return [];
-      }
-    }
-    Object.defineProperty(window, 'IntersectionObserver', {
-      configurable: true,
-      value: IntersectionObserverMock,
-    });
+    panes = [];
   });
 
-  afterEach(async () => {
-    // A drag swallows the next click until the following macrotask; let it expire before the next test.
-    await new Promise((resolve) => setTimeout(resolve));
-    dragPanes.forEach((pane) => pane.remove());
-    Object.defineProperty(window, 'IntersectionObserver', {
-      configurable: true,
-      value: originalIntersectionObserver,
-    });
+  afterEach(() => {
+    // Releases held keys and any drag left in progress.
+    window.dispatchEvent(new Event('blur'));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+    panes.forEach((pane) => pane.remove());
+    window.ResizeObserver = originalResizeObserver;
+    window.IntersectionObserver = originalIntersectionObserver;
   });
 
   function createModel(params: {
@@ -127,55 +97,49 @@ describe('DraggableService', () => {
     parentId?: string;
     size?: [number, number];
   }) {
-    const nodeConfig: any = {
-      id: params.id,
-      point: { x: 0, y: 0 },
-      selected: params.selected ?? false,
-      draggable: params.draggable ?? true,
-      parentId: params.parentId,
-      width: params.size?.[0],
-      height: params.size?.[1],
-    };
-
-    const model = TestBed.runInInjectionContext(() => new NodeModel(createNode(nodeConfig)));
+    const model = TestBed.runInInjectionContext(
+      () =>
+        new NodeModel(
+          createNode({
+            id: params.id,
+            point: { x: 0, y: 0 },
+            selected: params.selected ?? false,
+            draggable: params.draggable ?? true,
+            parentId: params.parentId,
+            width: params.size?.[0],
+            height: params.size?.[1],
+          }),
+        ),
+    );
 
     entitiesService.nodes.update((nodes) => [...nodes, model]);
 
     return model;
   }
 
-  function createDragSurface(...paneRects: DOMRect[]) {
+  function placePane(pane: HTMLElement, { left, top, width, height }: PaneBox) {
+    Object.assign(pane.style, { left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
+  }
+
+  /** A pane the browser lays out at `box`, registered as the pane of the flow, with an element of a node inside. */
+  function createDragSurface(box: PaneBox = { left: 0, top: 0, width: 400, height: 300 }) {
     const pane = document.createElement('div');
-    // The flow registers its pane; a drag surface without one is the element itself.
+    pane.style.position = 'fixed';
+    placePane(pane, box);
     TestBed.inject(FlowRenderingService).pane.set(pane);
-    const nodesLayer = document.createElement('div');
     const element = document.createElement('div');
-    nodesLayer.append(element);
-    pane.append(nodesLayer);
+    pane.append(element);
     document.body.append(pane);
-    dragPanes.push(pane);
+    panes.push(pane);
 
-    const getPaneRect = vi.spyOn(pane, 'getBoundingClientRect');
-    paneRects.forEach((rect) => getPaneRect.mockReturnValueOnce(rect));
-
-    return { pane, element, getPaneRect };
+    return { pane, element };
   }
 
-  const pointerTypes = { mousedown: 'pointerdown', mousemove: 'pointermove', mouseup: 'pointerup' } as const;
+  /** The element a press lands on; moves and releases go to the window. */
+  let currentElement: HTMLElement;
 
-  function dispatchMouse(target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number, y: number) {
-    dispatchPointer(target, pointerTypes[type], { x, y });
-  }
-
-  function press(target: EventTarget | null, init: { button?: number; ctrlKey?: boolean } = {}) {
-    const event = pointerEvent('pointerdown', { x: 0, y: 0, ...init });
-    Object.defineProperty(event, 'target', { value: target });
-    return event;
-  }
-
-  function dragFilter(model: NodeModel): (event: PointerEvent) => boolean {
-    return (service as any).dragFilter(model);
-  }
+  const pointer = (type: string, x: number, y: number, init: Partial<PointerInit> = {}) =>
+    dispatchPointer(type === 'pointerdown' ? currentElement : window, type, { x, y, ...init });
 
   /** The types of the drag events reported from now on. */
   function dragEvents(): string[] {
@@ -184,15 +148,17 @@ describe('DraggableService', () => {
     return types;
   }
 
-  function startNodeDrag(...paneRects: DOMRect[]) {
+  /** Presses a node at (10, 20) at client (150, 100). */
+  function startNodeDrag(box?: PaneBox) {
     const model = createModel({ id: 'node' });
     model.setPoint({ x: 10, y: 20 });
-    const dragSurface = createDragSurface(...paneRects);
+    const surface = createDragSurface(box);
+    currentElement = surface.element;
 
-    service.enable(dragSurface.element, model);
-    dispatchMouse(dragSurface.element, 'mousedown', 150, 100);
+    service.enable(surface.element, model);
+    pointer('pointerdown', 150, 100);
 
-    return { model, ...dragSurface };
+    return { model, ...surface };
   }
 
   /** Makes a press start the drag, for the specs about what a drag in progress observes before its first move. */
@@ -200,71 +166,270 @@ describe('DraggableService', () => {
     TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(0) });
   }
 
-  function dispatchPanePosition(rect: DOMRectReadOnly, pane: Element) {
-    panePositionCallback?.(
-      [{ boundingClientRect: rect, target: pane } as IntersectionObserverEntry],
-      intersectionObserverMock as unknown as IntersectionObserver,
-    );
+  function holdKey(key: string, code: string) {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key, code }));
   }
 
-  it('delays node drag until the client-space threshold is crossed at non-unit zoom', () => {
-    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
-    viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
-    const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
-    const drags = dragEvents();
-    expect(drags).toEqual([]);
-    dispatchMouse(window, 'mousemove', 156, 100);
-    expect(model.point()).toEqual({ x: 10, y: 20 });
-    expect(drags).toEqual([]);
-    dispatchMouse(window, 'mousemove', 162, 100);
-    expect(model.point()).toEqual({ x: 16, y: 20 });
-    expect(drags).toEqual(['start']);
-    dispatchMouse(window, 'mouseup', 162, 100);
+  function releaseKey(key: string, code: string) {
+    document.dispatchEvent(new KeyboardEvent('keyup', { key, code }));
+  }
+
+  function clicksOn(element: HTMLElement) {
+    const clicks = { count: 0 };
+    element.addEventListener('click', () => clicks.count++);
+    return clicks;
+  }
+
+  describe('threshold', () => {
+    beforeEach(() => {
+      TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
+      viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
+    });
+
+    it('does not drag before the pointer crosses the threshold in client pixels at non-unit zoom', () => {
+      const drags = dragEvents();
+      const { model } = startNodeDrag();
+
+      pointer('pointermove', 156, 100);
+
+      expect(model.point()).toEqual({ x: 10, y: 20 });
+      expect(drags).toEqual([]);
+    });
+
+    it('starts the drag at the move that crosses the threshold, with the distance it took', () => {
+      const drags = dragEvents();
+      const { model } = startNodeDrag();
+
+      pointer('pointermove', 162, 100);
+
+      expect(model.point()).toEqual({ x: 16, y: 20 });
+      expect(drags).toEqual(['start']);
+    });
+
+    it('reports no drag end for a release below the threshold', () => {
+      const drags = dragEvents();
+      const { model } = startNodeDrag();
+
+      pointer('pointerup', 150, 100);
+
+      expect(model.point()).toEqual({ x: 10, y: 20 });
+      expect(drags).toEqual([]);
+    });
   });
 
-  it('keeps a press that moves within the default threshold a click: no drag, no move, no suppressed click', () => {
+  it('does not drag a press that moves within the default threshold', () => {
     const drags = dragEvents();
-    const { model, element } = startNodeDrag(new DOMRect(0, 0, 400, 300));
-    let clicks = 0;
-    element.addEventListener('click', () => clicks++);
-    dispatchMouse(window, 'mousemove', 152, 101);
-    dispatchMouse(window, 'mouseup', 152, 101);
+    const { model } = startNodeDrag();
+
+    pointer('pointermove', 152, 101);
+    pointer('pointerup', 152, 101);
+
+    expect(model.point()).toEqual({ x: 10, y: 20 });
+    expect(drags).toEqual([]);
+  });
+
+  it('keeps the click of a press that moves within the default threshold', () => {
+    const { element } = startNodeDrag();
+    const clicks = clicksOn(element);
+
+    pointer('pointermove', 152, 101);
+    pointer('pointerup', 152, 101);
     element.click();
-    expect(model.point()).toEqual({ x: 10, y: 20 });
-    expect(drags).toEqual([]);
-    expect(clicks).toBe(1);
+
+    expect(clicks.count).toBe(1);
   });
 
-  it('does not emit node drag end for a release below the threshold', () => {
-    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
+  it('suppresses the click that follows a drag', () => {
+    const { element } = startNodeDrag();
+    const clicks = clicksOn(element);
+
+    pointer('pointermove', 175, 100);
+    pointer('pointerup', 175, 100);
+    element.click();
+
+    expect(clicks.count).toBe(0);
+  });
+
+  it('lets clicks through again once the click that follows a drag has passed', () => {
+    const { element } = startNodeDrag();
+    const clicks = clicksOn(element);
+    pointer('pointermove', 175, 100);
+    pointer('pointerup', 175, 100);
+
+    vi.runAllTimers();
+    element.click();
+
+    expect(clicks.count).toBe(1);
+  });
+
+  it('ends the drag where the browser cancels the pointer', () => {
     const drags = dragEvents();
-    const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
-    dispatchMouse(window, 'mouseup', 150, 100);
-    expect(model.point()).toEqual({ x: 10, y: 20 });
-    expect(drags).toEqual([]);
+    const { model } = startNodeDrag();
+    pointer('pointermove', 160, 100);
+
+    dispatchPointer(window, 'pointercancel', { x: 160, y: 100 });
+
+    expect(drags.at(-1)).toBe('end');
+    expect(model.dragging()).toBe(false);
+    expect(model.point()).toEqual({ x: 20, y: 20 });
   });
 
-  it('moves a selected parent without its selected child, which follows in local coordinates', () => {
-    const parent = createModel({ id: 'parent', selected: true });
-    const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
+  it('ends the drag when the window loses focus and ignores later moves', () => {
+    const { model } = startNodeDrag();
+    pointer('pointermove', 170, 100);
 
-    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([parent]);
-    expect(parent.point()).toEqual({ x: 5, y: 0 });
-    expect(child.point()).toEqual({ x: 0, y: 0 });
+    window.dispatchEvent(new Event('blur'));
+    pointer('pointermove', 190, 100);
+
+    expect(model.dragging()).toBe(false);
+    expect(model.point()).toEqual({ x: 30, y: 20 });
   });
 
-  it('moves a selected child of an unselected parent on its own, within the parent', () => {
-    const parent = createModel({ id: 'parent', selected: false, size: [100, 50] });
-    const child = createModel({ id: 'child', selected: true, parentId: 'parent', size: [80, 30] });
+  it('ends a mouse drag whose release happened out of sight', () => {
+    const drags = dragEvents();
+    startNodeDrag();
+    pointer('pointermove', 160, 100);
 
-    expect(service.moveSelected(child, { x: 0, y: 1 }, false)).toEqual([child]);
-    expect(parent.point()).toEqual({ x: 0, y: 0 });
-    expect(child.point()).toEqual({ x: 0, y: 5 });
+    window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, pointerType: 'mouse', buttons: 0 }));
 
-    service.moveSelected(child, { x: 1, y: 1 }, true);
-    expect(child.point()).toEqual({ x: 20, y: 20 });
-    service.moveSelected(child, { x: -1, y: 0 }, true);
-    expect(child.point()).toEqual({ x: 0, y: 20 });
+    expect(drags.at(-1)).toBe('end');
+  });
+
+  describe('presses that do not drag', () => {
+    beforeEach(dragFromThePress);
+
+    it.each([
+      ['the middle button', { button: 1 }],
+      ['the secondary button', { button: 2 }],
+      ['ctrl held, the context menu on macOS', { ctrlKey: true }],
+    ])('ignores a press with %s', (_, init) => {
+      const drags = dragEvents();
+      const { model } = startNodeDrag();
+      pointer('pointerup', 150, 100);
+
+      pointer('pointerdown', 150, 100, init);
+      pointer('pointermove', 180, 100, init);
+
+      expect(drags).toEqual(['start', 'end']);
+      expect(model.dragging()).toBe(false);
+    });
+
+    it('ignores a press inside a no-drag element of the node', () => {
+      const drags = dragEvents();
+      const model = createModel({ id: 'node' });
+      const { element } = createDragSurface();
+      const control = document.createElement('div');
+      control.setAttribute('data-v-no-drag', '');
+      const target = document.createElement('span');
+      control.append(target);
+      element.append(control);
+      service.enable(element, model);
+
+      dispatchPointer(target, 'pointerdown', { x: 150, y: 100 });
+      pointer('pointermove', 180, 100);
+
+      expect(drags).toEqual([]);
+      expect(model.point()).toEqual({ x: 0, y: 0 });
+    });
+
+    it('does not drag a group while the selection modifier is held', () => {
+      const drags = dragEvents();
+      const group = createModel({ id: 'group' });
+      createModel({ id: 'member', parentId: 'group' });
+      const { element } = createDragSurface();
+      currentElement = element;
+      service.enable(element, group);
+      holdKey('Shift', 'ShiftLeft');
+
+      pointer('pointerdown', 150, 100);
+      pointer('pointermove', 180, 100);
+
+      expect(drags).toEqual([]);
+      expect(group.point()).toEqual({ x: 0, y: 0 });
+    });
+  });
+
+  it('drags a node that is not a group while the selection modifier is held', () => {
+    dragFromThePress();
+    holdKey('Shift', 'ShiftLeft');
+    const { model } = startNodeDrag();
+
+    pointer('pointermove', 180, 100);
+
+    expect(model.point()).toEqual({ x: 40, y: 20 });
+  });
+
+  describe('moveSelected', () => {
+    it('moves a selected parent without its selected child, which follows in local coordinates', () => {
+      const parent = createModel({ id: 'parent', selected: true });
+      const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
+
+      expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([parent]);
+      expect(parent.point()).toEqual({ x: 5, y: 0 });
+      expect(child.point()).toEqual({ x: 0, y: 0 });
+    });
+
+    it('moves a selected child of an unselected parent by itself', () => {
+      const parent = createModel({ id: 'parent', selected: false, size: [100, 50] });
+      const child = createModel({ id: 'child', selected: true, parentId: 'parent', size: [80, 30] });
+
+      expect(service.moveSelected(child, { x: 0, y: 1 }, false)).toEqual([child]);
+      expect(parent.point()).toEqual({ x: 0, y: 0 });
+      expect(child.point()).toEqual({ x: 0, y: 5 });
+    });
+
+    it('moves four times as far when accelerated', () => {
+      const node = createModel({ id: 'node', selected: true });
+
+      service.moveSelected(node, { x: 1, y: 0 }, true);
+
+      expect(node.point()).toEqual({ x: 20, y: 0 });
+    });
+
+    it.each([
+      [
+        { x: 1, y: 1 },
+        { x: 20, y: 20 },
+      ],
+      [
+        { x: -1, y: -1 },
+        { x: 0, y: 0 },
+      ],
+    ])('keeps a child moved by %o inside its parent', (direction, expected) => {
+      createModel({ id: 'parent', size: [100, 50] });
+      const child = createModel({ id: 'child', selected: true, parentId: 'parent', size: [80, 30] });
+
+      service.moveSelected(child, direction, true);
+
+      expect(child.point()).toEqual(expected);
+    });
+
+    it('moves a selected node by one cell of the grid', () => {
+      TestBed.inject(FlowSettingsService).bind({ snapGrid: signal([10, 10]) });
+      const node = createModel({ id: 'node', selected: true });
+
+      service.moveSelected(node, { x: 1, y: 0 }, false);
+
+      expect(node.point()).toEqual({ x: 10, y: 0 });
+    });
+
+    it('moves only the topmost selected ancestor of a hierarchy, together with unrelated selected nodes', () => {
+      const grandParent = createModel({ id: 'grand-parent', selected: true });
+      const parent = createModel({ id: 'parent', selected: true, parentId: 'grand-parent' });
+      const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
+      const standalone = createModel({ id: 'standalone', selected: true });
+
+      expect(service.moveSelected(child, { x: 1, y: 0 }, true)).toEqual([grandParent, standalone]);
+      expect([grandParent, parent, child, standalone].map((node) => node.point().x)).toEqual([20, 0, 0, 20]);
+    });
+
+    it('moves nothing from an unselected node', () => {
+      const selected = createModel({ id: 'selected', selected: true });
+      const unselected = createModel({ id: 'unselected' });
+
+      expect(service.moveSelected(unselected, { x: 1, y: 0 }, false)).toEqual([]);
+      expect(selected.point()).toEqual({ x: 0, y: 0 });
+    });
   });
 
   it('keeps the dragged node under the pointer while the origin of its parent moves', () => {
@@ -273,253 +438,173 @@ describe('DraggableService', () => {
     const child = createModel({ id: 'child', parentId: 'parent', size: [50, 50] });
     child.rawNode.extent!.set(null);
     child.setPoint({ x: 50, y: 50 });
-    const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+    const { element } = createDragSurface({ left: 0, top: 0, width: 800, height: 600 });
+    currentElement = element;
     service.enable(element, child);
 
-    dispatchMouse(element, 'mousedown', 150, 100);
-    dispatchMouse(window, 'mousemove', 160, 100);
+    pointer('pointerdown', 150, 100);
+    pointer('pointermove', 160, 100);
     expect(child.point()).toEqual({ x: 60, y: 50 });
 
     // The parent grows to the left by 20 and keeps the child in place, as a parent auto-size would.
     parent.setPoint({ x: 80, y: 100 });
     child.setPoint({ x: 80, y: 50 });
-    dispatchMouse(window, 'mousemove', 170, 100);
+    pointer('pointermove', 170, 100);
+
     expect(child.point()).toEqual({ x: 90, y: 50 });
     expect(child.globalPoint()).toEqual({ x: 170, y: 150 });
-    dispatchMouse(window, 'mouseup', 170, 100);
   });
 
-  it('snaps a nested node to the grid of the flow, not of its parent', () => {
+  it('snaps a dragged nested node to the grid of the flow, not of its parent', () => {
     TestBed.inject(FlowSettingsService).bind({ snapGrid: signal([10, 10]) });
     const parent = createModel({ id: 'parent', size: [300, 300] });
     parent.setPoint({ x: 5, y: 5 });
     const child = createModel({ id: 'child', parentId: 'parent', size: [50, 50] });
     child.setPoint({ x: 10, y: 10 });
-    const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+    const { element } = createDragSurface({ left: 0, top: 0, width: 800, height: 600 });
+    currentElement = element;
     service.enable(element, child);
 
-    dispatchMouse(element, 'mousedown', 150, 100);
-    dispatchMouse(window, 'mousemove', 153, 101);
+    pointer('pointerdown', 150, 100);
+    pointer('pointermove', 153, 101);
+
     expect(child.globalPoint()).toEqual({ x: 20, y: 20 });
     expect(child.point()).toEqual({ x: 15, y: 15 });
-    dispatchMouse(window, 'mouseup', 153, 101);
-
-    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([]);
-    child.rawNode.selected!.set(true);
-    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([child]);
-    expect(child.globalPoint()).toEqual({ x: 30, y: 20 });
   });
 
-  it('moves only the topmost selected ancestor of a hierarchy, together with unrelated selected nodes', () => {
-    const grandParent = createModel({ id: 'grand-parent', selected: true });
-    const parent = createModel({ id: 'parent', selected: true, parentId: 'grand-parent' });
-    const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
-    const standalone = createModel({ id: 'standalone', selected: true });
+  describe('pane geometry', () => {
+    const PANE = { left: 100, top: 50, width: 800, height: 600 };
 
-    expect(service.moveSelected(child, { x: 1, y: 0 }, true)).toEqual([grandParent, standalone]);
-    expect([grandParent, parent, child, standalone].map((node) => node.point().x)).toEqual([20, 0, 0, 20]);
-  });
+    function reportResize(pane: HTMLElement, width: number, height: number) {
+      resizeCallback(
+        [{ target: pane, contentRect: new DOMRect(0, 0, width, height) } as unknown as ResizeObserverEntry],
+        resizeObserver as unknown as ResizeObserver,
+      );
+    }
 
-  it('moves nothing from an unselected node', () => {
-    const selected = createModel({ id: 'selected', selected: true });
-    const unselected = createModel({ id: 'unselected' });
+    function reportPosition(pane: HTMLElement, box: PaneBox) {
+      positionCallback!(
+        [
+          {
+            boundingClientRect: new DOMRect(box.left, box.top, box.width, box.height),
+            target: pane,
+          } as unknown as IntersectionObserverEntry,
+        ],
+        positionObserver as unknown as IntersectionObserver,
+      );
+    }
 
-    expect(service.moveSelected(unselected, { x: 1, y: 0 }, false)).toEqual([]);
-    expect(selected.point()).toEqual({ x: 0, y: 0 });
-  });
+    it('reuses the pane position read at the start of the drag at non-unit zoom', () => {
+      viewportService.readableViewport.set({ x: 0, y: 0, zoom: 1.6245 });
+      const { model, pane } = startNodeDrag(PANE);
+      pointer('pointermove', 180, 120);
 
-  it('should block group drag when selection shortcut is active', () => {
-    const group = createModel({ id: 'group' });
-    createModel({ id: 'member', parentId: 'group' });
-    const filter = dragFilter(group);
-    const target = document.createElement('div');
+      // Moved without a resize, a scroll or a reported position: the drag must not read the pane again.
+      placePane(pane, { ...PANE, left: 0, top: 0 });
+      pointer('pointermove', 210, 140);
 
-    keyboardServiceMock.selectionActive = true;
+      expect(model.point().x).toBeCloseTo(46.93, 2);
+      expect(model.point().y).toBeCloseTo(44.62, 2);
+    });
 
-    expect(filter(press(target))).toBe(false);
-  });
+    it('reads the pane again after it is resized', () => {
+      dragFromThePress();
+      const { model, pane } = startNodeDrag(PANE);
 
-  it('should keep regular node drag available when selection shortcut is active', () => {
-    const node = createModel({ id: 'node' });
-    const filter = dragFilter(node);
-    const target = document.createElement('div');
+      placePane(pane, { left: 120, top: 50, width: 700, height: 600 });
+      reportResize(pane, 700, 600);
+      pointer('pointermove', 210, 140);
 
-    keyboardServiceMock.selectionActive = true;
+      expect(model.point()).toEqual({ x: 50, y: 60 });
+    });
 
-    expect(filter(press(target))).toBe(true);
-  });
+    it('keeps the pane position when a resize report does not change its size', () => {
+      dragFromThePress();
+      const { model, pane } = startNodeDrag(PANE);
 
-  it('should reject drag for non-primary mouse buttons (primary button only)', () => {
-    const filter = dragFilter(createModel({ id: 'node' }));
+      placePane(pane, { ...PANE, left: 120 });
+      reportResize(pane, 800, 600);
+      pointer('pointermove', 210, 140);
 
-    expect(filter(press(null, { button: 1 }))).toBe(false);
-    expect(filter(press(null, { button: 2 }))).toBe(false);
-  });
+      expect(model.point()).toEqual({ x: 70, y: 60 });
+    });
 
-  it('should reject drag when ctrlKey is set (context menu on macOS)', () => {
-    const filter = dragFilter(createModel({ id: 'node' }));
+    it('reads the pane again after the document scrolls', () => {
+      dragFromThePress();
+      const { model, pane } = startNodeDrag(PANE);
 
-    expect(filter(press(null, { ctrlKey: true }))).toBe(false);
-  });
+      placePane(pane, { ...PANE, left: 130, top: 60 });
+      document.dispatchEvent(new Event('scroll'));
+      pointer('pointermove', 220, 150);
 
-  it('should allow drag for primary mouse button with a null target', () => {
-    const filter = dragFilter(createModel({ id: 'node' }));
+      expect(model.point()).toEqual({ x: 50, y: 60 });
+    });
 
-    expect(filter(pointerEvent('pointerdown', { x: 0, y: 0 }))).toBe(true);
-  });
+    it('stops observing the size of the pane when the drag ends', () => {
+      dragFromThePress();
+      const { pane } = startNodeDrag(PANE);
 
-  it('suppresses the click after a drag past the threshold and keeps it below', async () => {
-    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
-    const { element } = startNodeDrag(new DOMRect(0, 0, 400, 300));
-    let clicks = 0;
-    element.addEventListener('click', () => clicks++);
-    dispatchMouse(window, 'mousemove', 155, 100);
-    dispatchMouse(window, 'mouseup', 155, 100);
-    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(clicks).toBe(1);
+      pointer('pointerup', 150, 100);
 
-    dispatchMouse(element, 'mousedown', 150, 100);
-    dispatchMouse(window, 'mousemove', 175, 100);
-    dispatchMouse(window, 'mouseup', 175, 100);
-    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(clicks).toBe(1);
-    await new Promise((resolve) => setTimeout(resolve));
-    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(clicks).toBe(2);
-  });
+      expect(resizeObserver.unobserve).toHaveBeenCalledWith(pane);
+    });
 
-  it('ends the drag when the browser cancels the pointer and when the window loses focus', () => {
-    const drags = dragEvents();
-    const { model, element } = startNodeDrag(new DOMRect(0, 0, 400, 300), new DOMRect(0, 0, 400, 300));
-    dispatchMouse(window, 'mousemove', 160, 100);
-    dispatchPointer(window, 'pointercancel', { x: 160, y: 100 });
-    expect(drags.at(-1)).toBe('end');
-    expect(model.dragging()).toBe(false);
-    expect(model.point()).toEqual({ x: 20, y: 20 });
+    it('takes a position-only change of the pane from the intersection observer', () => {
+      dragFromThePress();
+      const { model, pane } = startNodeDrag(PANE);
 
-    dispatchMouse(element, 'mousedown', 150, 100);
-    dispatchMouse(window, 'mousemove', 170, 100);
-    window.dispatchEvent(new Event('blur'));
-    expect(model.dragging()).toBe(false);
-    dispatchMouse(window, 'mousemove', 190, 100);
-    expect(model.point()).toEqual({ x: 40, y: 20 });
-  });
+      // The entry alone carries the new position: the pane itself stays where it was.
+      reportPosition(pane, { ...PANE, left: 120 });
+      pointer('pointermove', 210, 140);
 
-  it('ends a mouse drag whose release happened out of sight', () => {
-    const drags = dragEvents();
-    startNodeDrag(new DOMRect(0, 0, 400, 300));
-    dispatchMouse(window, 'mousemove', 160, 100);
-    window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, pointerType: 'mouse', buttons: 0 }));
-    expect(drags.at(-1)).toBe('end');
-  });
+      expect(model.point()).toEqual({ x: 50, y: 60 });
+    });
 
-  it('should reject drag from a descendant of a no-drag element', () => {
-    const node = createModel({ id: 'node' });
-    const filter = dragFilter(node);
-    const noDragElement = document.createElement('div');
-    const target = document.createElement('span');
-    noDragElement.setAttribute('data-v-no-drag', '');
-    noDragElement.append(target);
+    it('ignores a reported position that did not change', () => {
+      dragFromThePress();
+      const { model, pane } = startNodeDrag(PANE);
 
-    expect(filter(press(target))).toBe(false);
-  });
+      placePane(pane, { ...PANE, left: 0 });
+      reportPosition(pane, PANE);
+      pointer('pointermove', 210, 140);
 
-  it('should reuse pane geometry while dragging at non-unit zoom', () => {
-    viewportService.readableViewport.set({ x: 0, y: 0, zoom: 1.6245 });
-    const { model, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600));
-    expect(model.point()).toEqual({ x: 10, y: 20 });
-    dispatchMouse(window, 'mousemove', 180, 120);
-    dispatchMouse(window, 'mousemove', 210, 140);
-    dispatchMouse(window, 'mouseup', 210, 140);
+      expect(model.point()).toEqual({ x: 70, y: 60 });
+    });
 
-    expect(model.point().x).toBeCloseTo(46.93, 2);
-    expect(model.point().y).toBeCloseTo(44.62, 2);
-    expect(getPaneRect).toHaveBeenCalledTimes(1);
-  });
+    it('stops observing the position of the pane when the drag ends', () => {
+      dragFromThePress();
+      startNodeDrag(PANE);
 
-  it('should refresh pane geometry after root resize and document scroll', () => {
-    dragFromThePress();
-    const { model, pane, getPaneRect } = startNodeDrag(
-      new DOMRect(100, 50, 800, 600),
-      new DOMRect(120, 50, 700, 600),
-      new DOMRect(130, 60, 700, 600),
-    );
+      pointer('pointerup', 150, 100);
 
-    expect(observedPane).toBe(pane);
-    paneResizeCallback?.({
-      target: pane,
-      contentRect: new DOMRect(0, 0, 800, 600),
-    } as unknown as ResizeObserverEntry);
-    expect(getPaneRect).toHaveBeenCalledTimes(1);
+      expect(positionObserver.disconnect).toHaveBeenCalled();
+    });
 
-    paneResizeCallback?.({
-      target: pane,
-      contentRect: new DOMRect(0, 0, 700, 600),
-    } as unknown as ResizeObserverEntry);
-    dispatchMouse(window, 'mousemove', 210, 140);
-    expect(model.point()).toEqual({ x: 50, y: 60 });
+    it('keeps the node under the pointer while the viewport pans and zooms', () => {
+      dragFromThePress();
+      const { model } = startNodeDrag(PANE);
 
-    document.dispatchEvent(new Event('scroll'));
-    dispatchMouse(window, 'mousemove', 220, 150);
-    dispatchMouse(window, 'mouseup', 220, 150);
+      viewportService.readableViewport.set({ x: 20, y: 0, zoom: 1 });
+      TestBed.flushEffects();
+      pointer('pointermove', 210, 140);
+      expect(model.point()).toEqual({ x: 50, y: 60 });
 
-    expect(model.point()).toEqual({ x: 50, y: 60 });
-    expect(getPaneRect).toHaveBeenCalledTimes(3);
-    expect(observedPane).toBeNull();
-  });
+      viewportService.readableViewport.set({ x: 20, y: 0, zoom: 2 });
+      TestBed.flushEffects();
+      pointer('pointermove', 300, 210);
+      expect(model.point()).toEqual({ x: 50, y: 50 });
+    });
 
-  it('should refresh pane geometry after a position-only document layout change', () => {
-    dragFromThePress();
-    const { model, pane, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600), new DOMRect(120, 50, 800, 600));
+    it('keeps the node under a still pointer when the viewport zooms during the drag', () => {
+      dragFromThePress();
+      const { model } = startNodeDrag(PANE);
 
-    dispatchPanePosition(new DOMRect(120, 50, 800, 600), pane);
-    dispatchMouse(window, 'mousemove', 210, 140);
-    dispatchMouse(window, 'mouseup', 210, 140);
+      // The press is at flow (50, 50), 40 and 30 flow units from the node origin; at zoom 2 it is over flow (25, 25).
+      viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
+      TestBed.flushEffects();
 
-    expect(model.point()).toEqual({ x: 50, y: 60 });
-    expect(getPaneRect).toHaveBeenCalledTimes(1);
-    expect(intersectionObserverMock.disconnect).toHaveBeenCalled();
-  });
-
-  it('should ignore an unchanged pane position across multiple drag steps', () => {
-    const { model, pane, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600));
-
-    dispatchPanePosition(new DOMRect(100, 50, 800, 600), pane);
-    dispatchMouse(window, 'mousemove', 180, 120);
-    dispatchMouse(window, 'mousemove', 210, 140);
-    dispatchMouse(window, 'mouseup', 210, 140);
-
-    expect(model.point()).toEqual({ x: 70, y: 60 });
-    expect(getPaneRect).toHaveBeenCalledTimes(1);
-  });
-
-  it('should keep cached pane geometry while the viewport pans and zooms', () => {
-    dragFromThePress();
-    const { model, getPaneRect } = startNodeDrag(new DOMRect(100, 50, 800, 600));
-
-    viewportService.readableViewport.set({ x: 20, y: 0, zoom: 1 });
-    TestBed.flushEffects();
-    dispatchMouse(window, 'mousemove', 210, 140);
-    expect(model.point()).toEqual({ x: 50, y: 60 });
-
-    viewportService.readableViewport.set({ x: 20, y: 0, zoom: 2 });
-    TestBed.flushEffects();
-    dispatchMouse(window, 'mousemove', 300, 210);
-    dispatchMouse(window, 'mouseup', 300, 210);
-
-    expect(model.point()).toEqual({ x: 50, y: 50 });
-    expect(getPaneRect).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps the node under a still pointer when the viewport zooms during the drag', () => {
-    dragFromThePress();
-    const { model } = startNodeDrag(new DOMRect(100, 50, 800, 600));
-
-    // The press is at flow (50, 50), 40 and 30 flow units from the node origin; at zoom 2 it is over flow (25, 25).
-    viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
-    TestBed.flushEffects();
-    expect(model.point()).toEqual({ x: -15, y: -5 });
-    dispatchMouse(window, 'mouseup', 150, 100);
+      expect(model.point()).toEqual({ x: -15, y: -5 });
+    });
   });
 
   describe('with the alignment helper', () => {
@@ -532,9 +617,6 @@ describe('DraggableService', () => {
       alignment = TestBed.inject(AlignmentService);
     });
 
-    // A spec leaves its drag in progress to read the guides; the release keeps it from following the next spec.
-    afterEach(() => dispatchMouse(window, 'mouseup', 0, 0));
-
     function placed(params: Parameters<typeof createModel>[0], x: number, y: number) {
       const model = createModel(params);
       model.setPoint({ x, y });
@@ -546,10 +628,11 @@ describe('DraggableService', () => {
 
     /** Presses `model` at client (150, 100) on a pane at the origin and moves the pointer by `dx`, `dy`. */
     function drag(model: NodeModel, dx: number, dy: number) {
-      const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+      const { element } = createDragSurface({ left: 0, top: 0, width: 800, height: 600 });
+      currentElement = element;
       service.enable(element, model);
-      dispatchMouse(element, 'mousedown', 150, 100);
-      dispatchMouse(window, 'mousemove', 150 + dx, 100 + dy);
+      pointer('pointerdown', 150, 100);
+      pointer('pointermove', 150 + dx, 100 + dy);
     }
 
     it('shifts the whole selection by one aligned offset while dragging', () => {
@@ -561,9 +644,16 @@ describe('DraggableService', () => {
 
       expect(a.point()).toEqual({ x: 10, y: 200 });
       expect(b.point()).toEqual({ x: 200, y: 200 });
-      expect(alignment.guides().lines.length).toBeGreaterThan(0);
+      expect(alignment.guides().lines).not.toEqual([]);
+    });
 
-      dispatchMouse(window, 'mouseup', 150, 284);
+    it('keeps the aligned position and clears the guides on release', () => {
+      const a = placed({ id: 'a' }, 10, 20);
+      placed({ id: 'target' }, -300, 200);
+      drag(a, 0, 184);
+
+      pointer('pointerup', 150, 284);
+
       expect(a.point()).toEqual({ x: 10, y: 200 });
       expect(alignment.guides().lines).toEqual([]);
     });
@@ -582,17 +672,26 @@ describe('DraggableService', () => {
       expect(child.point()).toEqual({ x: 0, y: 50 });
     });
 
-    it('does not align a child with the edges of its parent, only with its center', () => {
+    it('does not align a child with the edges of its parent', () => {
       const parent = placed({ id: 'parent' }, 100, 100);
       parent.width.set(300);
       parent.height.set(300);
       const child = placed({ id: 'child', parentId: 'parent' }, 20, 50);
 
       drag(child, -16, 0);
+
       expect(child.point()).toEqual({ x: 4, y: 50 });
+    });
+
+    it('aligns a child with the center of its parent', () => {
+      const parent = placed({ id: 'parent' }, 100, 100);
+      parent.width.set(300);
+      parent.height.set(300);
+      const child = placed({ id: 'child', parentId: 'parent' }, 20, 50);
 
       // Center 100 + 102 + 50 = 252 is next to the parent's center 250
-      dispatchMouse(window, 'mousemove', 150 + 82, 100);
+      drag(child, 82, 0);
+
       expect(child.point()).toEqual({ x: 100, y: 50 });
     });
 
@@ -609,15 +708,23 @@ describe('DraggableService', () => {
     it('moves freely while the bypass modifier is held', () => {
       const a = placed({ id: 'a' }, 10, 20);
       placed({ id: 'target' }, 0, 203);
-      keyboardServiceMock.bypassActive = true;
+      holdKey('Alt', 'AltLeft');
 
       drag(a, 3, 181);
 
       expect(a.point()).toEqual({ x: 13, y: 201 });
       expect(alignment.guides().lines).toEqual([]);
+    });
 
-      keyboardServiceMock.bypassActive = false;
-      dispatchMouse(window, 'mousemove', 153, 281);
+    it('aligns again once the bypass modifier is released', () => {
+      const a = placed({ id: 'a' }, 10, 20);
+      placed({ id: 'target' }, 0, 203);
+      holdKey('Alt', 'AltLeft');
+      drag(a, 3, 181);
+
+      releaseKey('Alt', 'AltLeft');
+      pointer('pointermove', 153, 281);
+
       expect(a.point()).toEqual({ x: 13, y: 203 });
     });
   });

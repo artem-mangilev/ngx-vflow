@@ -51,29 +51,35 @@ class ChangesHostComponent {
 }
 
 describe('change outputs of the flow', () => {
-  const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
+  /** Node changes reach the application 25 ms after the tick that made them. */
+  const DELIVERY = 25;
 
-  async function setup() {
-    TestBed.configureTestingModule({
-      imports: [ChangesHostComponent],
-    });
+  afterEach(() => vi.useRealTimers());
+
+  async function render() {
+    TestBed.configureTestingModule({ imports: [ChangesHostComponent] });
     const fixture = TestBed.createComponent(ChangesHostComponent);
     const host = fixture.componentInstance;
     fixture.detectChanges();
-    await fixture.whenStable();
+    await new Promise<void>((resolve) => host.flow().initialized.subscribe(() => resolve()));
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
 
+    const stable = async () => {
+      TestBed.tick();
+      await vi.advanceTimersByTimeAsync(DELIVERY);
+    };
+    await stable();
+
+    return { host, stable };
+  }
+
+  async function setup() {
+    const { host, stable } = await render();
     const code: NodeChange[][] = [];
     host.flow().nodesChanges.subscribe((changes) => code.push(changes));
 
-    const stable = async () => {
-      fixture.detectChanges();
-      await fixture.whenStable();
-      await settle();
-    };
-
     // The first layout reports the measured sizes.
-    await stable();
-    host.all.length = host.positions.length = host.edgeChanges.length = host.detached.length = code.length = 0;
+    host.all.length = host.positions.length = host.edgeChanges.length = host.detached.length = 0;
 
     return { host, code, stable };
   }
@@ -97,7 +103,7 @@ describe('change outputs of the flow', () => {
     expect(code).toEqual(expected as NodeChange[][]);
   });
 
-  it('puts every type of one tick into (nodesChanges) and only its own type into a filtered output', async () => {
+  it('puts every type of one tick into (nodesChanges)', async () => {
     const { host, stable } = await setup();
     const [a] = host.nodes();
 
@@ -105,49 +111,69 @@ describe('change outputs of the flow', () => {
     a.selected.set(true);
     await stable();
 
-    expect(host.all.length).toBe(1);
-    expect(host.all[0]).toHaveLength(2);
-    expect(host.all[0]).toEqual(
+    expect(host.all).toEqual([
       expect.arrayContaining([
         { type: 'position', id: 'a', point: { x: 10, y: 10 } },
         { type: 'select', id: 'a', selected: true },
       ]),
-    );
+    ]);
+    expect(host.all[0]).toHaveLength(2);
+  });
+
+  it('puts only its own type into a filtered output', async () => {
+    const { host, stable } = await setup();
+    const [a] = host.nodes();
+
+    a.point.set({ x: 10, y: 10 });
+    a.selected.set(true);
+    await stable();
+
     expect(host.positions).toEqual([[{ type: 'position', id: 'a', point: { x: 10, y: 10 } }]]);
   });
 
-  it('reports the edges detached by a removed node as one array, and no change of the node itself', async () => {
+  it('reports no position of a selected node that did not move', async () => {
+    const { host, stable } = await setup();
+    const [a, b] = host.nodes();
+    b.selected.set(true);
+    await stable();
+    host.positions.length = 0;
+
+    a.point.set({ x: 20, y: 0 });
+    await stable();
+
+    expect(host.positions).toEqual([[{ type: 'position', id: 'a', point: { x: 20, y: 0 } }]]);
+  });
+
+  it('reports the edges detached by a removed node as one array', async () => {
+    const { host, stable } = await setup();
+
+    host.nodes.update((nodes) => nodes.filter((node) => node.id !== 'a'));
+    await stable();
+
+    expect(host.detached).toEqual([
+      expect.arrayContaining([
+        { type: 'detached', id: 'a-b' },
+        { type: 'detached', id: 'a-c' },
+      ]),
+    ]);
+    expect(host.detached[0]).toHaveLength(2);
+    expect(host.edgeChanges).toEqual(host.detached);
+  });
+
+  it('reports no change of a node the application removed', async () => {
     const { host, stable } = await setup();
 
     host.nodes.update((nodes) => nodes.filter((node) => node.id !== 'a'));
     await stable();
 
     expect(host.all).toEqual([]);
-    expect(host.detached.length).toBe(1);
-    expect(host.detached[0]).toHaveLength(2);
-    expect(host.detached[0]).toEqual(
-      expect.arrayContaining([
-        { type: 'detached', id: 'a-b' },
-        { type: 'detached', id: 'a-c' },
-      ]),
-    );
-    expect(host.edgeChanges).toEqual(host.detached);
   });
 
   it('reports no edge as detached while its handles are not yet measured at startup', async () => {
-    TestBed.configureTestingModule({ imports: [ChangesHostComponent] });
-    const fixture = TestBed.createComponent(ChangesHostComponent);
-    const host = fixture.componentInstance;
-
-    for (let tick = 0; tick < 3; tick++) {
-      fixture.detectChanges();
-      await fixture.whenStable();
-      await settle();
-    }
+    const { host } = await render();
 
     expect(host.initialized).toEqual({ edgeChanges: [], detached: [] });
     expect(host.edgeChanges).toEqual([]);
-    expect(host.detached).toEqual([]);
     expect(host.flow().detachedEdges()).toEqual([]);
   });
 

@@ -39,34 +39,52 @@ describe('animateViewport', () => {
     });
   }
 
-  it('times the animation from the request and reads its start on the first frame', () => {
+  it('reads its start on the first frame and times the animation from the request', () => {
     const events: string[] = [];
     const states: ViewportState[] = [];
     let current = { x: 0, y: 0, zoom: 1 };
     run(100, () => current, events, states);
     current = { x: 20, y: 0, zoom: 1 };
+
     frame(50);
+
     expect(events).toEqual(['start']);
     // Half the duration with cubic in-out easing is half the way from where the viewport was on the first frame.
-    expect(states[0]).toEqual(
+    expect(states).toEqual([
       interpolateViewport({ x: 20, y: 0, zoom: 1 }, { x: 100, y: 0, zoom: 1 }, { x: 50, y: 50 }, 100)(0.5),
-    );
+    ]);
+  });
+
+  it('ends on the target once the duration has passed and requests no more frames', () => {
+    const events: string[] = [];
+    const states: ViewportState[] = [];
+    run(100, () => ({ x: 0, y: 0, zoom: 1 }), events, states);
+
+    frame(50);
     frame(60);
+
     expect(states.at(-1)).toEqual({ x: 100, y: 0, zoom: 1 });
     expect(events).toEqual(['start', 'end']);
     expect(frames.size).toBe(0);
   });
 
-  it('ends an interrupted animation once and cancels one that did not start silently', () => {
+  it('ends an interrupted animation once', () => {
     const events: string[] = [];
     const animation = run(100, () => ({ x: 0, y: 0, zoom: 1 }), events, []);
     frame(10);
+
     animation.interrupt();
     animation.interrupt();
+
     expect(events).toEqual(['start', 'end']);
-    const pending: string[] = [];
-    run(100, () => ({ x: 0, y: 0, zoom: 1 }), pending, []).interrupt();
+  });
+
+  it('cancels an animation interrupted before its first frame silently', () => {
+    const events: string[] = [];
+
+    run(100, () => ({ x: 0, y: 0, zoom: 1 }), events, []).interrupt();
     frame(10);
-    expect(pending).toEqual([]);
+
+    expect(events).toEqual([]);
   });
 });

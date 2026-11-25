@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('follows a rebound key in the shortcut configuration example', async ({ page }) => {
   await page.goto('/docs/interactions/keyboard-shortcuts');
@@ -21,5 +21,16 @@ test('follows a rebound key in the shortcut configuration example', async ({ pag
   await page.keyboard.press('x');
   await expect(demo.getByText('Deletion requests: 2.', { exact: false })).toBeVisible();
   await expect(graph.getByRole('group', { name: 'Review', exact: true })).toHaveCount(0);
-  expect((await new AxeBuilder({ page }).include('[data-testid="shortcuts-demo"]').analyze()).violations).toEqual([]);
+});
+
+test.describe('accessibility', () => {
+  // The flows fade in; axe samples the contrast of a fading element wrongly.
+  test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+  test('the shortcut configuration example has no axe violations', async ({ page }) => {
+    await page.goto('/docs/interactions/keyboard-shortcuts');
+    await expect(page.getByTestId('shortcuts-config')).toContainText('Backspace');
+    const results = await new AxeBuilder({ page }).include('[data-testid="shortcuts-demo"]').analyze();
+    expect(results.violations).toEqual([]);
+  });
 });

@@ -94,9 +94,11 @@ describe('EntityComponentOutletDirective', () => {
 
   async function settle() {
     fixture.detectChanges();
-    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
     await fixture.whenStable();
   }
+
+  const texts = (root: HTMLElement) =>
+    Array.from(root.querySelectorAll('.emitter')).map((el) => (el as HTMLElement).textContent?.trim());
 
   function emitter(id: string): EmitterNodeComponent {
     return fixture.debugElement
@@ -108,13 +110,12 @@ describe('EntityComponentOutletDirective', () => {
   beforeEach(async () => {
     fixture = TestBed.createComponent(HostComponent);
     await settle();
+    // The lazy factory resolves in a later task.
+    await expect.poll(() => texts(fixture.nativeElement).length).toBe(2);
   });
 
   it('renders component classes and lazy factories without a base class and gives them the node context', () => {
-    const texts = Array.from(fixture.nativeElement.querySelectorAll('.emitter')).map((el) =>
-      (el as HTMLElement).textContent?.trim(),
-    );
-    expect(texts).toEqual(['emitter:one', 'lazy:two']);
+    expect(texts(fixture.nativeElement)).toEqual(['emitter:one', 'lazy:two']);
   });
 
   it('gives components inside a template presentation the same node context', () => {
@@ -144,22 +145,15 @@ describe('EntityComponentOutletDirective', () => {
 
     removed.legacy.emit('late');
 
-    expect(fixture.nativeElement.querySelectorAll('.emitter').length).toBe(1);
+    expect(texts(fixture.nativeElement)).toEqual(['lazy:two']);
     expect(fixture.componentInstance.events).toEqual([]);
   });
 
   it('resolves a lazy factory once its node reaches the viewport with the viewport trigger', async () => {
     const viewportFixture = TestBed.createComponent(ViewportTriggerHostComponent);
     viewportFixture.detectChanges();
-    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-    await viewportFixture.whenStable();
-    await new Promise((resolve) => setTimeout(resolve));
-    viewportFixture.detectChanges();
     await viewportFixture.whenStable();
 
-    const texts = Array.from(viewportFixture.nativeElement.querySelectorAll('.emitter')).map((el) =>
-      (el as HTMLElement).textContent?.trim(),
-    );
-    expect(texts).toEqual(['near:near']);
+    await expect.poll(() => texts(viewportFixture.nativeElement)).toEqual(['near:near']);
   });
 });

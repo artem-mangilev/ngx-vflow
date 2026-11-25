@@ -5,29 +5,36 @@ function parse(binding: string) {
   return parseBinding(binding)!;
 }
 
-describe('public keyboard key labels', () => {
-  it('names modifiers the way each platform calls them, in words a screen reader can read', () => {
-    expect(formatBinding(parse('Mod+Shift+a'), true)).toBe('Command+Shift+A');
-    expect(formatBinding(parse('Mod+Shift+a'), false)).toBe('Ctrl+Shift+A');
-    expect(formatBinding(parse('Alt+Enter'), true)).toBe('Option+Enter');
-    expect(formatBinding(parse('Alt+Enter'), false)).toBe('Alt+Enter');
-    // A modifier entry names the held key itself.
-    expect(formatBinding(parse('Mod'), true)).toBe('Command');
-    expect(formatBinding(parse('Mod'), false)).toBe('Ctrl');
+describe('formatBinding', () => {
+  it.each([
+    ['Mod+Shift+a', true, 'Command+Shift+A'],
+    ['Mod+Shift+a', false, 'Ctrl+Shift+A'],
+    ['Alt+Enter', true, 'Option+Enter'],
+    ['Alt+Enter', false, 'Alt+Enter'],
+    ['Mod', true, 'Command'],
+    ['Mod', false, 'Ctrl'],
+  ])('names the modifiers of %s the way the platform does (mac: %s)', (binding, mac, label) => {
+    expect(formatBinding(parse(binding), mac)).toBe(label);
   });
 
-  it('keeps the spelling of the configuration', () => {
-    expect(formatBinding(parse('ArrowUp'))).toBe('ArrowUp');
-    expect(formatBinding(parse('NumpadAdd'))).toBe('NumpadAdd');
-    expect(formatBinding(parse('Space'))).toBe('Space');
-    expect(formatBinding(parse(' '))).toBe('Space');
-    expect(formatBinding(parse('+'))).toBe('+');
+  it.each([
+    ['ArrowUp', 'ArrowUp'],
+    ['NumpadAdd', 'NumpadAdd'],
+    ['Space', 'Space'],
+    [' ', 'Space'],
+    ['+', '+'],
+  ])('keeps the spelling of %j', (binding, label) => {
+    expect(formatBinding(parse(binding))).toBe(label);
   });
+});
 
-  it('joins a list into one phrase', () => {
-    expect(formatBindings(['Enter', 'Space'].map(parse))).toBe('Enter or Space');
-    expect(formatBindings(['+', '=', 'NumpadAdd'].map(parse))).toBe('+, = or NumpadAdd');
-    expect(formatBindings([parse('Enter')])).toBe('Enter');
-    expect(formatBindings([])).toBe('');
+describe('formatBindings', () => {
+  it.each([
+    [[], ''],
+    [['Enter'], 'Enter'],
+    [['Enter', 'Space'], 'Enter or Space'],
+    [['+', '=', 'NumpadAdd'], '+, = or NumpadAdd'],
+  ])('joins %j into one phrase', (bindings, phrase) => {
+    expect(formatBindings(bindings.map(parse))).toBe(phrase);
   });
 });

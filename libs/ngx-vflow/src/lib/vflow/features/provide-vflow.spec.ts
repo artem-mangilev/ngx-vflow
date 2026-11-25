@@ -17,11 +17,14 @@ class HostComponent {
 }
 
 describe('provideVflow', () => {
+  it('provides nothing without features', () => {
+    expect(provideVflow()).toEqual([]);
+  });
+
   it('flattens the providers of its features in order', () => {
     const a = { provide: TOKEN, useValue: 'a' };
     const b = { provide: TOKEN, useValue: 'b' };
 
-    expect(provideVflow()).toEqual([]);
     expect(provideVflow(vflowFeature('test:a', [a]), vflowFeature('test:b', [b]))).toEqual([a, b]);
   });
 
@@ -48,20 +51,22 @@ describe('provideVflow', () => {
     expect(flow.injector.get(TOKEN)).toBe('root');
   });
 
-  it('rejects two features of one kind in one call and anything that is not a feature', () => {
+  it('rejects two features of one kind in one call', () => {
     expect(() => provideVflow(vflowFeature('test:a', []), vflowFeature('test:a', []))).toThrowError(
       /"test:a" was provided twice/,
     );
+  });
+
+  it('rejects an object that was not made by a with*() function', () => {
     expect(() => provideVflow({ kind: 'test:a', providers: [] } as unknown as VflowFeature)).toThrowError(
       /with\*\(\) function/,
     );
   });
 
-  it('types the kind of a feature', () => {
+  it('checks types: a feature carries its kind as a literal type and is accepted by provideVflow', () => {
     const feature = vflowFeature('acme:proximity', []);
-    const kind: 'acme:proximity' = feature.kind;
 
-    expect(kind).toBe('acme:proximity');
-    expect(provideVflow(feature)).toEqual([]);
+    expectTypeOf(feature.kind).toEqualTypeOf<'acme:proximity'>();
+    expectTypeOf(provideVflow).toBeCallableWith(feature);
   });
 });

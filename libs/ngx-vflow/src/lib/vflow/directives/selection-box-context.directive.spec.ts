@@ -1,114 +1,115 @@
-import { ChangeDetectionStrategy, Component, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
-import { createNode as createRawNode } from '../interfaces/node.interface';
-import { NodeModel } from '../models/node.model';
-import { FlowEntitiesService } from '../services/flow-entities.service';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { NodeRenderingService } from '../services/node-rendering.service';
-import { KeyboardService } from '../services/keyboard.service';
-import { ViewportService } from '../services/viewport.service';
-import { FlowRenderingService } from '../services/flow-rendering.service';
+import { createNodes } from '../interfaces/node.interface';
+import { SelectionMode } from '../types/selection-mode.type';
+import { Vflow } from '../vflow';
 import { SelectionBoxContextDirective } from './selection-box-context.directive';
-import { SpacePointContextDirective } from './space-point-context.directive';
 import { dispatchPointer } from '../gestures/pointer-events.testing';
 
 @Component({
-  template: `<div spacePointContext selectionBoxContext></div>`,
-  imports: [SpacePointContextDirective, SelectionBoxContextDirective],
+  imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" [selectionMode]="selectionMode()">
+    <div *vNode style="width: 50px; height: 30px"></div>
+  </vflow>`,
 })
 class SelectionBoxHostComponent {
-  @ViewChild(SelectionBoxContextDirective)
-  public context!: SelectionBoxContextDirective;
+  public readonly selectionMode = signal<SelectionMode>('default');
+  public readonly nodes = createNodes([
+    { id: 'eligible', point: { x: 10, y: 10 } },
+    { id: 'ineligible', point: { x: 80, y: 10 }, selectable: false },
+    { id: 'selected', point: { x: 300, y: 200 }, selected: true },
+  ]);
 }
 
 describe('SelectionBoxContextDirective', () => {
   let fixture: ComponentFixture<SelectionBoxHostComponent>;
-  let entitiesService: FlowEntitiesService;
-  let settingsService: FlowSettingsService;
-  let selectionShortcutActive = true;
+  let root: HTMLElement;
+  let pane: HTMLElement;
 
-  beforeEach(() => {
-    selectionShortcutActive = true;
-
-    TestBed.configureTestingModule({
-      imports: [SelectionBoxHostComponent],
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        { provide: KeyboardService, useValue: { isActiveModifier: () => selectionShortcutActive } },
-        NodeRenderingService,
-        ViewportService,
-        FlowRenderingService,
-      ],
-    });
-
+  beforeEach(async () => {
     fixture = TestBed.createComponent(SelectionBoxHostComponent);
-    fixture.detectChanges();
-    entitiesService = TestBed.inject(FlowEntitiesService);
-    settingsService = TestBed.inject(FlowSettingsService);
+    root = fixture.nativeElement;
+    await stable();
+    pane = fixture.debugElement.query(By.directive(SelectionBoxContextDirective)).nativeElement;
   });
-
-  function createNode(id: string, selectable?: boolean) {
-    return TestBed.runInInjectionContext(
-      () =>
-        new NodeModel(
-          createRawNode({
-            id,
-            point: { x: 0, y: 0 },
-            width: 10,
-            height: 10,
-            selectable,
-          }),
-        ),
-    );
-  }
-
-  function startSelectionBox() {
-    const pane = fixture.nativeElement.querySelector('[spacePointContext]') as HTMLElement;
-    pane.getBoundingClientRect = () => ({ left: 0, top: 0, x: 0, y: 0 }) as DOMRect;
-    dispatchPointer(pane, 'pointerdown', { x: 0, y: 0 });
-  }
 
   afterEach(() => {
-    fixture?.destroy();
+    // Releases the held modifier.
+    window.dispatchEvent(new Event('blur'));
   });
 
-  it('should not start when the selection shortcut is disabled or selection is manual', async () => {
-    const node = createNode('manual');
-    node.selected.set(true);
-    entitiesService.nodes.set([node]);
+  async function stable() {
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
 
-    selectionShortcutActive = false;
-    startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBe(false);
+  const selected = () =>
+    Array.from(root.querySelectorAll('[data-v-node][data-v-selected]')).map((node) => node.getAttribute('data-v-node'));
+  const box = () => root.querySelector('[data-v-selection-box]');
 
-    selectionShortcutActive = true;
-    settingsService.bind({ selectionMode: signal('manual') });
-    startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBe(false);
-    expect(node.selected()).toBe(true);
+  function holdSelectionModifier() {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', code: 'ShiftLeft' }));
+  }
+
+  /** Presses the pane at flow (0, 0) and moves the pointer to flow (150, 100), around the first two nodes. */
+  async function dragOverTheFirstNodes() {
+    const { left, top } = pane.getBoundingClientRect();
+    dispatchPointer(pane, 'pointerdown', { x: left, y: top });
+    dispatchPointer(window, 'pointermove', { x: left + 150, y: top + 100 });
+    await stable();
+  }
+
+  async function release() {
+    const { left, top } = pane.getBoundingClientRect();
+    dispatchPointer(window, 'pointerup', { x: left + 150, y: top + 100 });
+    await stable();
+  }
+
+  it('draws the box while the selection modifier is held', async () => {
+    holdSelectionModifier();
+
+    await dragOverTheFirstNodes();
+
+    expect(box()).not.toBeNull();
   });
 
-  it('should preselect and apply only eligible nodes', async () => {
-    const ineligible = createNode('ineligible', false);
-    const eligible = createNode('eligible', true);
-    entitiesService.nodes.set([ineligible, eligible]);
+  it('does not start without the selection modifier', async () => {
+    await dragOverTheFirstNodes();
 
-    startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBe(true);
-    dispatchPointer(document, 'pointermove', { x: 20, y: 20 });
+    expect(box()).toBeNull();
+    expect(selected()).toEqual(['selected']);
+  });
 
-    expect(fixture.componentInstance.context.model.width()).toBeGreaterThan(2);
-    expect(ineligible.preselected()).toBe(false);
-    expect(eligible.preselected()).toBe(true);
+  it('does not start in the manual selection mode and keeps the selection', async () => {
+    fixture.componentInstance.selectionMode.set('manual');
+    await stable();
+    holdSelectionModifier();
 
-    eligible.rawNode.selectable!.set(false);
+    await dragOverTheFirstNodes();
+    await release();
 
-    dispatchPointer(document, 'pointerup', { x: 120, y: 120 });
+    expect(box()).toBeNull();
+    expect(selected()).toEqual(['selected']);
+  });
 
-    expect(ineligible.selected()).toBe(false);
-    expect(eligible.selected()).toBe(true);
+  it('marks the selectable nodes inside the box as selected while dragging', async () => {
+    holdSelectionModifier();
+
+    await dragOverTheFirstNodes();
+
+    expect(selected()).toEqual(['eligible', 'selected']);
+  });
+
+  it('selects only the selectable nodes inside the box on release, in place of the previous selection', async () => {
+    holdSelectionModifier();
+    await dragOverTheFirstNodes();
+
+    await release();
+
+    expect(box()).toBeNull();
+    expect(selected()).toEqual(['eligible']);
   });
 });

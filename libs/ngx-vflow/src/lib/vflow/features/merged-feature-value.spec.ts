@@ -55,21 +55,34 @@ describe('provideMergedFeatureValue', () => {
     expect(reader.labels?.()).toEqual({ edge: 'Link' });
   });
 
-  it('runs a factory in the injector and follows the signal it returns', () => {
+  it('runs a factory in the injector', () => {
     const reader = readerWith([provideMergedFeatureValue(LABELS, () => inject(Translations).labels)]);
+
     expect(reader.labels?.()).toEqual({ flow: 'Схема' });
+  });
+
+  it('follows the signal a factory returns', () => {
+    const reader = readerWith([provideMergedFeatureValue(LABELS, () => inject(Translations).labels)]);
 
     TestBed.inject(Translations).labels.set({ flow: 'Диаграмма', node: 'Шаг' });
+
     expect(reader.labels?.()).toEqual({ flow: 'Диаграмма', node: 'Шаг' });
   });
 
-  it('follows a signal given directly and a plain object returned by a factory', () => {
+  it('merges a plain object returned by a factory over the level above', () => {
+    TestBed.configureTestingModule({ providers: [provideMergedFeatureValue(LABELS, { node: 'Node' })] });
+    const reader = readerWith([provideMergedFeatureValue(LABELS, () => ({ edge: 'Edge' }))]);
+
+    expect(reader.labels?.()).toEqual({ node: 'Node', edge: 'Edge' });
+  });
+
+  it('follows a signal given directly at a level above', () => {
     const own: WritableSignal<Partial<Labels>> = signal({ node: 'Node' });
     TestBed.configureTestingModule({ providers: [provideMergedFeatureValue(LABELS, own)] });
     const reader = readerWith([provideMergedFeatureValue(LABELS, () => ({ edge: 'Edge' }))]);
-    expect(reader.labels?.()).toEqual({ node: 'Node', edge: 'Edge' });
 
     own.set({ node: 'Step', flow: 'Flow' });
+
     expect(reader.labels?.()).toEqual({ node: 'Step', flow: 'Flow', edge: 'Edge' });
   });
 });

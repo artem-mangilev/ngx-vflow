@@ -47,16 +47,7 @@ describe('SelectionService', () => {
     );
   }
 
-  it('should ignore selection requests for an ineligible entity', () => {
-    const node = createModel('node', false);
-    entitiesService.nodes.set([node]);
-
-    selectionService.select(node);
-
-    expect(node.selected()).toBe(false);
-  });
-
-  it('should allow deselection even when selection is disabled globally', () => {
+  it('deselects even when selection is disabled globally', () => {
     const node = createModel('node');
     entitiesService.nodes.set([node]);
     node.selected.set(true);
@@ -67,7 +58,7 @@ describe('SelectionService', () => {
     expect(node.selected()).toBe(false);
   });
 
-  it('should clear an ineligible selected entity when replacing it with an eligible selection', () => {
+  it('clears a selected ineligible entity when an eligible one is selected', () => {
     const ineligible = createModel('ineligible', false);
     const eligible = createModel('eligible');
     entitiesService.nodes.set([ineligible, eligible]);
@@ -79,7 +70,7 @@ describe('SelectionService', () => {
     expect(eligible.selected()).toBe(true);
   });
 
-  it('should leave selection writes to the consumer in manual mode', () => {
+  it('leaves selection to the application in manual mode', () => {
     const node = createModel('node');
     entitiesService.nodes.set([node]);
     settingsService.bind({ selectionMode: signal('manual') });

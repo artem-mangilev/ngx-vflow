@@ -11,6 +11,15 @@
         "cwd": "{projectRoot}"
       }
     },
+    "e2e-preview": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["docs:site"],
+      "options": {
+        "command": "playwright test smoke.spec.ts",
+        "cwd": "{projectRoot}",
+        "env": { "E2E_TARGET": "preview" }
+      }
+    },
     "lint": {
       "executor": "@angular-eslint/builder:lint",
       "options": {

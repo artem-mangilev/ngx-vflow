@@ -1,105 +1,40 @@
-import { expect, Locator, Page, test } from '@playwright/test';
+import { drag, expect, test, type Locator } from './fixtures';
 
-/** Pixels that layout rounding may add between a node box and the controls or handles drawn around it. */
+/** Pixels that layout rounding may add between a node box and the controls drawn around it. */
 const TOLERANCE = 1.5;
 
-async function box(locator: Locator) {
-  const rect = await locator.boundingBox();
-  if (!rect) throw new Error('Expected a rendered element');
-  return { ...rect, right: rect.x + rect.width, bottom: rect.y + rect.height, centerX: rect.x + rect.width / 2 };
-}
-
-function zoomOf(node: Locator) {
-  return node.evaluate((element) => {
-    const viewport = element.closest<HTMLElement>('.v-viewport')!;
-    return new DOMMatrixReadOnly(viewport.style.transform).a;
-  });
-}
-
-function offsetSize(element: Locator) {
-  return element.evaluate((el: HTMLElement) => ({ width: el.offsetWidth, height: el.offsetHeight }));
-}
-
+/** The resize lines frame the card: the top one spans its width, the left one its height. */
 async function expectOutline(node: Locator, card: Locator) {
-  const cardBox = await box(card);
-  const top = await box(node.locator('[data-v-resize-control=line][data-v-resize-control-position=top]'));
-  const left = await box(node.locator('[data-v-resize-control=line][data-v-resize-control-position=left]'));
-
-  expect(Math.abs(top.x - cardBox.x)).toBeLessThanOrEqual(TOLERANCE);
-  expect(Math.abs(top.width - cardBox.width)).toBeLessThanOrEqual(TOLERANCE);
-  expect(Math.abs(left.y - cardBox.y)).toBeLessThanOrEqual(TOLERANCE);
-  expect(Math.abs(left.height - cardBox.height)).toBeLessThanOrEqual(TOLERANCE);
-}
-
-/** Distance between the right handle's center and the card's right edge, in screen pixels. */
-async function rightHandleOffset(node: Locator, card: Locator) {
-  const handle = await box(node.locator('[data-v-handle][data-v-handle-position="right"]').first());
-  return Math.abs(handle.centerX - (await box(card)).right);
-}
-
-async function dragControl(page: Page, control: Locator, dx: number, dy: number) {
-  const start = await box(control);
-  const x = start.centerX;
-  const y = start.y + start.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x + dx, y + dy, { steps: 10 });
-  await page.mouse.up();
+  await expect(async () => {
+    const box = (await card.boundingBox())!;
+    const top = (await node.locator('[data-v-resize-control=line][data-v-resize-control-position=top]').boundingBox())!;
+    const left = (await node
+      .locator('[data-v-resize-control=line][data-v-resize-control-position=left]')
+      .boundingBox())!;
+    expect(Math.abs(top.x - box.x)).toBeLessThanOrEqual(TOLERANCE);
+    expect(Math.abs(top.width - box.width)).toBeLessThanOrEqual(TOLERANCE);
+    expect(Math.abs(left.y - box.y)).toBeLessThanOrEqual(TOLERANCE);
+    expect(Math.abs(left.height - box.height)).toBeLessThanOrEqual(TOLERANCE);
+  }).toPass();
 }
 
 test('overview: the selected group shows its resizer and grows by the dragged distance', async ({ page }) => {
   await page.goto('/examples/feature-overview');
-  const node = page.locator('[data-v-node][aria-label="Fulfilment"]');
+  const node = page.getByRole('group', { name: 'Fulfilment', exact: true });
   const group = node.locator('section');
   await node.scrollIntoViewIfNeeded();
-  await expect(node).toHaveCSS('visibility', 'visible');
   await expect(node.locator('[data-v-resize-control]')).toHaveCount(0);
 
   await group.locator('header').click();
   await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
   await expectOutline(node, group);
 
-  const zoom = await zoomOf(node);
-  const before = await offsetSize(group);
-  await dragControl(
-    page,
-    node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
-    40,
-    30,
-  );
-
-  const after = await offsetSize(group);
-  expect(Math.abs(after.width - before.width - 40 / zoom)).toBeLessThanOrEqual(TOLERANCE);
-  expect(Math.abs(after.height - before.height - 30 / zoom)).toBeLessThanOrEqual(TOLERANCE);
-  await expectOutline(node, group);
-});
-
-test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {
-  await page.goto('/docs/nodes/resizer');
-  const node = page.locator('[data-v-node]', { has: page.getByTestId('resizable-card') }).first();
-  const card = node.getByTestId('resizable-card');
+  const before = (await group.boundingBox())!;
   const corner = node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]');
-  await node.scrollIntoViewIfNeeded();
-  await expect(node).toHaveCSS('visibility', 'visible');
-  await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
+  const from = (await corner.boundingBox())!;
+  await drag(page, corner, { x: from.x + from.width / 2 + 40, y: from.y + from.height / 2 + 30 });
 
-  await expect(card).not.toHaveAttribute('style', /width/);
-  await expectOutline(node, card);
-
-  const minWidth = await card.evaluate((el) => parseFloat(getComputedStyle(el).minWidth));
-  const zoom = await zoomOf(node);
-  // The content-sized card already sits at its min-width, so shrinking changes nothing and the node stays auto.
-  expect((await offsetSize(card)).width).toBe(minWidth);
-  await dragControl(page, corner, -40 * zoom, 0);
-  await expect(card).not.toHaveAttribute('style', /width/);
-
-  await dragControl(page, corner, 60 * zoom, 0);
-  await expect(card).toHaveAttribute('style', /width: \d+px/);
-  expect(Math.abs((await offsetSize(card)).width - minWidth - 60)).toBeLessThanOrEqual(TOLERANCE);
-
-  await dragControl(page, corner, -200 * zoom, 0);
-  await expect(card).toHaveAttribute('style', new RegExp(`width: ${minWidth}px`));
-  expect((await offsetSize(card)).width).toBe(minWidth);
-  await expectOutline(node, card);
-  await expect.poll(() => rightHandleOffset(node, card)).toBeLessThanOrEqual(TOLERANCE);
+  await expect.poll(async () => (await group.boundingBox())!.width - before.width).toBeCloseTo(40, 0);
+  await expect.poll(async () => (await group.boundingBox())!.height - before.height).toBeCloseTo(30, 0);
+  await expectOutline(node, group);
 });

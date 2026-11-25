@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, viewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
@@ -49,9 +49,13 @@ class FitOnInitComponent {
   public initialized = 0;
 }
 
-const frames = async (count: number) => {
-  for (let i = 0; i < count; i++) await new Promise(requestAnimationFrame);
-};
+async function renderFitOnInit() {
+  const fixture = TestBed.createComponent(FitOnInitComponent);
+  fixture.detectChanges();
+  await expect.poll(() => fixture.componentInstance.initialized).toBe(1);
+  await fixture.whenStable();
+  return fixture;
+}
 
 describe('Initial viewport', () => {
   it('paints the graph for the first time with the viewport set in reaction to initialized', async () => {
@@ -85,14 +89,14 @@ describe('Initial viewport', () => {
 
     fixture.detectChanges();
     check();
-    expect(fixture.componentInstance.initialized).toBe(0);
-
-    await frames(8);
+    await expect.poll(() => fixture.componentInstance.initialized).toBe(1);
+    await fixture.whenStable();
+    // Pending mutation callbacks are microtasks queued before this one.
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
     observer.disconnect();
     check();
 
     expect(violations, states.join('\n')).toEqual([]);
-    expect(fixture.componentInstance.initialized).toBe(1);
     expect(states.at(-1)).not.toContain(IDENTITY);
     expect(states.at(-1)).toContain('shown=4');
   });
@@ -101,50 +105,58 @@ describe('Initial viewport', () => {
     const style = document.createElement('style');
     style.textContent = '[data-v-node]:has(.no-box) { display: none; }';
     document.head.append(style);
+    onTestFinished(() => style.remove());
 
-    try {
-      const fixture = TestBed.createComponent(VflowComponent);
-      let initialized = false;
-      fixture.componentInstance.initialized.subscribe(() => (initialized = true));
-      Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-      fixture.componentRef.setInput('nodes', [
-        createNode({ id: 'shown', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
-        createNode({ id: 'collapsed', component: NoBoxNodeComponent, point: { x: 200, y: 0 } }),
-      ]);
-      fixture.detectChanges();
-      await frames(8);
+    const fixture = TestBed.createComponent(VflowComponent);
+    let initialized = false;
+    fixture.componentInstance.initialized.subscribe(() => (initialized = true));
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'shown', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
+      createNode({ id: 'collapsed', component: NoBoxNodeComponent, point: { x: 200, y: 0 } }),
+    ]);
+    fixture.detectChanges();
+    await expect.poll(() => initialized).toBe(true);
+    await fixture.whenStable();
 
-      expect(initialized).toBe(true);
-      const shown = fixture.nativeElement.querySelector('[data-v-node]:not(:has(.no-box))');
-      expect(getComputedStyle(shown).visibility).toBe('visible');
-    } finally {
-      style.remove();
-    }
+    const shown = fixture.nativeElement.querySelector('[data-v-node]:not(:has(.no-box))');
+    expect(getComputedStyle(shown).visibility).toBe('visible');
   });
 
-  it('emits initialized once, for an empty graph too, and not again when the graph or its size change', async () => {
-    const fixture = TestBed.createComponent(VflowComponent);
-    let emissions = 0;
-    fixture.componentInstance.initialized.subscribe(() => emissions++);
-    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('nodes', []);
-    fixture.detectChanges();
-    await frames(8);
-    expect(emissions).toBe(1);
+  describe('initialized', () => {
+    let fixture: ComponentFixture<VflowComponent>;
+    let emissions: number;
 
-    fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
-    ]);
-    Object.assign(fixture.nativeElement.style, { width: '500px', height: '300px' });
-    fixture.detectChanges();
-    await frames(8);
-    expect(emissions).toBe(1);
+    beforeEach(async () => {
+      fixture = TestBed.createComponent(VflowComponent);
+      emissions = 0;
+      fixture.componentInstance.initialized.subscribe(() => emissions++);
+      Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
+      fixture.componentRef.setInput('nodes', []);
+      fixture.detectChanges();
+      await expect.poll(() => emissions).toBe(1);
+    });
+
+    it('is emitted for an empty graph', () => {
+      expect(emissions).toBe(1);
+    });
+
+    it('is not emitted again when the graph and the size of the flow change', async () => {
+      fixture.componentRef.setInput('nodes', [
+        createNode({ id: 'a', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
+      ]);
+      Object.assign(fixture.nativeElement.style, { width: '500px', height: '300px' });
+      fixture.detectChanges();
+      // The new node is laid out: the point where a first layout would emit.
+      await expect.poll(() => fixture.componentInstance.getNodeRect('a')?.width).toBe(100);
+      await fixture.whenStable();
+
+      expect(emissions).toBe(1);
+    });
   });
 
   it('keeps an effect that fits the view independent of the nodes it fits', async () => {
-    const fixture = TestBed.createComponent(FitOnInitComponent);
-    fixture.detectChanges();
-    await frames(8);
+    const fixture = await renderFitOnInit();
     const flow = fixture.componentInstance.flow();
     let runs = 0;
     TestBed.runInInjectionContext(() =>
@@ -154,40 +166,55 @@ describe('Initial viewport', () => {
       }),
     );
     TestBed.tick();
-    expect(runs).toBe(1);
     const zoom = flow.viewport().zoom;
 
     fixture.componentInstance.nodes[1].point.set({ x: 1200, y: 800 });
     fixture.detectChanges();
-    await frames(4);
+    await fixture.whenStable();
     TestBed.tick();
+
     expect(runs).toBe(1);
     expect(flow.viewport().zoom).toBe(zoom);
   });
 
-  it('fits within the zoom bounds a call gives, inside the flow limits', async () => {
-    const fixture = TestBed.createComponent(FitOnInitComponent);
-    fixture.detectChanges();
-    await frames(8);
-    const flow = fixture.componentInstance.flow();
-    const unbounded = flow.viewport().zoom;
-    expect(unbounded).toBeGreaterThan(0.5);
-    expect(unbounded).toBeLessThan(1);
+  describe('fitView zoom bounds', () => {
+    let flow: VflowComponent;
+    /** The zoom that fits both nodes with no bounds given: about 0.6 for this graph. */
+    let unbounded: number;
 
-    // A single node would fill the pane at the flow's maxZoom.
-    expect(await flow.fitView({ nodes: ['a'], maxZoom: 1.5 })).toBe(true);
-    expect(flow.viewport().zoom).toBe(1.5);
-    expect(await flow.fitView({ minZoom: 1 })).toBe(true);
-    expect(flow.viewport().zoom).toBe(1);
-    // maxZoom wins over a greater minZoom; both stay within the flow limits.
-    await flow.fitView({ minZoom: 2, maxZoom: 1.5 });
-    expect(flow.viewport().zoom).toBe(1.5);
-    await flow.fitView({ minZoom: 0.01 });
-    expect(flow.viewport().zoom).toBe(unbounded);
-    await flow.fitView({ nodes: ['a'], maxZoom: 10 });
-    expect(flow.viewport().zoom).toBe(3);
+    beforeEach(async () => {
+      flow = (await renderFitOnInit()).componentInstance.flow();
+      unbounded = flow.viewport().zoom;
+    });
 
-    expect(() => flow.fitView({ maxZoom: 0 })).toThrowError(RangeError);
-    expect(await flow.fitView({ nodes: ['missing'] })).toBe(false);
+    it('fits the graph inside the zoom limits of the flow without bounds', () => {
+      expect(unbounded).toBeGreaterThan(0.5);
+      expect(unbounded).toBeLessThan(1);
+    });
+
+    it.each([
+      // A single node would fill the pane at the flow's maxZoom.
+      ['a maxZoom below the zoom that fits', { nodes: ['a'], maxZoom: 1.5 }, 1.5],
+      ['a minZoom above the zoom that fits', { minZoom: 1 }, 1],
+      ['a maxZoom over a greater minZoom', { minZoom: 2, maxZoom: 1.5 }, 1.5],
+      ['the flow maxZoom over a greater maxZoom', { nodes: ['a'], maxZoom: 10 }, 3],
+    ])('keeps to %s', async (_, options, zoom) => {
+      expect(await flow.fitView(options)).toBe(true);
+      expect(flow.viewport().zoom).toBe(zoom);
+    });
+
+    it('does not zoom out for a minZoom below the zoom that fits', async () => {
+      await flow.fitView({ minZoom: 0.01 });
+
+      expect(flow.viewport().zoom).toBe(unbounded);
+    });
+
+    it('throws a RangeError for a maxZoom of 0', () => {
+      expect(() => flow.fitView({ maxZoom: 0 })).toThrowError(RangeError);
+    });
+
+    it('resolves to false for nodes the flow does not have', async () => {
+      expect(await flow.fitView({ nodes: ['missing'] })).toBe(false);
+    });
   });
 });

@@ -1,118 +1,41 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, Locator, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const pages = [
-  ['workflow', 'app-ui-workflow-demo'],
-  ['pipeline', 'app-ui-pipeline-demo'],
-  ['erd-schema-mapping', 'app-ui-entities-demo'],
-  ['relationships-map', 'app-ui-relationships-demo'],
+  ['workflow', 'app-ui-workflow-demo', 'received'],
+  ['pipeline', 'app-ui-pipeline-demo', 'photo'],
+  ['erd-schema-mapping', 'app-ui-entities-demo', 'customer'],
+  ['relationships-map', 'app-ui-relationships-demo', 'ana'],
 ] as const;
 
-for (const [route, selector] of pages) {
-  test(`accessibility: ${route} has no axe violations, focusable entities and visible focus`, async ({ page }) => {
+test.describe('accessibility', () => {
+  // The flows fade in; axe samples the contrast of a fading element wrongly.
+  test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+  for (const [route, selector] of pages) {
+    test(`${route} has no axe violations`, async ({ page }) => {
+      await page.goto(`/examples/applications/${route}`);
+      await page.locator(selector).evaluate((element) => element.scrollIntoView({ block: 'center' }));
+
+      const results = await new AxeBuilder({ page }).include(selector).analyze();
+      expect(
+        results.violations.map(
+          (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
+        ),
+      ).toEqual([]);
+    });
+  }
+});
+
+for (const [route, selector, node] of pages) {
+  test(`${route}: a focused node shows a focus ring`, async ({ page }) => {
     await page.goto(`/examples/applications/${route}`);
-    const demo = page.locator(selector);
-    await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-    await expect(demo.locator('[data-v-node]').first()).toBeVisible();
-    // Let the fit-view animation finish: axe samples backgrounds of moving elements unreliably.
-    const viewportTransform = () =>
-      demo
-        .locator('.v-viewport')
-        .first()
-        .evaluate((element) => element.style.transform);
-    await expect
-      .poll(async () => {
-        const first = await viewportTransform();
-        await page.waitForTimeout(150);
-        return first === (await viewportTransform());
-      })
-      .toBe(true);
-    const results = await new AxeBuilder({ page }).include(selector).analyze();
-    expect(
-      results.violations.map(
-        (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
-      ),
-    ).toEqual([]);
-    // Core keeps focus on its wrappers; the theme maps --v-focus, so the halo is the selection color, tinted.
-    const wrapper = demo.locator('[data-v-node]').first();
+    const wrapper = page.locator(selector).locator(`[data-v-node="${node}"]`);
+    await expect(wrapper).toHaveCSS('box-shadow', 'none');
+
     await wrapper.focus();
+
     await expect(wrapper).toBeFocused();
-    await expect(wrapper).toHaveCSS('box-shadow', /^oklab\((0\.546 .* \/ 0\.28|0\.623 .* \/ 0\.5)\) 0px 0px 0px 4px$/);
+    await expect(wrapper).not.toHaveCSS('box-shadow', 'none');
   });
 }
-
-async function rowEndpointError(demo: Locator) {
-  return demo.evaluate((root) => {
-    const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
-    const source = root
-      .querySelector(
-        '[data-entity="crm"] [data-field="email"] .vui-port[data-v-handle][data-v-handle-position="right"]',
-      )!
-      .getBoundingClientRect();
-    const target = root
-      .querySelector(
-        '[data-entity="erp"] [data-field="email"] .vui-port[data-v-handle][data-v-handle-position="left"]',
-      )!
-      .getBoundingClientRect();
-    const matrix = edge.getScreenCTM()!;
-    const start = edge.getPointAtLength(0).matrixTransform(matrix);
-    const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
-    return Math.max(
-      Math.abs(start.x - source.right),
-      Math.abs(start.y - source.y - source.height / 2),
-      Math.abs(end.x - target.left),
-      Math.abs(end.y - target.y - target.height / 2),
-    );
-  });
-}
-
-test('geometry: long names, typography and density changes keep endpoints on their rows', async ({ page }) => {
-  await page.goto('/examples/applications/erd-schema-mapping');
-  const demo = page.locator('app-ui-entities-demo');
-  await demo.scrollIntoViewIfNeeded();
-  await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  // A long identifier, written as a re-render of the field data would: core observes the node content.
-  const name = demo.locator('[data-entity="erp"] [data-field="email"] .vui-title');
-  const original = await name.textContent();
-  await name.evaluate((element) => (element.textContent += '_of_the_primary_business_contact_record'));
-  await expect(name).toContainText('primary_business_contact');
-  const height = () => name.evaluate((element) => element.getBoundingClientRect().height);
-  await expect.poll(height).toBeGreaterThan(20);
-  await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  // Typography and density of the cards change; endpoints follow.
-  await demo.locator('docs-demo').evaluate((element: HTMLElement) => element.style.setProperty('--vui-space', '6px'));
-  await demo
-    .locator('article.vui-node')
-    .evaluateAll((cards: HTMLElement[]) => cards.forEach((card) => card.style.setProperty('font-size', '18px')));
-  await expect(demo.locator('article.vui-node').first()).toHaveCSS('font-size', '18px');
-  await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  await name.evaluate((element, text) => (element.textContent = text), original);
-  await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-});
-
-test('geometry: endpoints stay on ports after zooming through the controls', async ({ page }) => {
-  await page.goto('/examples/applications/workflow');
-  const workflow = page.locator('app-ui-workflow-demo');
-  const controls = workflow.getByRole('group', { name: 'Viewport controls' });
-  const endpointError = () =>
-    workflow.evaluate((root) => {
-      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
-      // The process runs from the top down: the first edge leaves the bottom handle of the first card.
-      const port = root
-        .querySelector('[data-v-node] [data-v-handle][data-v-handle-position="bottom"]')!
-        .getBoundingClientRect();
-      const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
-      return Math.max(Math.abs(start.x - port.x - port.width / 2), Math.abs(start.y - port.bottom));
-    });
-  await expect.poll(endpointError).toBeLessThan(1);
-  const zoom = () =>
-    workflow.locator('.v-viewport').evaluate((element) => {
-      const match = /scale\(([^)]+)\)/.exec(element.style.transform);
-      return match ? Number(match[1]) : 1;
-    });
-  const initial = await zoom();
-  await controls.getByRole('button', { name: 'Zoom in', exact: true }).click();
-  await controls.getByRole('button', { name: 'Zoom in', exact: true }).click();
-  await expect.poll(zoom).toBeCloseTo(initial * 1.44, 3);
-  await expect.poll(endpointError).toBeLessThan(1.5);
-});

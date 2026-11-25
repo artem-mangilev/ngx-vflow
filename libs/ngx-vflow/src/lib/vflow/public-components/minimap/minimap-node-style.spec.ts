@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Injector, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
 import { createNodes } from '../../interfaces/node.interface';
@@ -6,7 +6,7 @@ import { MinimapNodeStyle, MinimapNodeStyleRule, MinimapSettings } from '../../i
 import { Node } from '../../interfaces/node.interface';
 import { provideVflow } from '../../features/feature';
 import { withNodeComponents } from '../../features/with-entity-components';
-import { VFLOW_MINIMAP_SETTINGS, withMinimap } from '../../features/with-minimap';
+import { withMinimap } from '../../features/with-minimap';
 
 /** Stands for every node component of the specs: the minimap reads the key, not the component. */
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
@@ -110,44 +110,61 @@ describe('minimap node styles', () => {
   const fill = (x: number, y: number) => getComputedStyle(pathAt(x, y)!).fill;
   const stroke = (x: number, y: number) => getComputedStyle(pathAt(x, y)!).stroke;
 
-  it('fills a node without a style with the token, and the nodes of a component with its style', async () => {
+  it('fills a node without a style with the token', () => {
     expect(fill(45, 30)).toBe(DEFAULT);
+  });
+
+  it('fills the nodes of a component with the style of its key', () => {
     expect(fill(165, 30)).toBe(GREEN);
     expect(fill(285, 30)).toBe(RED);
-    // Between the nodes nothing is drawn.
-    expect(pathAt(105, 30)).toBeNull();
+  });
 
+  it('draws nothing between the nodes', () => {
+    expect(pathAt(105, 30)).toBeNull();
+  });
+
+  it('follows a theme that changes the node token, and keeps the style of a component', async () => {
     host.theme.set('dark');
     await settle();
+
     expect(fill(45, 30)).toBe('rgb(10, 20, 30)');
     expect(fill(165, 30)).toBe(GREEN);
   });
 
-  it('draws a node with children as an outline in the color of nodes, with its members above it', async () => {
+  it('draws a node with children as an outline in the color of nodes', async () => {
     expect(fill(300, 220)).toBe(NONE);
     expect(stroke(300, 220)).toBe(DEFAULT);
-    expect(fill(175, 150)).toBe(DEFAULT);
-    expect(pathAt(175, 150)).not.toBe(pathAt(300, 220));
 
     host.theme.set('dark');
     await settle();
     expect(stroke(300, 220)).toBe('rgb(10, 20, 30)');
-
-    // The style of its component is taken as written: a group may ask for a fill.
-    host.style('section', { background: 'rgb(1, 2, 3)' });
-    await settle();
-    expect(fill(300, 220)).toBe('rgb(1, 2, 3)');
-    expect(fill(175, 150)).toBe('rgb(10, 20, 30)');
   });
 
-  it('draws an outline one pixel of the minimap wide where its color is set, and rounds the corners', async () => {
+  it('draws the members of a group above it', () => {
+    expect(fill(175, 150)).toBe(DEFAULT);
+    expect(pathAt(175, 150)).not.toBe(pathAt(300, 220));
+  });
+
+  it('takes the style of the component of a group as written, a fill included', async () => {
+    host.style('section', { background: 'rgb(1, 2, 3)' });
+    await settle();
+
+    expect(fill(300, 220)).toBe('rgb(1, 2, 3)');
+    expect(fill(175, 150)).toBe(DEFAULT);
+  });
+
+  it('draws an outline one pixel of the minimap wide where its color is set', async () => {
     host.style('alert', { background: 'rgb(255, 0, 0)', borderColor: 'rgb(0, 0, 0)' });
     await settle();
+
     const path = getComputedStyle(pathAt(285, 30)!);
     expect([path.stroke, path.strokeWidth, path.vectorEffect]).toEqual(['rgb(0, 0, 0)', '1px', 'non-scaling-stroke']);
+  });
 
+  it('rounds the corners by the radius of a style, up to a pill', async () => {
     host.style('alert', { background: 'rgb(255, 0, 0)', borderRadius: 999 });
     await settle();
+
     // A radius beyond half the shorter side is a pill: the corner of the rectangle is empty.
     expect(pathAt(242, 2)).toBeNull();
     expect(fill(285, 30)).toBe(RED);
@@ -189,24 +206,36 @@ describe('minimap node styles', () => {
     expect(pathAt(122, 102)).toBeNull();
   });
 
-  it('derives a style from the data of a node, and asks nothing while nodes move', async () => {
+  describe('a style rule of a function', () => {
     const failed: MinimapNodeStyle = { background: 'rgb(200, 0, 0)' };
-    const rule = vi.fn((node: Node) => ((node.data?.() as { failed?: boolean }).failed ? failed : undefined));
-    host.style('task', rule);
-    await settle();
-    // Once for the one node of the component; without a style it takes the tokens.
-    expect(rule).toHaveBeenCalledTimes(1);
-    expect(fill(165, 30)).toBe(DEFAULT);
+    let rule: ReturnType<typeof vi.fn<(node: Node) => MinimapNodeStyle | undefined>>;
 
-    host.nodes()[1].point.set({ x: 125, y: 5 });
-    await settle();
-    expect(rule).toHaveBeenCalledTimes(1);
+    beforeEach(async () => {
+      rule = vi.fn((node: Node) => ((node.data?.() as { failed?: boolean }).failed ? failed : undefined));
+      host.style('task', rule);
+      await settle();
+    });
 
-    host.nodes()[1].data.set({ failed: true });
-    await settle();
-    expect(rule).toHaveBeenCalledTimes(2);
-    expect(fill(165, 30)).toBe('rgb(200, 0, 0)');
-    expect(fill(285, 30)).toBe(RED);
+    it('is asked once per node of its component, and without a style the node takes the tokens', () => {
+      expect(rule).toHaveBeenCalledTimes(1);
+      expect(fill(165, 30)).toBe(DEFAULT);
+    });
+
+    it('is not asked again while the node moves', async () => {
+      host.nodes()[1].point.set({ x: 125, y: 5 });
+      await settle();
+
+      expect(rule).toHaveBeenCalledTimes(1);
+    });
+
+    it('derives the style again from data that changes', async () => {
+      host.nodes()[1].data.set({ failed: true });
+      await settle();
+
+      expect(rule).toHaveBeenCalledTimes(2);
+      expect(fill(165, 30)).toBe('rgb(200, 0, 0)');
+      expect(fill(285, 30)).toBe(RED);
+    });
   });
 
   it('follows settings that change', async () => {
@@ -217,21 +246,67 @@ describe('minimap node styles', () => {
   });
 });
 
-describe('withMinimap()', () => {
-  it('adds the keys of a closer level to the level above, a key it sets replacing the style above', () => {
-    const byData = (node: Node) => (node.id === 'a' ? { background: 'red' } : undefined);
-    const root = Injector.create({
-      providers: provideVflow(
-        withMinimap({ nodeStyles: { task: { background: 'green', borderRadius: 4 }, alert: byData } }),
-      ),
-    });
-    const closer = Injector.create({
-      parent: root,
-      providers: provideVflow(withMinimap({ nodeStyles: { task: { background: 'blue' } } })),
-    });
+@Component({
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideVflow(withMinimap({ nodeStyles: { task: { background: 'rgb(0, 128, 0)' } } }))],
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes">
+    <v-minimap vPanel="bottom-right" [pannable]="true" />
+  </vflow>`,
+})
+class CloserMinimapHostComponent {
+  nodes = createNodes([
+    { id: 'plain', point: { x: 0, y: 0 }, width: 90, height: 60 },
+    { id: 'task', component: 'task', point: { x: 120, y: 0 }, width: 90, height: 60 },
+    { id: 'alert', component: 'alert', point: { x: 240, y: 0 }, width: 90, height: 60 },
+    { id: 'corner', point: { x: 310, y: 240 }, width: 90, height: 60 },
+  ]);
+}
 
-    const styles = closer.get(VFLOW_MINIMAP_SETTINGS)().nodeStyles!;
-    expect(styles['task']).toEqual({ background: 'blue' });
-    expect(styles['alert']).toBe(byData);
+describe('withMinimap() on two levels', () => {
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      providers: [
+        provideVflow(
+          withNodeComponents({ task: TaskNodeComponent, alert: TaskNodeComponent }),
+          withMinimap({
+            nodeStyles: {
+              task: { background: 'rgb(255, 0, 0)', borderRadius: 999 },
+              alert: (node: Node) => (node.id === 'alert' ? { background: 'rgb(0, 0, 255)' } : undefined),
+            },
+          }),
+        ),
+      ],
+    }),
+  );
+
+  async function render() {
+    const fixture = TestBed.createComponent(CloserMinimapHostComponent);
+    fixture.detectChanges();
+    for (let i = 0; i < 2; i++) await new Promise(requestAnimationFrame);
+    await fixture.whenStable();
+    const box = fixture.nativeElement.querySelector('v-minimap svg').getBoundingClientRect();
+    const zoom = Math.min((box.width - 10) / 400, (box.height - 10) / 300);
+    return (x: number, y: number) => {
+      const hit = document.elementFromPoint(
+        box.left + box.width / 2 + (x - 200) * zoom,
+        box.top + box.height / 2 + (y - 150) * zoom,
+      );
+      return hit instanceof SVGPathElement ? hit : null;
+    };
+  }
+
+  it('replaces the style of a key that the closer level sets, the radius of the level above included', async () => {
+    const pathAt = await render();
+
+    expect(getComputedStyle(pathAt(165, 30)!).fill).toBe(GREEN);
+    // Without the pill radius of the level above, the corner of the node is drawn.
+    expect(pathAt(125, 5)).not.toBeNull();
+  });
+
+  it('keeps the keys of the level above that the closer level does not set', async () => {
+    const pathAt = await render();
+
+    expect(getComputedStyle(pathAt(285, 30)!).fill).toBe('rgb(0, 0, 255)');
   });
 });

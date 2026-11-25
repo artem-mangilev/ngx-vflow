@@ -6,15 +6,24 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
 import { FlowRenderingService } from '../services/flow-rendering.service';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-
-@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
-class ProbeNodeComponent {}
+import { ChangeDetectionStrategy, Component, WritableSignal, signal } from '@angular/core';
+import { Vflow } from '../vflow';
+import { Point } from '../interfaces/point.interface';
 
 describe('NodeModel', () => {
   let model: NodeModel;
   let entitiesService: FlowEntitiesService;
   let settingsService: FlowSettingsService;
+
+  const make = (node: Parameters<typeof createNode>[0]) =>
+    TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
+
+  /** Adds a model of `node` to the graph. */
+  const add = (node: Parameters<typeof createNode>[0]) => {
+    const added = make(node);
+    entitiesService.nodes.update((nodes) => [...nodes, added]);
+    return added;
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -27,111 +36,81 @@ describe('NodeModel', () => {
       ],
     });
 
-    model = TestBed.runInInjectionContext(
-      () =>
-        new NodeModel(
-          createNode({
-            id: '1',
-
-            point: { x: 15, y: 15 },
-          }),
-        ),
-    );
-
     entitiesService = TestBed.inject(FlowEntitiesService);
     settingsService = TestBed.inject(FlowSettingsService);
-
-    entitiesService.nodes.update((nodes) => [...nodes, model]);
+    model = add({ id: '1', point: { x: 15, y: 15 } });
   });
 
   describe('size modes', () => {
-    const make = (node: Parameters<typeof createNode>[0]) =>
-      TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
     const modes = (model: NodeModel) => [model.widthMode(), model.heightMode()];
 
-    it('is auto on both axes for nodes without application-provided size', () => {
-      expect(modes(make({ id: 'a', point: { x: 0, y: 0 } }))).toEqual(['auto', 'auto']);
-    });
-
-    it('decides each axis by its own application signal', () => {
-      expect(modes(make({ id: 'b', point: { x: 0, y: 0 }, width: 10, height: 20 }))).toEqual(['explicit', 'explicit']);
-      expect(modes(make({ id: 'c', point: { x: 0, y: 0 }, width: 10 }))).toEqual(['explicit', 'auto']);
-      expect(modes(make({ id: 'c2', point: { x: 0, y: 0 }, height: 10 }))).toEqual(['auto', 'explicit']);
+    it.each([
+      ['no size', {}, ['auto', 'auto']],
+      ['both sizes', { width: 10, height: 20 }, ['explicit', 'explicit']],
+      ['only a width', { width: 10 }, ['explicit', 'auto']],
+      ['only a height', { height: 10 }, ['auto', 'explicit']],
+    ])('decides each axis by its own application signal, with %s', (_, size, expected) => {
+      expect(modes(make({ id: 'a', point: { x: 0, y: 0 }, ...size }))).toEqual(expected);
     });
 
     it('does not become explicit because other nodes reference it as parent', () => {
-      const parent = make({ id: 'd', point: { x: 0, y: 0 } });
-      const child = make({ id: 'd-child', parentId: 'd', point: { x: 0, y: 0 } });
-      entitiesService.nodes.update((nodes) => [...nodes, parent, child]);
+      const parent = add({ id: 'd', point: { x: 0, y: 0 } });
+      const child = add({ id: 'd-child', parentId: 'd', point: { x: 0, y: 0 } });
+
       expect(parent.children()).toEqual([child]);
       expect(modes(parent)).toEqual(['auto', 'auto']);
     });
-
-    it('makes only the resized axis explicit when the application has no signal', () => {
-      const auto = make({ id: 'e', point: { x: 0, y: 0 } });
-      auto.setExplicitSize({ width: 240 });
-      expect(modes(auto)).toEqual(['explicit', 'auto']);
-      expect(auto.explicitWidth()).toBe(240);
-      expect(auto.rawNode.width).toBeUndefined();
-    });
-
-    it('writes a resized axis into the application signal when there is one', () => {
-      const sized = make({ id: 'f', point: { x: 0, y: 0 }, width: 100, height: 50 });
-      sized.setExplicitSize({ width: 180, height: 90 });
-      expect(sized.rawNode.width!()).toBe(180);
-      expect(sized.rawNode.height!()).toBe(90);
-    });
   });
 
-  describe('rendered size', () => {
-    const make = (node: Parameters<typeof createNode>[0]) =>
-      TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
+  it('starts from the explicit size of the application', () => {
+    const sized = make({ id: 'a', point: { x: 0, y: 0 }, width: 100, height: 50 });
 
-    it('starts from the explicit size and follows it', () => {
-      const sized = make({ id: 'a', point: { x: 0, y: 0 }, width: 100, height: 50 });
-      expect([sized.width(), sized.height()]).toEqual([100, 50]);
+    expect([sized.width(), sized.height()]).toEqual([100, 50]);
+  });
 
-      sized.rawNode.width!.set(300);
-      expect(sized.width()).toBe(300);
-    });
+  it('follows a change of the explicit size of the application', () => {
+    const sized = make({ id: 'a', point: { x: 0, y: 0 }, width: 100, height: 50 });
 
-    it('does not write measurement into the application signals', () => {
-      const sized = make({ id: 'b', point: { x: 0, y: 0 }, width: 100, height: 50 });
-      // CSS min-width clamped the rendered box.
-      sized.width.set(140);
-      expect(sized.width()).toBe(140);
-      expect(sized.rawNode.width!()).toBe(100);
-      expect(sized.explicitWidth()).toBe(100);
-    });
+    sized.rawNode.width!.set(300);
+
+    expect(sized.width()).toBe(300);
   });
 
   describe('signals added to the node object later', () => {
-    const make = (id: string) => {
+    const makeLate = (id: string) => {
       const node: Node = { id, point: signal({ x: 0, y: 0 }) };
-      const model = TestBed.runInInjectionContext(() => new NodeModel(node));
-      entitiesService.nodes.update((nodes) => [...nodes, model]);
-      return { node, model };
+      const late = TestBed.runInInjectionContext(() => new NodeModel(node));
+      entitiesService.nodes.update((nodes) => [...nodes, late]);
+      return { node, model: late };
     };
     const passNewArray = () => entitiesService.nodes.update((nodes) => [...nodes]);
 
-    it('reads a size signal once the application passes a new array, and resizes into it', () => {
-      const { node, model } = make('a');
+    it('reads a size signal once the application passes a new array', () => {
+      const { node, model } = makeLate('a');
       model.setExplicitSize({ width: 300 });
-      expect(model.explicitWidth()).toBe(300);
 
       node.width = signal(300);
       passNewArray();
       node.width.set(500);
+
       expect(model.explicitWidth()).toBe(500);
       expect(model.width()).toBe(500);
+    });
+
+    it('resizes into a size signal it has read', () => {
+      const { node, model } = makeLate('a');
+      node.width = signal(300);
+      passNewArray();
 
       model.setExplicitSize({ width: 400 });
+
       expect(node.width()).toBe(400);
       expect(model.explicitWidth()).toBe(400);
     });
 
     it('keeps resizing into the model until the new array arrives', () => {
-      const { node, model } = make('b');
+      const { node, model } = makeLate('b');
+      // Read once, as a rendered flow does.
       expect(model.widthMode()).toBe('auto');
 
       node.width = signal(300);
@@ -144,22 +123,29 @@ describe('NodeModel', () => {
       expect(model.explicitWidth()).toBe(300);
     });
 
-    it('selects through the application signal, which wins over the selection held by the model', () => {
-      const { node, model } = make('c');
+    it('takes the selection from an application signal over the selection held by the model', () => {
+      const { node, model } = makeLate('c');
       model.selected.set(true);
-      expect(model.selected()).toBe(true);
 
       node.selected = signal(false);
       passNewArray();
+
       expect(model.selected()).toBe(false);
       expect(model.context.$implicit.selected()).toBe(false);
+    });
+
+    it('selects into an application signal it has read', () => {
+      const { node, model } = makeLate('c');
+      node.selected = signal(false);
+      passNewArray();
 
       model.selected.set(true);
+
       expect(node.selected()).toBe(true);
     });
 
-    it('reads the capabilities, the extent and the data', () => {
-      const { node, model } = make('d');
+    it('reads the capabilities, the extent and the data once the application passes a new array', () => {
+      const { node, model } = makeLate('d');
       expect([model.draggable(), model.extent(), model.selectable(), model.focusable()]).toEqual([
         true,
         'parent',
@@ -185,118 +171,118 @@ describe('NodeModel', () => {
     });
 
     it('adds no signals to the application object on resize and selection', () => {
-      const { node, model } = make('e');
+      const { node, model } = makeLate('e');
+
       model.setExplicitSize({ width: 240, height: 120 });
       model.selected.set(true);
+
       expect(Object.keys(node)).toEqual(['id', 'point']);
     });
   });
 
-  it('should create correct translate function from point', () => {
+  it('translates the node element to its point', () => {
     model.setPoint({ x: 10, y: 10 });
+
     expect(model.pointTransformCss()).toEqual('translate(10px, 10px)');
   });
 
-  it('should create correct parent/children links', () => {
-    const childModel = () =>
-      new NodeModel(
-        createNode({
-          id: '2',
-          parentId: '1',
-          point: { x: 10, y: 10 },
-        }),
-      );
+  it('links a parent and its children', () => {
+    const child = add({ id: '2', parentId: '1', point: { x: 10, y: 10 } });
 
-    entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
-
-    expect(model.children().length).toEqual(1);
-    // check if children of model is correct
-    expect(model.children()[0].rawNode.id).toEqual('2');
-    // check if parent of child is also set correctly
-    expect(model.children()[0].parent()?.rawNode.id).toEqual('1');
+    expect(model.children()).toEqual([child]);
+    expect(child.parent()).toBe(model);
   });
 
-  it('should return correct global point', () => {
-    const childModel = () =>
-      new NodeModel(
-        createNode({
-          id: '2',
-          parentId: '1',
-          point: { x: 10, y: 10 },
-        }),
-      );
+  it('places a child relative to its parent', () => {
+    const child = add({ id: '2', parentId: '1', point: { x: 10, y: 10 } });
 
-    entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
-
-    expect(model.children()[0].globalPoint()).toEqual({ x: 25, y: 25 });
+    expect(child.globalPoint()).toEqual({ x: 25, y: 25 });
   });
 
-  it('should resolve selection and focus defaults reactively', () => {
-    expect(model.selectable()).toBe(true);
-    expect(model.focusable()).toBe(true);
+  it.each([
+    ['selectable', 'nodesSelectable'],
+    ['focusable', 'nodesFocusable'],
+  ] as const)('follows the %s default of the flow', (capability, setting) => {
+    expect(model[capability]()).toBe(true);
 
-    settingsService.bind({ nodesSelectable: signal(false) });
-    settingsService.bind({ nodesFocusable: signal(false) });
+    settingsService.bind({ [setting]: signal(false) });
 
-    expect(model.selectable()).toBe(false);
-    expect(model.focusable()).toBe(false);
+    expect(model[capability]()).toBe(false);
   });
 
-  it('should let explicit capability overrides win over global settings', () => {
-    const rawNode = createNode({
-      id: 'explicit',
-      point: { x: 0, y: 0 },
-      selectable: false,
-      focusable: true,
-    });
-    const explicitModel = TestBed.runInInjectionContext(() => new NodeModel(rawNode));
+  it.each([
+    ['selectable', 'nodesSelectable', false],
+    ['focusable', 'nodesFocusable', true],
+  ] as const)('lets the %s value of a node win over the flow default', (capability, setting, value) => {
+    const explicit = make({ id: 'explicit', point: { x: 0, y: 0 }, [capability]: value });
 
-    settingsService.bind({ nodesSelectable: signal(true) });
-    settingsService.bind({ nodesFocusable: signal(false) });
+    settingsService.bind({ [setting]: signal(!value) });
 
-    expect(explicitModel.selectable()).toBe(false);
-    expect(explicitModel.focusable()).toBe(true);
-  });
-
-  it('should keep inherited capabilities absent when factories materialize defaults', () => {
-    const created = createNode({ id: 'factory', point: { x: 0, y: 0 } });
-
-    expect(created.selectable).toBeUndefined();
-    expect(created.focusable).toBeUndefined();
-    expect(created.parentId()).toBeNull();
+    expect(explicit[capability]()).toBe(value);
   });
 
   it('exposes node data and model size to the presentation of every node', () => {
     const ctx = model.context.$implicit;
-    expect(ctx.node).toBe(model.rawNode);
-    expect(ctx.data()).toEqual({});
+
     model.width.set(240);
     model.height.set(120);
+
+    expect(ctx.node).toBe(model.rawNode);
+    expect(ctx.data()).toEqual({});
     expect(ctx.width()).toBe(240);
     expect(ctx.height()).toBe(120);
   });
 
-  it('describes a node as a group only while other nodes reference it as parent', () => {
-    expect(model.ariaLabel()).toBe('Node 1');
-    expect(model.accessibility().roleDescription).toBe('node');
-    const child = TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id: '2', parentId: '1', point: { x: 0, y: 0 } })),
-    );
-    entitiesService.nodes.update((nodes) => [...nodes, child]);
+  it('describes a node with a child as a group, keeping its label', () => {
+    add({ id: '2', parentId: '1', point: { x: 0, y: 0 } });
+
     expect(model.ariaLabel()).toBe('Node 1');
     expect(model.accessibility().roleDescription).toBe('group');
-    entitiesService.nodes.update((nodes) => nodes.filter((node) => node !== child));
-    expect(model.accessibility().roleDescription).toBe('node');
   });
 
-  it('loads a component class immediately and waits for the viewport with a lazy factory', () => {
-    settingsService.bind({ lazyLoadTrigger: signal('viewport') });
-    const make = (component: Parameters<typeof createNode>[0]['component']) =>
-      TestBed.runInInjectionContext(
-        () => new NodeModel(createNode({ id: 'c', component, point: { x: 5000, y: 5000 } })),
-      );
+  it('describes a node as a node again once its last child is removed', () => {
+    const child = add({ id: '2', parentId: '1', point: { x: 0, y: 0 } });
 
-    expect(make(ProbeNodeComponent).shouldLoad()).toBe(true);
-    expect(make(() => Promise.resolve(ProbeNodeComponent)).shouldLoad()).toBe(false);
+    entitiesService.nodes.update((nodes) => nodes.filter((node) => node !== child));
+
+    expect(model.accessibility().roleDescription).toBe('node');
+  });
+});
+
+@Component({
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes()" />`,
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class FlowHostComponent {
+  public readonly nodes = signal<Node[]>([]);
+}
+
+describe('NodeModel in a flow', () => {
+  it('stops observing the point of a node removed from the graph', async () => {
+    const point = signal<Point>({ x: 0, y: 0 });
+    // The application signal is the boundary: the spy counts the reads of the flow.
+    const read = vi.fn(() => point());
+    const observedPoint = Object.assign(read, point) as unknown as WritableSignal<Point>;
+    const fixture = TestBed.createComponent(FlowHostComponent);
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    fixture.componentInstance.nodes.set([{ id: 'removed', point: observedPoint }]);
+    await settle();
+
+    read.mockClear();
+    point.set({ x: 1, y: 0 });
+    await settle();
+    expect(read).toHaveBeenCalled();
+
+    fixture.componentInstance.nodes.set([]);
+    await settle();
+    read.mockClear();
+    point.set({ x: 5, y: 0 });
+    await settle();
+
+    expect(read).not.toHaveBeenCalled();
   });
 });

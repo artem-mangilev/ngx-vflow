@@ -16,15 +16,7 @@ import { createEdges } from '../../interfaces/edge.interface';
       <span vHandle handleType="target" position="left"></span>
       <span vHandle handleType="source" position="right"></span>
     </div>
-    <ng-template let-ctx vEdge>
-      @if (ctx.edge.id === 'a-b') {
-        <svg:g>
-          <svg:path class="line" fill="none" [attr.d]="ctx.path()" />
-        </svg:g>
-      } @else {
-        <svg:path class="line" fill="none" [attr.d]="ctx.path()" />
-      }
-    </ng-template>
+    <svg:path *vEdge="let ctx" class="line" fill="none" [attr.d]="ctx.path()" />
   </vflow>`,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,81 +63,102 @@ describe('selection by click', () => {
     await settle();
   });
 
-  it('selects a node by a click on its presentation without any directive', async () => {
+  it('selects a node by a click on its presentation without any directive', () => {
     click(nodeElement('a').querySelector('.card')!);
-    expect(node('a').selected!()).toBe(true);
 
+    expect(node('a').selected!()).toBe(true);
+  });
+
+  it('moves the selection to the node clicked next', () => {
+    click(nodeElement('a').querySelector('.card')!);
     click(nodeElement('b').querySelector('.card')!);
-    expect(node('a').selected!()).toBe(false);
-    expect(node('b').selected!()).toBe(true);
+
+    expect([node('a').selected!(), node('b').selected!()]).toEqual([false, true]);
   });
 
-  it('keeps the selection on a click inside [vNoSelect] and on an unselectable node', async () => {
+  it('keeps the selection on a click inside [vNoSelect]', () => {
     click(nodeElement('a').querySelector('.card')!);
-
     click(nodeElement('b').querySelector('.action')!);
-    expect(node('b').selected!()).toBe(false);
-    expect(node('a').selected!()).toBe(true);
 
+    expect([node('a').selected!(), node('b').selected!()]).toEqual([true, false]);
+  });
+
+  it('keeps the selection on a click on an unselectable node', () => {
+    click(nodeElement('a').querySelector('.card')!);
     click(nodeElement('c').querySelector('.card')!);
-    expect(node('c').selected!()).toBe(false);
-    expect(node('a').selected!()).toBe(true);
+
+    expect([node('a').selected!(), node('c').selected!()]).toEqual([true, false]);
   });
 
-  it('draws the hit area of an edge in its host when the template starts with control flow', async () => {
-    const withGroup = edgeElement('a-b');
-    const plain = edgeElement('a-c');
-    // A group inside control flow can be destroyed without the view, so it never holds the stroke.
-    expect(withGroup.querySelector(':scope > [data-v-interactive-edge]')).not.toBeNull();
-    expect(withGroup.querySelector('g > [data-v-interactive-edge]')).toBeNull();
-    const stroke = plain.querySelector<SVGPathElement>(':scope > [data-v-interactive-edge]')!;
-    expect(stroke).not.toBeNull();
-    expect(stroke.style.strokeWidth).toBe('20px');
-    // The presentation stays on top of the stroke.
-    expect(
-      stroke.compareDocumentPosition(plain.querySelector('.line')!) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-
-    click(stroke);
-    expect(edge('a-c').selected!()).toBe(true);
-    click(withGroup.querySelector('[data-v-interactive-edge]')!);
-    expect(edge('a-b').selected!()).toBe(true);
-    expect(edge('a-c').selected!()).toBe(false);
-
-    edge('a-c').interactionWidth!.set(0);
+  it('marks a node selected by a click with data-v-selected', async () => {
+    click(nodeElement('a').querySelector('.card')!);
     await settle();
-    expect(stroke.style.display).toBe('none');
+
+    expect(nodeElement('a').hasAttribute('data-v-selected')).toBe(true);
   });
 
-  it('elevates a node and an edge when they become selected, however the selection is made', async () => {
+  it('moves data-v-selected from a node to the edge clicked next', async () => {
+    click(nodeElement('a').querySelector('.card')!);
+    await settle();
+    click(edgeElement('a-b').querySelector('[data-v-interactive-edge]')!);
+    await settle();
+
+    expect([
+      nodeElement('a').hasAttribute('data-v-selected'),
+      edgeElement('a-b').hasAttribute('data-v-selected'),
+    ]).toEqual([false, true]);
+  });
+
+  describe('elevation', () => {
     const elevation = (element: HTMLElement | SVGElement) => Number(element.style.zIndex);
-    const a = nodeElement('a');
-    const b = nodeElement('b');
-    // The input order is the initial render order.
-    expect(elevation(a)).toBeLessThan(elevation(b));
 
-    node('a').selected!.set(true);
-    await settle();
-    expect(elevation(a)).toBeGreaterThan(elevation(b));
+    it('renders nodes in input order at first', () => {
+      expect(elevation(nodeElement('a'))).toBeLessThan(elevation(nodeElement('b')));
+    });
 
-    click(b.querySelector('.card')!);
-    await settle();
-    expect(elevation(b)).toBeGreaterThan(elevation(a));
+    it('elevates a node selected by the application', async () => {
+      node('a').selected!.set(true);
+      await settle();
 
-    const ab = edgeElement('a-b');
-    const ac = edgeElement('a-c');
-    edge('a-c').selected!.set(true);
-    await settle();
-    expect(elevation(ac)).toBeGreaterThan(elevation(ab));
+      expect(elevation(nodeElement('a'))).toBeGreaterThan(elevation(nodeElement('b')));
+    });
 
-    host.elevateNodes.set(false);
-    await settle();
-    node('a').selected!.set(false);
-    node('b').selected!.set(false);
-    await settle();
-    const before = elevation(a);
-    node('a').selected!.set(true);
-    await settle();
-    expect(elevation(a)).toBe(before);
+    it('elevates a node selected by a click', async () => {
+      node('b').selected!.set(true);
+      await settle();
+      click(nodeElement('a').querySelector('.card')!);
+      await settle();
+
+      expect(elevation(nodeElement('a'))).toBeGreaterThan(elevation(nodeElement('b')));
+    });
+
+    it('elevates a selected edge', async () => {
+      edge('a-c').selected!.set(true);
+      await settle();
+
+      expect(elevation(edgeElement('a-c'))).toBeGreaterThan(elevation(edgeElement('a-b')));
+    });
+
+    it('keeps the order of a selected node when elevateNodesOnSelect is off', async () => {
+      host.elevateNodes.set(false);
+      await settle();
+      const before = elevation(nodeElement('a'));
+
+      node('a').selected!.set(true);
+      await settle();
+
+      expect(elevation(nodeElement('a'))).toBe(before);
+    });
+
+    it('keeps the order of a selected edge when elevateEdgesOnSelect is off', async () => {
+      host.elevateEdges.set(false);
+      await settle();
+      const before = elevation(edgeElement('a-b'));
+
+      edge('a-b').selected!.set(true);
+      await settle();
+
+      expect(elevation(edgeElement('a-b'))).toBe(before);
+    });
   });
 });

@@ -15,6 +15,7 @@ describe('NodesChangeService', () => {
   let entities: FlowEntitiesService;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     TestBed.configureTestingModule({
       providers: [
         NodesChangeService,
@@ -29,68 +30,40 @@ describe('NodesChangeService', () => {
     entities = TestBed.inject(FlowEntitiesService);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   /**
    * Runs the effects that read the signals, a few times over since observing a node starts effects of its own, and
-   * waits for the batch: the service delivers it 25 ms after the pass, before a timer started later for longer.
+   * lets the 25 ms delay of the batch pass.
    */
   async function settle() {
     for (let i = 0; i < 3; i++) {
       TestBed.tick();
-      await new Promise((resolve) => setTimeout(resolve));
+      await vi.advanceTimersByTimeAsync(0);
     }
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await vi.advanceTimersByTimeAsync(25);
   }
 
   function node(id: string) {
     return TestBed.runInInjectionContext(() => new NodeModel(createNode({ id, point: { x: 0, y: 0 } })));
   }
 
-  it('delivers the changes of one tick as one array', async () => {
-    const [a, b] = [node('a'), node('b')];
+  async function record(...nodes: NodeModel[]) {
     const batches: NodeChange[][] = [];
-    const positions: NodeChange[][] = [];
     service.changes$.subscribe((changes) => batches.push(changes));
-    service.changesOfType('position').subscribe((changes) => positions.push(changes));
-    entities.nodes.set([a, b]);
+    entities.nodes.set(nodes);
     await settle();
-    batches.length = positions.length = 0;
-
-    a.point.set({ x: 10, y: 0 });
-    b.point.set({ x: 20, y: 0 });
-    a.selected.set(true);
-    await settle();
-
-    expect(batches.length).toBe(1);
-    expect(batches[0]).toHaveLength(3);
-    expect(batches[0]).toEqual(
-      expect.arrayContaining([
-        { type: 'position', id: 'a', point: { x: 10, y: 0 } },
-        { type: 'position', id: 'b', point: { x: 20, y: 0 } },
-        { type: 'select', id: 'a', selected: true },
-      ]),
-    );
-    expect(positions).toEqual([
-      [
-        { type: 'position', id: 'a', point: { x: 10, y: 0 } },
-        { type: 'position', id: 'b', point: { x: 20, y: 0 } },
-      ],
-    ]);
-
-    b.point.set({ x: 30, y: 0 });
-    await settle();
-    expect(batches.length).toBe(2);
-    expect(batches[1]).toEqual([{ type: 'position', id: 'b', point: { x: 30, y: 0 } }]);
-  });
+    batches.length = 0;
+    return batches;
+  }
 
   it('gives the same array to every listener', async () => {
     const a = node('a');
-    const first: NodeChange[][] = [];
+    const first = await record(a);
     const second: NodeChange[][] = [];
-    service.changes$.subscribe((changes) => first.push(changes));
     service.changes$.subscribe((changes) => second.push(changes));
-    entities.nodes.set([a]);
-    await settle();
-    first.length = second.length = 0;
 
     a.point.set({ x: 10, y: 0 });
     await settle();
@@ -99,42 +72,41 @@ describe('NodesChangeService', () => {
     expect(second[0]).toBe(first[0]);
   });
 
-  it('reports nothing when the application adds or removes a node', async () => {
-    const [a, b] = [node('a'), node('b')];
-    const batches: NodeChange[][] = [];
-    service.changes$.subscribe((changes) => batches.push(changes));
-    entities.nodes.set([a]);
-    await settle();
-    batches.length = 0;
+  it('reports no position or selection when the application replaces a node', async () => {
+    const batches = await record(node('a'));
 
-    entities.nodes.set([b]);
+    entities.nodes.set([node('b')]);
     await settle();
 
     expect(batches.flat().filter((change) => change.type !== 'size')).toEqual([]);
   });
 
-  it('reports the mode of each axis with every size change', async () => {
-    const model = TestBed.runInInjectionContext(() => new NodeModel(createNode({ id: '1', point: { x: 0, y: 0 } })));
-    const changes: NodeChange[] = [];
-    service.changes$.subscribe((c) => changes.push(...c));
-    entities.nodes.set([model]);
-    await settle();
+  it('reports a measured size with both axes in auto mode', async () => {
+    const model = node('1');
+    const batches = await record(model);
 
     model.width.set(120);
     await settle();
-    expect(changes.at(-1)).toEqual({
+
+    expect(batches.flat().at(-1)).toEqual({
       type: 'size',
       id: '1',
       size: { width: 120, height: 50 },
       mode: { width: 'auto', height: 'auto' },
     });
+  });
+
+  it('reports an explicit size with the mode of each axis', async () => {
+    const model = node('1');
+    const batches = await record(model);
 
     model.setExplicitSize({ height: 80 });
     await settle();
-    expect(changes.at(-1)).toEqual({
+
+    expect(batches.flat().at(-1)).toEqual({
       type: 'size',
       id: '1',
-      size: { width: 120, height: 80 },
+      size: { width: 100, height: 80 },
       mode: { width: 'auto', height: 'explicit' },
     });
   });

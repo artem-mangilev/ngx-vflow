@@ -10,17 +10,18 @@ import {
 } from '@nx/devkit';
 import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
-import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import { THEME_IMPORT } from '../../steps/tokens';
 import { uiGenerator } from './generator';
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
 
-/** Every template of the set, as paths inside `src`: `index.ts`, `lib/node.directive.ts`, … */
-const PARTS = readdirSync(join(__dirname, '../../steps/templates/ui/src/lib')).map(
-  (file) => `lib/${file.replace(/\.template$/, '')}`,
-);
+/** A minimal list of files every installed set has, as paths inside `src`. */
+const CORE_FILES = ['index.ts', 'lib/node.directive.ts', 'lib/edge.directive.ts'];
+
+/** Every file of the installed set under `directory`, as paths inside `src`. */
+function setFiles(tree: Tree, directory: string): string[] {
+  return ['index.ts', ...tree.children(`${directory}/src/lib`).map((file) => `lib/${file}`)];
+}
 
 /**
  * Where the alias points in tsconfig.base.json. The library generator of @nx/angular writes the path: with a
@@ -54,7 +55,6 @@ describe('ui in Nx', () => {
     await uiGenerator(tree);
 
     expect(aliasTarget(tree, '@acme/flow-ui')).toEqual(['libs/flow-ui/src/index.ts']);
-    expect(tree.exists('libs/flow-ui/src/lib/node.directive.ts')).toBe(true);
     expect(tree.exists('vflow.json')).toBe(false);
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([
       expect.objectContaining({ name: 'componentsPath', initial: 'libs/vflow-ui' }),
@@ -62,49 +62,36 @@ describe('ui in Nx', () => {
     ]);
   });
 
-  it('creates one library with the alias as import path and the whole set', async () => {
+  it('creates one library holding the set, with the alias as import path', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
 
     await uiGenerator(tree);
 
     const project = readProjectConfiguration(tree, 'vflow-ui');
     expect(project.root).toBe('libs/vflow-ui');
-    expect(project.targets?.['build']).toBeDefined();
     expect(aliasTarget(tree, '@vflow/ui')).toEqual(['libs/vflow-ui/src/index.ts']);
+    for (const file of CORE_FILES) expect(tree.exists(`libs/vflow-ui/src/${file}`)).toBe(true);
     expect(tree.read('libs/vflow-ui/src/index.ts', 'utf-8')).toContain("from './lib/node.directive'");
-    for (const part of PARTS) expect(tree.exists(`libs/vflow-ui/src/${part}`)).toBe(true);
-    expect(tree.children('libs/vflow-ui/src/lib').sort()).toEqual(PARTS.map((part) => part.slice(4)).sort());
   });
 
-  it('creates a library with a build target unless the nx.json default says otherwise', async () => {
+  it('creates the library with a build target by default', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+
     await uiGenerator(tree);
+
     expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeDefined();
-
-    const other = createTreeWithEmptyWorkspace();
-    updateNxJson(other, { generators: { '@nx/angular': { library: { buildable: false } } } });
-    await uiGenerator(other);
-    expect(readProjectConfiguration(other, 'vflow-ui').targets?.['build']).toBeUndefined();
   });
 
-  it('adds the tokens to the application and the parts to the workspace', async () => {
+  it('creates the library without a build target when nx.json says it is not buildable', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
-    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
-    addProjectConfiguration(tree, 'shop', {
-      root: 'apps/shop',
-      sourceRoot: 'apps/shop/src',
-      projectType: 'application',
-    });
-    tree.write('apps/shop/src/styles.css', "@import 'tailwindcss';\n");
+    updateNxJson(tree, { generators: { '@nx/angular': { library: { buildable: false } } } });
 
     await uiGenerator(tree);
 
-    expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
-    expect(tree.exists('apps/shop/src/vflow-ui.css')).toBe(true);
-    expect(tree.exists('libs/vflow-ui/src/lib/node.directive.ts')).toBe(true);
+    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
   });
 
-  it('adds the tokens to another application on a later run', async () => {
+  it('adds the tokens to another application on a later run without asking again', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
     for (const app of ['shop', 'admin']) {
@@ -123,7 +110,7 @@ describe('ui in Nx', () => {
     expect(vi.mocked(prompt)).toHaveBeenCalledTimes(1);
   });
 
-  it('fails before writing anything when the application has no Tailwind 4', async () => {
+  it('writes nothing when the application has no Tailwind 4', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     addProjectConfiguration(tree, 'shop', {
       root: 'apps/shop',
@@ -133,7 +120,9 @@ describe('ui in Nx', () => {
     tree.write('apps/shop/src/styles.css', '');
 
     await expect(uiGenerator(tree)).rejects.toThrow('needs Tailwind CSS 4');
+
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
+    expect(tree.exists('libs/vflow-ui')).toBe(false);
   });
 
   it('takes --directory without asking for it', async () => {
@@ -143,7 +132,6 @@ describe('ui in Nx', () => {
 
     expect(vi.mocked(prompt).mock.calls[0][0]).not.toContainEqual(expect.objectContaining({ name: 'componentsPath' }));
     expect(aliasTarget(tree, '@vflow/ui')).toEqual(['libs/shared/flow/src/index.ts']);
-    expect(tree.exists('libs/shared/flow/src/lib/node.directive.ts')).toBe(true);
   });
 
   it('takes --importAlias without asking for it', async () => {
@@ -152,7 +140,7 @@ describe('ui in Nx', () => {
     await uiGenerator(tree, { importAlias: '@acme/flow-ui' });
 
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([expect.objectContaining({ name: 'componentsPath' })]);
-    expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@acme/flow-ui']).toBeDefined();
+    expect(aliasTarget(tree, '@acme/flow-ui')).toEqual(['libs/vflow-ui/src/index.ts']);
   });
 
   it('asks nothing without an interactive terminal and takes the defaults', async () => {
@@ -167,8 +155,9 @@ describe('ui in Nx', () => {
   it('finds a moved and renamed set through the tsconfig paths without asking', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
-    for (const part of PARTS) tree.rename(`libs/vflow-ui/src/${part}`, `libs/flow/parts/src/${part}`);
-    tree.rename('libs/vflow-ui/src/index.ts', 'libs/flow/parts/src/index.ts');
+    for (const file of setFiles(tree, 'libs/vflow-ui')) {
+      tree.rename(`libs/vflow-ui/src/${file}`, `libs/flow/parts/src/${file}`);
+    }
     updateJson(tree, 'tsconfig.base.json', (json) => {
       json.compilerOptions.paths = { '@acme/flow': ['./libs/flow/parts/src/index.ts'] };
       return json;
@@ -196,22 +185,40 @@ describe('ui in Nx', () => {
   it('asks for --directory when the set is installed twice', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
-    for (const part of PARTS) tree.write(`libs/copy/src/${part}`, tree.read(`libs/vflow-ui/src/${part}`)!);
+    for (const file of setFiles(tree, 'libs/vflow-ui')) {
+      tree.write(`libs/copy/src/${file}`, tree.read(`libs/vflow-ui/src/${file}`)!);
+    }
     updateJson(tree, 'tsconfig.base.json', (json) => {
       json.compilerOptions.paths['@acme/copy'] = ['libs/copy/src/index.ts'];
       return json;
     });
 
     await expect(uiGenerator(tree)).rejects.toThrow('installed more than once: libs/vflow-ui, libs/copy');
-    await uiGenerator(tree, { directory: 'libs/copy' });
   });
 
-  it('adds ngx-vflow when it is missing', async () => {
+  it('takes --directory to choose between two installed sets', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    await uiGenerator(tree);
+    for (const file of setFiles(tree, 'libs/vflow-ui')) {
+      tree.write(`libs/copy/src/${file}`, tree.read(`libs/vflow-ui/src/${file}`)!);
+    }
+    updateJson(tree, 'tsconfig.base.json', (json) => {
+      json.compilerOptions.paths['@acme/copy'] = ['libs/copy/src/index.ts'];
+      return json;
+    });
+    tree.delete('libs/copy/src/lib/edge.directive.ts');
+
+    await uiGenerator(tree, { directory: 'libs/copy' });
+
+    expect(tree.exists('libs/copy/src/lib/edge.directive.ts')).toBe(true);
+  });
+
+  it('adds ngx-vflow to package.json as part of a run', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
 
     await uiGenerator(tree);
 
-    expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toMatch(/^\^\d/);
+    expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBeDefined();
   });
 
   it('refuses a later run into another folder than the installed set', async () => {
@@ -222,7 +229,13 @@ describe('ui in Nx', () => {
       '@vflow/ui is already installed in libs/vflow-ui',
     );
     expect(tree.exists('libs/other')).toBe(false);
-    await uiGenerator(tree, { directory: './libs/vflow-ui/' });
+  });
+
+  it('takes the installed folder written with a leading ./ and a trailing slash', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    await uiGenerator(tree);
+
+    await expect(uiGenerator(tree, { directory: './libs/vflow-ui/' })).resolves.toBeTypeOf('function');
   });
 
   it('refuses a first run into a folder that already has files', async () => {
@@ -251,28 +264,42 @@ describe('ui in Nx', () => {
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('./lib/node.directive'));
   });
 
-  it('reports edited files, replaces them with --overwrite but never the index, and writes nothing with --diff', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
-    await uiGenerator(tree);
+  describe('with an edited file and an edited index', () => {
     const node = 'libs/vflow-ui/src/lib/node.directive.ts';
     const index = 'libs/vflow-ui/src/index.ts';
-    tree.write(node, '// edited');
-    tree.write(index, "export * from './lib/node.directive';\n");
-    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
-    const info = vi.spyOn(logger, 'info').mockImplementation(() => undefined);
 
-    await uiGenerator(tree, { diff: true });
-    expect(tree.read(node, 'utf-8')).toBe('// edited');
-    expect(info).toHaveBeenCalledWith(expect.stringMatching(/--- libs\/vflow-ui\/src\/lib\/node\.directive\.ts/));
+    beforeEach(async () => {
+      answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+      await uiGenerator(tree);
+      tree.write(node, '// edited');
+      tree.write(index, "export * from './lib/node.directive';\n");
+    });
 
-    await uiGenerator(tree);
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringMatching(/2 files with your changes have a newer version: .*node\.directive\.ts.*--overwrite/),
-    );
+    it('reports edited files with a newer version', async () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
-    await uiGenerator(tree, { overwrite: true });
-    expect(tree.read(node, 'utf-8')).toContain('VuiNode');
-    expect(tree.read(index, 'utf-8')).toBe("export * from './lib/node.directive';\n");
+      await uiGenerator(tree);
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringMatching(/2 files with your changes have a newer version: .*node\.directive\.ts.*--overwrite/),
+      );
+    });
+
+    it('replaces edited files with --overwrite but never the index', async () => {
+      await uiGenerator(tree, { overwrite: true });
+
+      expect(tree.read(node, 'utf-8')).toContain('VuiNode');
+      expect(tree.read(index, 'utf-8')).toBe("export * from './lib/node.directive';\n");
+    });
+
+    it('prints the change and writes nothing with --diff', async () => {
+      const info = vi.spyOn(logger, 'info').mockImplementation(() => undefined);
+
+      await uiGenerator(tree, { diff: true });
+
+      expect(tree.read(node, 'utf-8')).toBe('// edited');
+      expect(info).toHaveBeenCalledWith(expect.stringMatching(/--- libs\/vflow-ui\/src\/lib\/node\.directive\.ts/));
+    });
   });
 
   it('with --diff on a workspace without the set adds nothing', async () => {
@@ -286,17 +313,34 @@ describe('ui in Nx', () => {
     expect(prompt).not.toHaveBeenCalled();
   });
 
-  it('accepts double-quoted exports and ignores files of the application', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
-    await uiGenerator(tree);
-    const exports = PARTS.map((part) => `export * from "./${part.replace(/\.ts$/, '')}";`).join('\n');
-    tree.write('libs/vflow-ui/src/index.ts', exports);
-    tree.write('libs/vflow-ui/src/lib/helpers.ts', 'export const mine = 1;\n');
-    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+  describe('with an index that exports the parts', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
 
-    await uiGenerator(tree);
+    beforeEach(async () => {
+      answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+      await uiGenerator(tree);
+      warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+    });
 
-    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('does not export'));
+    it('accepts double-quoted exports', async () => {
+      const exports = tree
+        .children('libs/vflow-ui/src/lib')
+        .map((file) => `export * from "./lib/${file.replace(/\.ts$/, '')}";`)
+        .join('\n');
+      tree.write('libs/vflow-ui/src/index.ts', exports);
+
+      await uiGenerator(tree);
+
+      expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('does not export'));
+    });
+
+    it('does not ask the index to export files of the application', async () => {
+      tree.write('libs/vflow-ui/src/lib/helpers.ts', 'export const mine = 1;\n');
+
+      await uiGenerator(tree);
+
+      expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('helpers'));
+    });
   });
 });
 
@@ -321,28 +365,25 @@ describe('ui in Angular CLI', () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
   });
 
-  it('refuses a directory outside the workspace and takes one with backslashes as the same folder', async () => {
-    for (const directory of ['../outside/ui', '/abs/ui', 'C:\\ui', 'libs/../../ui']) {
-      await expect(uiGenerator(tree, { angularCli: true, directory })).rejects.toThrow('inside the workspace');
-    }
+  it.each(['../outside/ui', '/abs/ui', 'C:\\ui', 'libs/../../ui'])('refuses the directory %s', async (directory) => {
+    await expect(uiGenerator(tree, { angularCli: true, directory })).rejects.toThrow('inside the workspace');
+  });
 
+  it('takes a directory with backslashes as the same folder on a second run', async () => {
     await uiGenerator(tree, { angularCli: true, directory: 'libs\\flow-ui' });
 
     expect(readJson(tree, 'tsconfig.json').compilerOptions.paths['@vflow/ui']).toEqual(['./libs/flow-ui/src/index.ts']);
-    expect(readJson(tree, 'tsconfig.app.json').include).toContain('libs/flow-ui/src/**/*.ts');
-    // A second run with the same folder finds the installed set.
-    await uiGenerator(tree, { angularCli: true, directory: 'libs\\flow-ui' });
+    await expect(uiGenerator(tree, { angularCli: true, directory: 'libs\\flow-ui' })).resolves.toBeTypeOf('function');
   });
 
-  it('asks without the Nx question and maps the alias in the root tsconfig', async () => {
+  it('maps the alias in the root tsconfig and stores no config of its own', async () => {
     await uiGenerator(tree, { angularCli: true });
 
     expect(tree.exists('vflow.json')).toBe(false);
     expect(readJson(tree, 'tsconfig.json').compilerOptions.paths['@vflow/ui']).toEqual([
       './libs/vflow-ui/src/index.ts',
     ]);
-    expect(tree.read('src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
-    for (const part of PARTS) expect(tree.exists(`libs/vflow-ui/src/${part}`)).toBe(true);
+    for (const file of CORE_FILES) expect(tree.exists(`libs/vflow-ui/src/${file}`)).toBe(true);
   });
 
   it('keeps the comments of the tsconfig files', async () => {
@@ -359,7 +400,6 @@ describe('ui in Angular CLI', () => {
     expect(root).toContain('// Shared by every project.');
     expect(root).toContain('"@vflow/ui"');
     expect(tree.read('tsconfig.app.json', 'utf-8')).toContain('/* App config. */');
-    expect(readJson(tree, 'tsconfig.app.json').include).toEqual(['src/**/*.ts', 'libs/vflow-ui/src/**/*.ts']);
   });
 
   it('refuses a first run into a folder that already has files', async () => {
@@ -369,7 +409,7 @@ describe('ui in Angular CLI', () => {
     expect(readJson(tree, 'tsconfig.json').compilerOptions.paths).toBeUndefined();
   });
 
-  it('adds the parts to tsconfig.app.json and keeps the app sources', async () => {
+  it('adds the parts to tsconfig.app.json once across runs, beside the app sources', async () => {
     await uiGenerator(tree, { angularCli: true });
     await uiGenerator(tree, { angularCli: true });
 

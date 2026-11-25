@@ -25,9 +25,15 @@ describe('allowRootZoomForNodeTarget', () => {
     expect(allowRootZoomForNodeTarget(pointerdownOn(child()), true)).toBe(false);
   });
 
-  it('allows a press that no control or handle keeps, and rejects one inside a no-pan part', () => {
+  it('allows a press on a plain part of a node', () => {
     expect(allowRootZoomForNodeTarget(pointerdownOn(child()), false)).toBe(true);
+  });
+
+  it('rejects a press inside a no-pan part', () => {
     expect(allowRootZoomForNodeTarget(pointerdownOn(child('data-v-no-pan')), false)).toBe(false);
+  });
+
+  it('rejects a press on a handle that can start a connection', () => {
     expect(
       allowRootZoomForNodeTarget(pointerdownOn(child('data-v-handle-type', 'data-v-handle-can-start')), false),
     ).toBe(false);

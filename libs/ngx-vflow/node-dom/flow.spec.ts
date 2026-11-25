@@ -88,6 +88,9 @@ describe('Vflow in a DOM without layout', () => {
       'note note',
       'note sized',
     ]);
+  });
+
+  it('renders the handles of every node presentation', () => {
     expect(element.querySelectorAll('[vHandle]').length).toBe(4);
   });
 
@@ -113,11 +116,16 @@ describe('Vflow in a DOM without layout', () => {
     expect(note.closest<HTMLElement>('[portalHost]')!.style.transform).toBe('translate(10px, 20px)');
   });
 
-  it('renders an edge presentation with a path between the node positions and its label', () => {
+  it('renders the path of an edge presentation between the node positions', () => {
     expect(element.querySelector('.edge-path')!.getAttribute('d')).toMatch(/^M0,0 .*250,0$/);
-    // The template starts with a group, a label follows it: the interaction stroke is the first child of the group.
+  });
+
+  it('draws the interaction stroke as the first child of the group a presentation starts with', () => {
     expect(element.querySelector('svg[edge] > g > path[data-v-interactive-edge]:first-child')).not.toBeNull();
     expect(element.querySelector('svg[edge] > path[data-v-interactive-edge]')).toBeNull();
+  });
+
+  it('renders the label of an edge presentation', () => {
     expect(element.querySelector('.v-edge-labels-layer')!.textContent).toContain('task-note');
   });
 
@@ -159,22 +167,39 @@ describe('Vflow in a DOM without layout', () => {
     expect(element.querySelector('.edge-path')).toBeNull();
   });
 
-  it('applies programmatic viewport changes, and reports that the first layout never completes', async () => {
+  it('zooms to a level', async () => {
     expect(await host.flow().zoomTo(2)).toBe(true);
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 2 });
+  });
+
+  it('sets the viewport', async () => {
     expect(await host.flow().setViewport({ x: 10, y: 20, zoom: 1 })).toBe(true);
     expect(host.flow().viewport()).toEqual({ x: 10, y: 20, zoom: 1 });
+  });
+
+  it('zooms in', async () => {
     await host.flow().zoomIn();
+
     expect(host.flow().viewport().zoom).toBeGreaterThan(1);
+  });
+
+  it('zooms back out by the step it zoomed in', async () => {
+    await host.flow().zoomIn();
     await host.flow().zoomOut();
+
     expect(host.flow().viewport().zoom).toBeCloseTo(1);
+  });
+
+  it('lists the nodes of the application', () => {
     expect(
       host
         .flow()
         .nodes()
         .map((node) => node.id),
-    ).toContain('task');
+    ).toEqual(['task', 'note', 'sized']);
+  });
 
+  it('never completes the first layout, so it is not initialized and cannot fit the view', async () => {
     expect(host.initialized).toBe(false);
     expect(await host.flow().fitView()).toBe(false);
   });

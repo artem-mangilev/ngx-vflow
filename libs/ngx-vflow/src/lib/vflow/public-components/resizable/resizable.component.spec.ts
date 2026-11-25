@@ -1,21 +1,19 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { Node, createNodes } from '../../interfaces/node.interface';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { Vflow } from '../../vflow';
-import { mouseAsPointer } from '../../gestures/pointer-events.testing';
-import { ResizeEvent } from './resizer-types';
+import { dispatchPointer, pointerDrag } from '../../gestures/pointer-events.testing';
+import { ControlPosition, ResizeEvent } from './resizer-types';
 
 @Component({
   template: `
     <vflow style="width: 400px; height: 300px" [nodes]="nodes">
       <ng-template vNode>
         @if (useCustomGap()) {
-          <div class="resizable-host" vResizable [gap]="gap()"></div>
+          <div class="box" [vResizable]="enabled()" [gap]="4" [autoScale]="autoScale()"></div>
         } @else {
-          <div class="resizable-host" vResizable></div>
+          <div class="box" [vResizable]="enabled()" [autoScale]="autoScale()"></div>
         }
       </ng-template>
     </vflow>
@@ -26,20 +24,16 @@ import { ResizeEvent } from './resizer-types';
       width: 400px;
       height: 300px;
     }
-
-    .resizable-host {
-      width: 100px;
-      height: 80px;
-    }
   `,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ResizableTestHostComponent {
   public readonly vflow = viewChild.required(VflowComponent);
-  public readonly gap = signal(4);
   public readonly useCustomGap = signal(true);
-  public readonly nodes = createNodes([{ id: 'node', point: { x: 50, y: 50 } }]);
+  public readonly enabled = signal(true);
+  public readonly autoScale = signal(true);
+  public readonly nodes = createNodes([{ id: 'node', point: { x: 50, y: 50 }, width: 100, height: 80 }]);
 }
 
 @Component({
@@ -50,6 +44,7 @@ class ResizableTestHostComponent {
           <div
             class="card"
             vResizable
+            [minWidth]="minWidth()"
             (resizeStart)="resizes.push(['start', $event])"
             (resize)="resizes.push(['resize', $event])"
             (resizeEnd)="resizes.push(['end', $event])">
@@ -92,12 +87,24 @@ class ResizableTestHostComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class SizeTargetHostComponent {
+  public readonly vflow = viewChild.required(VflowComponent);
   public readonly withResizable = signal(true);
+  public readonly minWidth = signal<number | undefined>(undefined);
   public readonly nodes = signal<Node[]>(createNodes([{ id: 'node', point: { x: 20, y: 20 } }]));
   public readonly resizes: Array<[string, ResizeEvent]> = [];
 }
 
 const SIZED_NODES = () => createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300, height: 150 }]);
+const POSITIONS: ControlPosition[] = [
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+];
 
 async function settle(fixture: ComponentFixture<unknown>) {
   fixture.detectChanges();
@@ -106,39 +113,34 @@ async function settle(fixture: ComponentFixture<unknown>) {
   fixture.detectChanges();
 }
 
-async function createSizeTargetFixture(options: { withResizable?: boolean; nodes?: Node[] } = {}) {
-  TestBed.configureTestingModule({
-    imports: [SizeTargetHostComponent],
-  });
-
+async function createSizeTargetFixture(options: { withResizable?: boolean; nodes?: Node[]; minWidth?: number } = {}) {
   const fixture = TestBed.createComponent(SizeTargetHostComponent);
   fixture.componentInstance.withResizable.set(options.withResizable ?? true);
+  fixture.componentInstance.minWidth.set(options.minWidth);
   if (options.nodes) fixture.componentInstance.nodes.set(options.nodes);
   await settle(fixture);
 
   const root = fixture.nativeElement as HTMLElement;
-  const entities = fixture.debugElement.query(By.directive(VflowComponent)).injector.get(FlowEntitiesService);
 
   return {
     fixture,
-    model: () => entities.nodes()[0],
+    rect: () => fixture.componentInstance.vflow().getNodeRect('node')!,
     card: () => root.querySelector<HTMLElement>('.card')!,
     wrapper: () => root.querySelector<HTMLElement>('.v-node-wrapper')!,
     node: () => root.querySelector<HTMLElement>('[data-v-node]')!,
     controls: () => Array.from(root.querySelectorAll<HTMLElement>('[data-v-resize-control]')),
-    handle: () => root.querySelector<HTMLElement>('[data-v-handle]')!,
+    control: (position: ControlPosition) =>
+      root.querySelector<HTMLElement>(`[data-v-resize-control-position="${position}"]`)!,
   };
 }
 
+/** Drags a control in two equal steps and releases it. */
 function drag(control: Element, dx: number, dy: number) {
-  const { x, y } = center(control);
-  const mouse = (type: string, clientX: number, clientY: number) =>
-    mouseAsPointer(type, { clientX, clientY, bubbles: true, view: window, buttons: type === 'mouseup' ? 0 : 1 });
-
-  control.dispatchEvent(mouse('mousedown', x, y));
-  window.dispatchEvent(mouse('mousemove', x + dx / 2, y + dy / 2));
-  window.dispatchEvent(mouse('mousemove', x + dx, y + dy));
-  window.dispatchEvent(mouse('mouseup', x + dx, y + dy));
+  const from = center(control);
+  pointerDrag(control, from, [
+    { x: from.x + dx / 2, y: from.y + dy / 2 },
+    { x: from.x + dx, y: from.y + dy },
+  ]);
 }
 
 function center(element: Element) {
@@ -147,103 +149,87 @@ function center(element: Element) {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-function expectCloseTo(actual: number, expected: number) {
-  expect(actual).toBeCloseTo(expected, 1);
-}
-
-async function createFixture(useCustomGap = true) {
-  TestBed.configureTestingModule({
-    imports: [ResizableTestHostComponent],
-  });
-
+async function createFixture(options: { useCustomGap?: boolean; enabled?: boolean; autoScale?: boolean } = {}) {
   const fixture = TestBed.createComponent(ResizableTestHostComponent);
-  fixture.componentInstance.useCustomGap.set(useCustomGap);
-  fixture.detectChanges();
-  await fixture.whenStable();
+  fixture.componentInstance.useCustomGap.set(options.useCustomGap ?? true);
+  fixture.componentInstance.enabled.set(options.enabled ?? true);
+  fixture.componentInstance.autoScale.set(options.autoScale ?? true);
+  await settle(fixture);
 
   return fixture;
 }
 
+/** How far outside the node box the center of each control is, on screen, on each axis the control is placed on. */
+function controlGaps(host: HTMLElement) {
+  const node = host.querySelector('[data-v-node]')!.getBoundingClientRect();
+  return POSITIONS.flatMap((position) => {
+    const { x, y } = center(host.querySelector(`[data-v-resize-control-position="${position}"]`)!);
+    const gaps: number[] = [];
+    if (position.includes('top')) gaps.push(node.top - y);
+    if (position.includes('bottom')) gaps.push(y - node.bottom);
+    if (position.includes('left')) gaps.push(node.left - x);
+    if (position.includes('right')) gaps.push(x - node.right);
+    return gaps;
+  });
+}
+
 describe('VflowResizableComponent', () => {
-  it('applies a custom gap to every resize line and corner handle', async () => {
-    const fixture: ComponentFixture<ResizableTestHostComponent> = await createFixture();
-
-    const host = fixture.nativeElement as HTMLElement;
-    const controls = Array.from(host.querySelectorAll<HTMLElement>('[data-v-resize-control]'));
-
-    expect(controls.length).toBe(8);
-    controls.forEach((control) => expect(getComputedStyle(control).getPropertyValue('--_gap')).toBe('4px'));
-  });
-
-  it('renders controls at the default 1.5px gap', async () => {
-    const fixture = await createFixture(false);
-
-    const host = fixture.nativeElement as HTMLElement;
-    const node = host.querySelector('[data-v-node]')!;
-    const topLeft = host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-left]')!;
-    const nodeRect = node.getBoundingClientRect();
-    const handleCenter = center(topLeft);
-
-    expectCloseTo(nodeRect.left - handleCenter.x, 1.5);
-    expectCloseTo(nodeRect.top - handleCenter.y, 1.5);
-  });
-
-  it('keeps every custom-gap control aligned at non-unit zoom with autoScale', async () => {
+  it('renders four lines and four corner handles', async () => {
     const fixture = await createFixture();
+    const controls = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[data-v-resize-control]'));
 
-    await fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom: 0.5 });
-    fixture.detectChanges();
-    await fixture.whenStable();
+    expect(controls.map((control) => control.getAttribute('data-v-resize-control-position'))).toEqual(POSITIONS);
+    expect(controls.map((control) => control.getAttribute('data-v-resize-control'))).toEqual([
+      ...Array(4).fill('line'),
+      ...Array(4).fill('handle'),
+    ]);
+  });
 
+  it.each([
+    { gap: 'the default 1.5px', useCustomGap: false, zoom: 1, expected: 1.5 },
+    { gap: 'a custom 4px', useCustomGap: true, zoom: 1, expected: 4 },
+    { gap: 'a custom 4px', useCustomGap: true, zoom: 0.5, expected: 2 },
+  ])('places every control $gap outside the node at zoom $zoom', async ({ useCustomGap, zoom, expected }) => {
+    const fixture = await createFixture({ useCustomGap });
+    await fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom });
+    await settle(fixture);
+
+    for (const gap of controlGaps(fixture.nativeElement)) expect(gap).toBeCloseTo(expected, 1);
+  });
+
+  it.each([
+    { autoScale: true, expected: 6 },
+    { autoScale: false, expected: 3 },
+  ])(
+    'draws a 6px corner handle $expected px wide on screen at zoom 0.5 with autoScale $autoScale',
+    async ({ autoScale, expected }) => {
+      const fixture = await createFixture({ autoScale });
+      await fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom: 0.5 });
+      await settle(fixture);
+
+      const handle = (fixture.nativeElement as HTMLElement).querySelector('[data-v-resize-control=handle]')!;
+      expect(handle.getBoundingClientRect().width).toBeCloseTo(expected, 1);
+    },
+  );
+
+  it('renders no controls with [vResizable]="false" and keeps the element as the sizing box', async () => {
+    const fixture = await createFixture({ enabled: false });
     const host = fixture.nativeElement as HTMLElement;
-    const nodeRect = host.querySelector('[data-v-node]')!.getBoundingClientRect();
-    const expectedScreenGap = fixture.componentInstance.gap() * 0.5;
 
-    const top = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=top]')!);
-    const right = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=right]')!);
-    const bottom = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=bottom]')!);
-    const left = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=left]')!);
-    const topLeft = center(
-      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-left]')!,
-    );
-    const topRight = center(
-      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-right]')!,
-    );
-    const bottomLeft = center(
-      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=bottom-left]')!,
-    );
-    const bottomRight = center(
-      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]')!,
-    );
-
-    expectCloseTo(nodeRect.top - top.y, expectedScreenGap);
-    expectCloseTo(right.x - nodeRect.right, expectedScreenGap);
-    expectCloseTo(bottom.y - nodeRect.bottom, expectedScreenGap);
-    expectCloseTo(nodeRect.left - left.x, expectedScreenGap);
-
-    expectCloseTo(nodeRect.left - topLeft.x, expectedScreenGap);
-    expectCloseTo(nodeRect.top - topLeft.y, expectedScreenGap);
-    expectCloseTo(topRight.x - nodeRect.right, expectedScreenGap);
-    expectCloseTo(nodeRect.top - topRight.y, expectedScreenGap);
-    expectCloseTo(nodeRect.left - bottomLeft.x, expectedScreenGap);
-    expectCloseTo(bottomLeft.y - nodeRect.bottom, expectedScreenGap);
-    expectCloseTo(bottomRight.x - nodeRect.right, expectedScreenGap);
-    expectCloseTo(bottomRight.y - nodeRect.bottom, expectedScreenGap);
-
-    expect(host.querySelector('[data-v-resize-control=handle]')!.getBoundingClientRect().width).toBeCloseTo(6, 1);
+    expect(host.querySelectorAll('[data-v-resize-control]').length).toBe(0);
+    expect(host.querySelector<HTMLElement>('.box')!.style.width).toBe('100px');
   });
 
   describe('size target', () => {
     it('leaves a content-sized node without inline size so the node box follows the element', async () => {
-      const { model, card, wrapper, node } = await createSizeTargetFixture();
+      const { rect, card, wrapper, node } = await createSizeTargetFixture();
 
-      expect([model().widthMode(), model().heightMode()]).toEqual(['auto', 'auto']);
       expect(card().style.width).toBe('');
       expect(wrapper().style.width).toBe('');
       // content-box min-width 240 + padding 20 + border 4
       expect(card().offsetWidth).toBe(264);
       expect(node().offsetWidth).toBe(264);
-      expect(model().width()).toBe(264);
+      expect(rect().width).toBe(264);
     });
 
     it('writes an explicit size to the resizable element as a border box instead of the wrapper', async () => {
@@ -255,17 +241,6 @@ describe('VflowResizableComponent', () => {
       expect(wrapper().style.width).toBe('');
       expect([card().offsetWidth, card().offsetHeight]).toEqual([300, 150]);
       expect([node().offsetWidth, node().offsetHeight]).toEqual([300, 150]);
-    });
-
-    it('moves the size onto the resizable element once the resizer commits', async () => {
-      const { fixture, model, card, node } = await createSizeTargetFixture();
-
-      model().setExplicitSize({ width: 320, height: 200 });
-      await settle(fixture);
-
-      expect(card().style.width).toBe('320px');
-      expect([card().offsetWidth, node().offsetWidth]).toEqual([320, 320]);
-      expect(model().width()).toBe(320);
     });
 
     it('renders controls in the node layer so a clipping element cannot hide them', async () => {
@@ -288,89 +263,84 @@ describe('VflowResizableComponent', () => {
     });
 
     it('hands the size back to the wrapper and removes controls when the resizable element is destroyed', async () => {
-      const { fixture, model, wrapper, controls } = await createSizeTargetFixture({ nodes: SIZED_NODES() });
+      const { fixture, wrapper, controls } = await createSizeTargetFixture({ nodes: SIZED_NODES() });
 
       fixture.componentInstance.withResizable.set(false);
       await settle(fixture);
 
-      expect(model().resizerTemplate()).toBeNull();
       expect(controls().length).toBe(0);
       expect(wrapper().style.width).toBe('300px');
     });
 
     it('makes both axes explicit when a corner resizes a content-sized node', async () => {
-      const { fixture, model, card, controls } = await createSizeTargetFixture();
+      const { fixture, rect, card, control } = await createSizeTargetFixture();
 
-      drag(
-        controls().find((control) =>
-          control.matches('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
-        )!,
-        40,
-        30,
-      );
+      drag(control('bottom-right'), 40, 30);
       await settle(fixture);
 
-      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'explicit']);
-      expect(model().width()).toBe(304);
-      expect(card().style.width).toBe('304px');
+      // 264×144 content size, grown by the drag.
+      expect([card().style.width, card().style.height]).toEqual(['304px', '174px']);
       expect(card().offsetWidth).toBe(304);
-      expect(model().rawNode.width).toBeUndefined();
+      expect([rect().width, rect().height]).toEqual([304, 174]);
+      // The application gave no size, so the flow adds no size signal to its node.
+      expect(fixture.componentInstance.nodes()[0].width).toBeUndefined();
     });
 
     it('makes only the width explicit when a side control resizes a content-sized node', async () => {
-      const { fixture, model, card, controls } = await createSizeTargetFixture();
+      const { fixture, rect, card, control } = await createSizeTargetFixture();
 
-      drag(
-        controls().find((control) =>
-          control.matches('[data-v-resize-control=line][data-v-resize-control-position=right]'),
-        )!,
-        40,
-        0,
-      );
+      drag(control('right'), 40, 0);
       await settle(fixture);
 
-      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'auto']);
       expect(card().style.width).toBe('304px');
       expect(card().style.height).toBe('');
       // An explicit axis makes the element border-box, so the auto height is now clamped by min-height alone.
-      expect(model().height()).toBe(120);
+      expect(rect().height).toBe(120);
     });
 
-    it('reports the resized node, the pointer event and the direction of each step per axis', async () => {
+    it('emits resizeStart, a resize per move and resizeEnd for the node of the application', async () => {
       const nodes = SIZED_NODES();
-      const { fixture, controls } = await createSizeTargetFixture({ nodes });
+      const { fixture, control } = await createSizeTargetFixture({ nodes });
       const resizes = fixture.componentInstance.resizes;
-      const corner = (selector: string) => controls().find((control) => control.matches(selector))!;
 
-      drag(corner('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'), 40, 30);
+      drag(control('bottom-right'), 40, 30);
       await settle(fixture);
 
       expect(resizes.map(([kind]) => kind)).toEqual(['start', 'resize', 'resize', 'end']);
       expect(resizes.every(([, event]) => event.node === nodes[0])).toBe(true);
-      expect(resizes.at(-1)?.[1]).toMatchObject({ width: 340, height: 180 });
-      expect(resizes[1][1].direction).toEqual({ x: 1, y: 1 });
-      expect(resizes[0][1].direction).toEqual({ x: 0, y: 0 });
-      expect(resizes.at(-1)?.[1].direction).toEqual({ x: 0, y: 0 });
       expect(resizes.every(([, event]) => event.sourceEvent instanceof PointerEvent)).toBe(true);
+    });
 
-      resizes.length = 0;
-      drag(corner('[data-v-resize-control=handle][data-v-resize-control-position=top-left]'), -20, 0);
+    it('reports the size before the gesture at the start and the last size at the end', async () => {
+      const { fixture, control } = await createSizeTargetFixture({ nodes: SIZED_NODES() });
+      const resizes = fixture.componentInstance.resizes;
+
+      drag(control('bottom-right'), 40, 30);
       await settle(fixture);
 
-      expect(resizes[1][1].direction).toEqual({ x: -1, y: 0 });
+      expect(resizes[0][1]).toMatchObject({ x: 20, y: 20, width: 300, height: 150, direction: { x: 0, y: 0 } });
+      expect(resizes.at(-1)![1]).toMatchObject({ x: 20, y: 20, width: 340, height: 180, direction: { x: 0, y: 0 } });
+    });
+
+    it.each<[ControlPosition, number, number, { x: number; y: number }]>([
+      ['bottom-right', 40, 30, { x: 1, y: 1 }],
+      ['bottom-right', -40, -30, { x: -1, y: -1 }],
+      ['top-left', -20, 0, { x: -1, y: 0 }],
+      ['top-left', 20, 20, { x: 1, y: 1 }],
+    ])('reports the direction the %s control moved by %i, %i on each axis', async (position, dx, dy, direction) => {
+      const { fixture, control } = await createSizeTargetFixture({ nodes: SIZED_NODES() });
+
+      drag(control(position), dx, dy);
+      await settle(fixture);
+
+      expect(fixture.componentInstance.resizes[1][1].direction).toEqual(direction);
     });
 
     it('writes the resized size into the application signals', async () => {
       const nodes = SIZED_NODES();
-      const { fixture, controls } = await createSizeTargetFixture({ nodes });
+      const { fixture, control } = await createSizeTargetFixture({ nodes });
 
-      drag(
-        controls().find((control) =>
-          control.matches('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
-        )!,
-        40,
-        30,
-      );
+      drag(control('bottom-right'), 40, 30);
       await settle(fixture);
 
       expect([nodes[0].width!(), nodes[0].height!()]).toEqual([340, 180]);
@@ -378,63 +348,64 @@ describe('VflowResizableComponent', () => {
 
     it('applies a programmatic size after a resize', async () => {
       const nodes = SIZED_NODES();
-      const { fixture, model, card, controls } = await createSizeTargetFixture({ nodes });
+      const { fixture, rect, card, control } = await createSizeTargetFixture({ nodes });
 
-      drag(
-        controls().find((control) =>
-          control.matches('[data-v-resize-control=line][data-v-resize-control-position=right]'),
-        )!,
-        40,
-        0,
-      );
+      drag(control('right'), 40, 0);
       await settle(fixture);
       nodes[0].width!.set(260);
       await settle(fixture);
 
       expect(card().offsetWidth).toBe(260);
-      expect(model().width()).toBe(260);
+      expect(rect().width).toBe(260);
     });
 
     it('keeps the application size when CSS clamps the rendered box', async () => {
       const nodes = createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 100, height: 150 }]);
-      const { model, card } = await createSizeTargetFixture({ nodes });
+      const { rect, card } = await createSizeTargetFixture({ nodes });
 
       // CSS min-width wins over the inline width.
       expect(card().offsetWidth).toBe(240);
-      expect(model().width()).toBe(240);
+      expect(rect().width).toBe(240);
       expect(nodes[0].width!()).toBe(100);
     });
 
     it('fixes only the width when the application provides only a width', async () => {
       const nodes = createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300 }]);
-      const { model, card, wrapper } = await createSizeTargetFixture({ nodes, withResizable: false });
+      const { rect, card, wrapper } = await createSizeTargetFixture({ nodes, withResizable: false });
 
       expect(wrapper().style.width).toBe('300px');
       expect(wrapper().style.height).toBe('');
-      expect([model().width(), model().height()]).toEqual([300, card().offsetHeight]);
-      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'auto']);
+      expect([rect().width, rect().height]).toEqual([300, card().offsetHeight]);
     });
 
-    it('ignores measurements during a gesture, then reconciles the size and moves the handles', async () => {
-      const nodes = SIZED_NODES();
-      const { fixture, model, card, handle } = await createSizeTargetFixture({ nodes });
+    describe('below the CSS min-width, allowed by [minWidth]="0"', () => {
+      /** Presses the right control and moves it 200px left, from 300 to 100, without releasing. */
+      async function hold() {
+        const target = await createSizeTargetFixture({ nodes: SIZED_NODES(), minWidth: 0 });
+        const from = center(target.control('right'));
+        dispatchPointer(target.control('right'), 'pointerdown', from);
+        dispatchPointer(window, 'pointermove', { x: from.x - 200, y: from.y });
+        await settle(target.fixture);
+        return { ...target, release: () => dispatchPointer(window, 'pointerup', { x: from.x - 200, y: from.y }) };
+      }
 
-      model().resizing.set(true);
-      model().setExplicitSize({ width: 100 });
-      await settle(fixture);
+      it('keeps the size of the gesture while CSS clamps the box during the resize', async () => {
+        const { rect, card, release } = await hold();
 
-      // CSS min-width wins in the DOM, but the gesture still owns the model size.
-      expect(card().offsetWidth).toBe(240);
-      expect(model().width()).toBe(100);
+        expect(card().offsetWidth).toBe(240);
+        expect(rect().width).toBe(100);
+        release();
+      });
 
-      model().resizing.set(false);
-      await settle(fixture);
+      it('takes the rendered size once the resize ends and leaves the application its size', async () => {
+        const { fixture, rect, release } = await hold();
 
-      expect(model().width()).toBe(240);
-      // Reconciliation updates the rendered size only; the application keeps the size the gesture wrote.
-      expect(nodes[0].width!()).toBe(100);
-      const handleModel = model().handles()[0];
-      expect(handleModel.pointAbsolute().x - model().globalPoint().x).toBeCloseTo(240 + handle().offsetWidth / 2, 1);
+        release();
+        await settle(fixture);
+
+        expect(rect().width).toBe(240);
+        expect(fixture.componentInstance.nodes()[0].width!()).toBe(100);
+      });
     });
   });
 });

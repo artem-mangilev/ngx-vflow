@@ -19,7 +19,13 @@
       },
       "defaultConfiguration": "production",
       "executor": "./libs/routing/node_modules/@angular/build:ng-packagr",
-      "inputs": ["production", { "dependentTasksOutputFiles": "**/*.d.ts", "transitive": true }],
+      "inputs": [
+        "production",
+        {
+          "dependentTasksOutputFiles": "**/*.d.ts",
+          "transitive": true
+        }
+      ],
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
@@ -31,6 +37,9 @@
       "configurations": {
         "watch": {
           "command": "vitest"
+        },
+        "coverage": {
+          "command": "vitest run --coverage"
         }
       }
     },

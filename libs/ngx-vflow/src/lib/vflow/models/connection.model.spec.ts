@@ -18,12 +18,16 @@ describe('ConnectionModel', () => {
     target,
   });
 
-  it('defaults to a bezier curve without self connections', () => {
-    const model = new ConnectionModel({});
+  it('defaults to a bezier curve', () => {
+    expect(new ConnectionModel({}).curve).toBe('bezier');
+  });
 
-    expect(model.curve).toBe('bezier');
-    expect(model.validator(connection())).toBe(true);
-    expect(model.validator(connection(end(a, 'source'), end(a, 'target')))).toBe(false);
+  it('accepts a connection between two nodes by default', () => {
+    expect(new ConnectionModel({}).validator(connection())).toBe(true);
+  });
+
+  it('rejects a self connection by default', () => {
+    expect(new ConnectionModel({}).validator(connection(end(a, 'source'), end(a, 'target')))).toBe(false);
   });
 
   it('accepts a self connection only when allowed', () => {
@@ -32,24 +36,33 @@ describe('ConnectionModel', () => {
     expect(validator(connection(end(a, 'source'), end(a, 'target')))).toBe(true);
   });
 
-  it('rejects two handles of the same role and accepts any role against an any handle', () => {
+  it.each<[HandleType, HandleType, boolean]>([
+    ['source', 'source', false],
+    ['target', 'target', false],
+    ['any', 'source', true],
+    ['any', 'any', true],
+  ])('decides a connection from a %s handle to a %s handle: %s', (from, to, accepted) => {
     const { validator } = new ConnectionModel({});
 
-    expect(validator(connection(end(a, 'source'), end(b, 'source')))).toBe(false);
-    expect(validator(connection(end(a, 'target'), end(b, 'target')))).toBe(false);
-    expect(validator(connection(end(a, 'any'), end(b, 'source')))).toBe(true);
-    expect(validator(connection(end(a, 'any'), end(b, 'any')))).toBe(true);
+    expect(validator(connection(end(a, from), end(b, to)))).toBe(accepted);
   });
 
-  it('asks the application validator only about connections the built-in rules accept', () => {
-    const validator = vi.fn(() => false);
+  it.each([
+    ['a self connection', () => connection(end(a, 'source'), end(a, 'target'))],
+    ['two handles of one role', () => connection(end(a, 'source'), end(b, 'source'))],
+  ])('does not ask the application validator about %s', (_, rejected) => {
+    const validator = vi.fn(() => true);
     const model = new ConnectionModel({ validator });
 
-    expect(model.validator(connection(end(a, 'source'), end(a, 'target')))).toBe(false);
-    expect(model.validator(connection(end(a, 'source'), end(b, 'source')))).toBe(false);
+    expect(model.validator(rejected())).toBe(false);
     expect(validator).not.toHaveBeenCalled();
+  });
 
+  it('asks the application validator about a connection the built-in rules accept', () => {
+    const validator = vi.fn(() => false);
+    const model = new ConnectionModel({ validator });
     const accepted = connection();
+
     expect(model.validator(accepted)).toBe(false);
     expect(validator).toHaveBeenCalledExactlyOnceWith(accepted);
   });

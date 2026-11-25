@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../vflow/vflow.component';
 import { Background } from '../../types/background.type';
 
@@ -42,16 +43,23 @@ describe('Background pattern', () => {
     expect(style.stroke).toBe('none');
   });
 
-  it('draws nothing for an image that does not load, and keeps following the viewport', async () => {
+  it('draws nothing for an image that does not load, also after the viewport moves', async () => {
+    const src = 'data:image/png;base64,broken';
     const fixture = TestBed.createComponent(BackgroundHostComponent);
-    fixture.componentInstance.background.set({ type: 'image', src: 'data:image/png;base64,broken' });
+    fixture.componentInstance.background.set({ type: 'image', src });
     fixture.detectChanges();
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    // The flow started loading the same source first, so its load has failed by the time this one does.
+    await new Promise((resolve) => {
+      const image = new Image();
+      image.onerror = resolve;
+      image.src = src;
+    });
     await fixture.whenStable();
 
-    const flow = fixture.debugElement.children[0].componentInstance as VflowComponent;
+    const flow = fixture.debugElement.query(By.directive(VflowComponent)).componentInstance as VflowComponent;
     await flow.setViewport({ x: 30, y: 20, zoom: 2 });
-    expect(() => fixture.detectChanges()).not.toThrow();
-    expect(fixture.nativeElement.querySelector('[data-v-background-pattern]')).toBeNull();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('image')).toBeNull();
   });
 });

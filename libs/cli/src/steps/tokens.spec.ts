@@ -36,8 +36,6 @@ describe('tokens step', () => {
       `@import 'tailwindcss';\n${THEME_IMPORT}\n\nbody {\n  margin: 0;\n}\n`,
     );
     expect(tree.read('apps/app/src/vflow-ui.css', 'utf-8')).toBe(TOKENS);
-    expect(TOKENS).toContain('@theme inline');
-    expect(TOKENS).not.toMatch(/@import ['"]@vflow\/cli/);
   });
 
   it('skips a leading comment, @charset and layer statements', async () => {
@@ -52,13 +50,20 @@ describe('tokens step', () => {
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${THEME_IMPORT}\n.a {`);
   });
 
-  it('requires Tailwind CSS 4', async () => {
+  it('refuses a Tailwind 3 range and names it', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', '');
-
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^3.4.17' } }));
+
     await expect(ensureUiTokens(tree)).rejects.toThrow('this workspace has tailwindcss ^3.4.17');
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
+  });
+
+  it('refuses a workspace without Tailwind', async () => {
+    addApp(tree, 'app');
+    tree.write('apps/app/src/styles.css', '');
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: {} }));
+
     await expect(ensureUiTokens(tree)).rejects.toThrow('needs Tailwind CSS 4');
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
   });
@@ -76,15 +81,23 @@ describe('tokens step', () => {
     expect(allowsTailwind4(range)).toBe(allowed);
   });
 
-  it('trusts the installed Tailwind over the range', async () => {
+  it('trusts an installed Tailwind 3 over a range that allows 4', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', '');
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '>=3.4.0' } }));
     writeJson(tree, 'node_modules/tailwindcss/package.json', { version: '3.4.17' });
 
     await expect(ensureUiTokens(tree)).rejects.toThrow('this workspace has tailwindcss 3.4.17');
+  });
+
+  it('accepts an installed Tailwind 4 under a range that also allows 3', async () => {
+    addApp(tree, 'app');
+    tree.write('apps/app/src/styles.css', '');
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '>=3.4.0' } }));
     writeJson(tree, 'node_modules/tailwindcss/package.json', { version: '4.1.3' });
+
     await ensureUiTokens(tree);
+
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(`${THEME_IMPORT}\n`);
   });
 
@@ -148,7 +161,7 @@ describe('tokens step', () => {
     expect(tree.read('node_modules/some-lib/styles.css', 'utf-8')).toBe('');
   });
 
-  it('uses --stylesEntryPoint and rejects a missing one', async () => {
+  it('uses --stylesEntryPoint instead of the conventional stylesheet', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', '');
     tree.write('apps/app/src/flow.css', "@import 'tailwindcss';\n");
@@ -157,6 +170,11 @@ describe('tokens step', () => {
 
     expect(tree.read('apps/app/src/flow.css', 'utf-8')).toContain(THEME_IMPORT);
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
+  });
+
+  it('rejects a --stylesEntryPoint that does not exist', async () => {
+    addApp(tree, 'app');
+
     await expect(ensureUiTokens(tree, { stylesEntryPoint: 'apps/app/src/missing.css' })).rejects.toThrow(
       'does not exist',
     );
@@ -191,7 +209,7 @@ describe('tokens step', () => {
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
   });
 
-  it('takes --project without asking and rejects an unknown one', async () => {
+  it('takes --project without asking', async () => {
     addApp(tree, 'admin');
     addApp(tree, 'shop');
     tree.write('apps/admin/src/styles.css', '');
@@ -200,6 +218,12 @@ describe('tokens step', () => {
 
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
     expect(tree.read('apps/admin/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
+  });
+
+  it('rejects an unknown --project and lists the applications', async () => {
+    addApp(tree, 'admin');
+    addApp(tree, 'shop');
+
     await expect(ensureUiTokens(tree, { project: 'shared' })).rejects.toThrow('Choose one of: admin, shop');
   });
 

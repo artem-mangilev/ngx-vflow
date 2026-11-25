@@ -72,26 +72,43 @@ describe('vPanel', () => {
     });
   });
 
-  it('follows the position, the margin and the styles of the application', async () => {
+  it('follows a position that changes', async () => {
     const { fixture, place } = await render();
 
     fixture.componentInstance.moving.set('bottom-center');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(place('moving')).toEqual([180, 270]);
+  });
+
+  it('takes the distance from the edge from the margin of the application', async () => {
+    const { fixture, place } = await render();
+
     fixture.componentInstance.margin.set('0px');
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(place('moving')).toEqual([180, 280]);
     expect(place('bottom-right')).toEqual([360, 280]);
-    // A class of the application wins over the rules of the panel.
+  });
+
+  it('lets a class of the application win over the rules of the panel', async () => {
+    const { place } = await render();
+
     expect(place('mine')).toEqual([330, 0]);
   });
 
-  it('takes the pointer above the pane and leaves an element without it to the application', async () => {
-    const { root, place } = await render();
+  it('takes the pointer above the pane', async () => {
+    const { root } = await render();
     const panel = root.querySelector('[data-testid="bottom-left"]')!;
     const rect = panel.getBoundingClientRect();
 
     expect(document.elementFromPoint(rect.left + 5, rect.top + 5)).toBe(panel);
+  });
+
+  it('leaves the place of an element without vPanel to the application', async () => {
+    const { root, place } = await render();
+
     expect(getComputedStyle(root.querySelector('[data-testid="unplaced"]')!).position).toBe('static');
     expect(place('unplaced')).toEqual([0, 0]);
   });

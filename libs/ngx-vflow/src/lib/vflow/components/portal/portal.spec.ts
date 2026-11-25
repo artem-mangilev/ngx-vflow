@@ -6,7 +6,7 @@ import { Point } from '../../interfaces/point.interface';
 import { PortalLayer } from '../../services/portal.service';
 import { injectNode } from '../../utils/inject-node';
 import { pointerDrag } from '../../gestures/pointer-events.testing';
-import { VflowComponent } from './vflow.component';
+import { VflowComponent } from '../vflow/vflow.component';
 
 /** A node component that declares content outside its own box. */
 @Component({
@@ -75,8 +75,6 @@ describe('vPortal', () => {
 
   async function settle() {
     fixture.detectChanges();
-    await new Promise(requestAnimationFrame);
-    await new Promise(requestAnimationFrame);
     await fixture.whenStable();
   }
 
@@ -85,6 +83,8 @@ describe('vPortal', () => {
     host = fixture.componentInstance;
     root = fixture.nativeElement;
     document.body.append(root);
+    fixture.detectChanges();
+    await new Promise<void>((resolve) => host.flow().initialized.subscribe(() => resolve()));
     await settle();
   });
 
@@ -93,10 +93,12 @@ describe('vPortal', () => {
     root.remove();
   });
 
-  it('renders the content at its flow point, and moves and scales it with the viewport', async () => {
+  it('renders the content at its flow point', () => {
     expect(offset(note()!)).toEqual({ x: 120, y: 105 });
     expect(note()!.getBoundingClientRect().width).toBeCloseTo(60, 1);
+  });
 
+  it('moves and scales the content with the viewport', async () => {
     await host.flow().setViewport({ x: 30, y: -10, zoom: 2 });
     await settle();
 
@@ -109,22 +111,35 @@ describe('vPortal', () => {
     expect(offset(root.querySelector('.origin')!)).toEqual({ x: 10, y: 20 });
   });
 
-  it('renders nothing without a point, follows a changed point and leaves with its declaration', async () => {
+  it('renders nothing for a point of null', async () => {
     host.point.set(null);
     await settle();
+
     expect(note()).toBeNull();
+  });
 
-    host.point.set({ x: 0, y: 0 });
-    await settle();
-    expect(offset(note()!)).toEqual({ x: 0, y: 0 });
-
+  it('follows a changed point', async () => {
     host.point.set({ x: 40, y: 60 });
     await settle();
-    expect(offset(note()!)).toEqual({ x: 40, y: 60 });
 
+    expect(offset(note()!)).toEqual({ x: 40, y: 60 });
+  });
+
+  it('renders the content again when a point comes back after null', async () => {
+    host.point.set(null);
+    await settle();
+    host.point.set({ x: 0, y: 0 });
+    await settle();
+
+    expect(offset(note()!)).toEqual({ x: 0, y: 0 });
+  });
+
+  it('removes the content with its declaration', async () => {
     expect(root.querySelector('.optional')).not.toBeNull();
+
     host.shown.set(false);
     await settle();
+
     expect(root.querySelector('.optional')).toBeNull();
   });
 
@@ -133,36 +148,46 @@ describe('vPortal', () => {
 
     expect(caption.textContent).toBe('b caption');
     expect(offset(caption)).toEqual({ x: 250, y: 70 });
-    // In the layer of the viewport, not in the node box.
+  });
+
+  it('renders content declared by a node component in the layer of the viewport, not in the node box', () => {
+    const caption = root.querySelector('.caption')!;
+
     expect(caption.closest('[data-v-node]')).toBeNull();
     expect(caption.closest('[data-v-portal-layer="above"]')).not.toBeNull();
   });
 
-  it('lets the pointer through to the node under it unless the content asks for the pointer', async () => {
-    const overlap = { x: flowRect().left + 140, y: flowRect().top + 125 };
+  describe('pointer', () => {
+    const overlap = () => ({ x: flowRect().left + 140, y: flowRect().top + 125 });
 
-    expect(hit(overlap)?.closest('[data-v-node]')).toBe(node(0));
+    it('lets the pointer through to the node under the content by default', () => {
+      expect(hit(overlap())?.closest('[data-v-node]')).toBe(node(0));
+    });
 
-    host.takesPointer.set(true);
-    await settle();
-    expect(hit(overlap)).toBe(note());
-  });
+    it('paints content that asks for the pointer above the nodes', async () => {
+      host.takesPointer.set(true);
+      await settle();
 
-  it('paints the content above the nodes, or below them with the layer below', async () => {
-    host.takesPointer.set(true);
-    await settle();
-    const overlap = { x: flowRect().left + 140, y: flowRect().top + 125 };
-    expect(hit(overlap)).toBe(note());
+      expect(hit(overlap())).toBe(note());
+    });
 
-    host.layer.set('below');
-    await settle();
-    expect(note()!.closest('[data-v-portal-layer="below"]')).not.toBeNull();
-    expect(hit(overlap)?.closest('[data-v-node]')).toBe(node(0));
+    it('paints content in the layer below under the nodes', async () => {
+      host.takesPointer.set(true);
+      host.layer.set('below');
+      await settle();
 
-    // Outside the node the content below still takes the pointer: the pane is under it, not over it.
-    host.point.set({ x: 0, y: 0 });
-    await settle();
-    expect(hit(center(note()!))).toBe(note());
+      expect(note()!.closest('[data-v-portal-layer="below"]')).not.toBeNull();
+      expect(hit(overlap())?.closest('[data-v-node]')).toBe(node(0));
+    });
+
+    it('gives the pointer to content in the layer below outside the nodes, above the pane', async () => {
+      host.takesPointer.set(true);
+      host.layer.set('below');
+      host.point.set({ x: 0, y: 0 });
+      await settle();
+
+      expect(hit(center(note()!))).toBe(note());
+    });
   });
 
   it('is not part of the graph: the node bounds ignore it', async () => {
@@ -172,22 +197,29 @@ describe('vPortal', () => {
     expect(host.flow().getNodesBounds()).toEqual({ x: 100, y: 100, width: 250, height: 50 });
   });
 
-  it('pans the viewport on a press on content that takes the pointer, and clears the selection on a click', async () => {
-    host.takesPointer.set(true);
-    host.point.set({ x: 0, y: 0 });
-    await settle();
-    host.nodes()[0].selected!.set(true);
-    await settle();
+  describe('a press on content that takes the pointer', () => {
+    beforeEach(async () => {
+      host.takesPointer.set(true);
+      host.point.set({ x: 0, y: 0 });
+      host.nodes()[0].selected!.set(true);
+      await settle();
+    });
 
-    const start = center(note()!);
-    pointerDrag(note()!, start, [{ x: start.x + 40, y: start.y }]);
-    await settle();
-    expect(host.flow().viewport().x).toBe(40);
-    expect(host.nodes()[0].selected!()).toBe(true);
+    it('pans the viewport on a drag and keeps the selection', async () => {
+      const start = center(note()!);
+      pointerDrag(note()!, start, [{ x: start.x + 40, y: start.y }]);
+      await settle();
 
-    const point = center(note()!);
-    pointerDrag(note()!, point, []);
-    await settle();
-    expect(host.nodes()[0].selected!()).toBe(false);
+      expect(host.flow().viewport().x).toBe(40);
+      expect(host.nodes()[0].selected!()).toBe(true);
+    });
+
+    it('clears the selection on a click', async () => {
+      const point = center(note()!);
+      pointerDrag(note()!, point, []);
+      await settle();
+
+      expect(host.nodes()[0].selected!()).toBe(false);
+    });
   });
 });
