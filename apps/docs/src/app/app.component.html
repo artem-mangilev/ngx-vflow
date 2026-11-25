@@ -14,11 +14,19 @@
       class="flex items-center gap-2 text-doc-heading no-underline"
       routerLink="/"
       aria-label="vflow, home">
-      <img class="size-8 dark:hidden" src="assets/logo.svg" alt="" />
-      <img class="hidden size-8 dark:block" src="assets/logo-dark.svg" alt="" />
-      <span data-testid="logo-text" class="text-[18px] font-bold tracking-[-0.015em] [@media(width<=520px)]:text-[16px]"
-        >vflow</span
-      >
+      <!-- The lockup: the mark and the word "vflow" as outlines, one file per theme. -->
+      <img
+        class="h-7 w-auto dark:hidden [@media(width<=520px)]:h-6"
+        src="assets/lockup.svg"
+        width="104"
+        height="28"
+        alt="" />
+      <img
+        class="hidden h-7 w-auto dark:block [@media(width<=520px)]:h-6"
+        src="assets/lockup-dark.svg"
+        width="104"
+        height="28"
+        alt="" />
     </a>
 
     <nav ngDocNavbarCenter class="flex items-center gap-1" aria-label="Sections">

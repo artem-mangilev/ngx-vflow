@@ -38,7 +38,7 @@
 
 ## Надпись
 
-Geist Sans SemiBold, в файлах — в кривых. При знаке высотой 64: кегль 48, трекинг −0,02 em, зазор до знака 18, слово выровнено по центру знака. Кернинг — из шрифта.
+Geist Sans Bold (вес 700), в файлах — в кривых. При знаке высотой 64: кегль 56, трекинг 0, зазор до знака 20, слово выровнено по центру знака. Кернинг — из шрифта.
 
 ## Нельзя
 
@@ -56,4 +56,4 @@ Geist Sans SemiBold, в файлах — в кривых. При знаке вы
 2. `python build-lockup.py` — связка. Нужны `fonttools` и `brotli`, шрифт берётся из соседнего `vflow-studio`.
 3. `node build-raster.mjs` — PNG и ICO, через Chromium из `apps/docs-e2e`.
 
-На сайте документации лежат копии: `apps/docs/src/favicon.svg`, `favicon.ico`, `assets/logo.svg`, `assets/logo-dark.svg`, `assets/apple-touch-icon.png`, `assets/og.png`. После пересборки их надо скопировать заново.
+На сайте документации лежат копии: `apps/docs/src/favicon.svg`, `favicon.ico`, `assets/logo.svg`, `assets/lockup.svg`, `assets/lockup-dark.svg`, `assets/apple-touch-icon.png`, `assets/og.png`. После пересборки их надо скопировать заново.

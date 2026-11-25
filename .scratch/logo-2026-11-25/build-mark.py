@@ -1,6 +1,6 @@
 # Builds the final mark (variant A3 of sheet-a.svg) as one outline on a 64 box without padding:
 # final/mark.svg in currentColor, final/mark-light.svg and final/mark-dark.svg in the gradients of brief.md,
-# final/favicon.svg in both, final/tile-light.svg and final/tile-dark.svg with a plate. The docs site has copies: assets/logo.svg, assets/logo-dark.svg, favicon.svg.
+# final/favicon.svg in both, final/tile-light.svg and final/tile-dark.svg with a plate. The docs site has copies: assets/logo.svg, favicon.svg.
 # A square, a circle and a triangle; a neck is what two "bite" circles leave between the flat side of a node
 # and the circle.
 import math, pathlib

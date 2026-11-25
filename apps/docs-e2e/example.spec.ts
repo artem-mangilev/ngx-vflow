@@ -1,7 +1,9 @@
 import { expect, test } from './fixtures';
 
-test('the landing page shows the brand name in its logo', async ({ page }) => {
+test('the landing page shows the logo as a link to the home page', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByTestId('logo-text')).toHaveText('vflow');
+  // The word is drawn in the image, so the link carries the name; the image itself has to load.
+  const logo = page.getByRole('link', { name: 'vflow, home' }).locator('img:visible');
+  await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
 });

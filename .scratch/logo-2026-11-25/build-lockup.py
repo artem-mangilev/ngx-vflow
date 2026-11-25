@@ -1,6 +1,6 @@
-# Builds the lockups: the mark of final/mark.svg and the word "vflow" in Geist Sans SemiBold as outlines.
+# Builds the lockups: the mark of final/mark.svg and the word "vflow" in Geist Sans Bold as outlines.
 # final/lockup.svg in currentColor, final/lockup-light.svg and final/lockup-dark.svg by brief.md.
-# Needs fonttools and brotli (`pip install fonttools brotli`) and the Studio checkout next to this repo for the font;
+# Needs fonttools and brotli (`pip install fonttools brotli`) and the Studio checkout next to this repo, with its dependencies installed, for the font;
 # run it after build-mark.py.
 import re, pathlib
 from fontTools.ttLib import TTFont
@@ -8,8 +8,8 @@ from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.boundsPen import BoundsPen
 root = pathlib.Path(__file__).parent
-WORD, SIZE, TRACKING, GAP = 'vflow', 48, -0.02, 18   # font size on the 64 box of the mark, tracking in em
-font = TTFont(root / '../../../vflow-studio/public/fonts/geist-sans-latin-600-normal.woff2')
+WORD, SIZE, TRACKING, GAP = 'vflow', 56, 0, 20   # font size on the 64 box of the mark, tracking in em
+font = TTFont(root / '../../../vflow-studio/node_modules/@fontsource/geist-sans/files/geist-sans-latin-700-normal.woff2')
 glyphs, names = font.getGlyphSet(), [font.getBestCmap()[ord(c)] for c in WORD]
 def kern(a, b):   # the pair adjustment of the font: GPOS pair positioning, glyph pairs and class pairs
     for lookup in font['GPOS'].table.LookupList.Lookup:
