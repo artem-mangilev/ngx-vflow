@@ -13,13 +13,11 @@ env:
   NX_DAEMON: 'false'
 
 jobs:
-  verify:
+  lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -29,18 +27,57 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm exec prettier . --check
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      # The browser-mode specs of the libraries
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
-      - run: pnpm build:dev
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The release preview reads the version tags
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      # Production libraries and the docs, every page prerendered
       - run: pnpm build
       - run: pnpm release:dry-run
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      # Against the development docs server, which builds the libraries in development
       - run: pnpm e2e
-      - name: Check the design system in production
-        run: pnpm e2e --grep "NgDoc uses"
-        env:
-          E2E_CONFIGURATION: production
-      - name: Check the prerendered site
-        run: pnpm e2e:preview
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
