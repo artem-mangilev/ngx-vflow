@@ -34,7 +34,6 @@
     "@angular/platform-server": "catalog:libs",
     "@vitest/browser": "catalog:libs",
     "@vitest/coverage-v8": "catalog:libs",
-    "ctxbrew": "^0.1.4",
     "happy-dom": "catalog:libs",
     "jsdom": "catalog:libs",
     "ng-packagr": "catalog:libs",

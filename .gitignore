@@ -38,7 +38,6 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
-**/ctxbrew
 /libs/ngx-vflow/skills
 
 # System files

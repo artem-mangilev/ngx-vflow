@@ -5,20 +5,6 @@
   "name": "ngx-vflow",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "context": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm exec ctxbrew build",
-        "cwd": "{projectRoot}"
-      },
-      "inputs": [
-        "{projectRoot}/ctxbrew.yaml",
-        "{projectRoot}/README.md",
-        "{workspaceRoot}/apps/docs/src/app/categories/docs/**/*"
-      ],
-      "outputs": ["{projectRoot}/ctxbrew"],
-      "cache": true
-    },
     "skill": {
       "executor": "nx:run-commands",
       "options": {
@@ -54,12 +40,11 @@
           "dependentTasksOutputFiles": "**/*.d.ts",
           "transitive": true
         },
-        "{projectRoot}/ctxbrew.yaml",
         "{projectRoot}/agent-skill.md",
         "{workspaceRoot}/apps/docs/src/app/categories/**/*"
       ],
       "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build", "context", "skill"]
+      "dependsOn": ["^build", "skill"]
     },
     "test": {
       "executor": "nx:run-commands",
