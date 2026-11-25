@@ -438,7 +438,7 @@ Handles are no longer exposed to assistive technology: the handle inputs `ariaLa
 ### Keyboard shortcut configuration
 
 `keyboardShortcuts` now has two sections instead of one flat object, and an empty list replaces `null` as the way to
-disable an entry. `selection`, `multiSelection`, `pan` and `zoom` are held modifiers; everything else is a command that
+disable an entry. `selection`, `multiSelection`, `panActivation` and `zoomActivation` are held modifiers; everything else is a command that
 runs on a press. `select`, `clearSelection` and the arrow keys for node movement and viewport panning became commands
 too, so they can be remapped or disabled like the rest. The types `KeyboardAction` and `KeyboardCommand` are gone;
 `KeyboardShortcuts` and the new `KeyboardCommandName` remain. See [Keyboard shortcuts](/docs/interactions/keyboard-shortcuts).

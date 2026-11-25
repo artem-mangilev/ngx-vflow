@@ -1,6 +1,6 @@
 # Releases
 
-`ngx-vflow`, `@vflow/cli` and the extension packages (`@vflow/routing`) belong to one Nx Release
+`ngx-vflow`, `@vflow/cli` and the extension packages (`@vflow/routing`, `@vflow/layout`, `@vflow/auto-size`) belong to one Nx Release
 fixed group, selected by the `release` project tag. They always receive the same version and one
 `v{version}` Git tag. `@vflow/ui` is not published (see below).
 Existing `v2.7.0` history is retained. Nx determines the next shared version from conventional commits since that tag. Source versions remain at the last release until release time.

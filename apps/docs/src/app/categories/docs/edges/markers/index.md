@@ -39,7 +39,7 @@ as the type alone, or as an object with a size. The connection line accepts it i
 ```
 
 ```ts
-edges = createEdges([{ id: 'order-line-item', source: 'order', target: 'line-item', markers: { start: 'bar', end: { type: 'diamond', width: 24 } } }]);
+edges = createEdges([{ id: 'order-line-item', source: 'order', target: 'line-item', markers: { end: { type: 'diamond', width: 24 } } }]);
 ```
 
 {% endraw %}

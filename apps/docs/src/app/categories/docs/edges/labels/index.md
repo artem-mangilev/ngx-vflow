@@ -21,6 +21,9 @@ together with the edge.
 
 {% endraw %}
 
+`vuiEdge` and `vuiEdgeLabel` are parts of [`@vflow/ui`](/packages/ui/overview); without it, draw your own path and style
+your own label element.
+
 - Without a value the label sits at the center. A value of `start` or `end` picks another point, as the button
   above shows; the value is an expression, so the quotes are required.
 - For several root elements use the long form on an `ng-template` with the `vEdgeLabel` attribute.
@@ -39,8 +42,10 @@ lower edge in the demo shows:
 
 {% raw %}
 
+<!-- prettier-ignore -->
 ```html
-<span *vEdgeLabel="'center'; orient: 'path'" vuiEdgeLabel>{{ ctx.data().label }}</span> <ng-template vEdgeLabel="end" vEdgeLabelOrient="path">…</ng-template>
+<span *vEdgeLabel="'center'; orient: 'path'" vuiEdgeLabel>{{ ctx.data().label }}</span>
+<ng-template vEdgeLabel="end" vEdgeLabelOrient="path">…</ng-template>
 ```
 
 {% endraw %}
