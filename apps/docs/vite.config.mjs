@@ -42,6 +42,7 @@ export default ({ mode }) => {
         ],
         assets: [
           'src/favicon.ico',
+          'src/favicon.svg',
           { glob: 'robots.txt', input: 'src/assets', output: '/' },
           'src/assets',
           {
