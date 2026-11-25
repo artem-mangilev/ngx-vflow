@@ -19,6 +19,21 @@
       "outputs": ["{projectRoot}/ctxbrew"],
       "cache": true
     },
+    "skill": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/build-skill.mjs",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": [
+        "{projectRoot}/scripts/build-skill.mjs",
+        "{projectRoot}/agent-skill.md",
+        "{workspaceRoot}/apps/docs/src/app/categories/**/*",
+        "{workspaceRoot}/apps/docs/src/app/shared/flow-presentations.ts"
+      ],
+      "outputs": ["{projectRoot}/skills"],
+      "cache": true
+    },
     "build": {
       "options": {
         "project": "libs/ngx-vflow/ng-package.json"
@@ -40,10 +55,11 @@
           "transitive": true
         },
         "{projectRoot}/ctxbrew.yaml",
-        "{workspaceRoot}/apps/docs/src/app/categories/docs/**/*"
+        "{projectRoot}/agent-skill.md",
+        "{workspaceRoot}/apps/docs/src/app/categories/**/*"
       ],
       "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build", "context"]
+      "dependsOn": ["^build", "context", "skill"]
     },
     "test": {
       "executor": "nx:run-commands",

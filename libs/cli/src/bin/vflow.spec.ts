@@ -37,6 +37,29 @@ describe('vflow bin', () => {
     expect(process.exitCode).toBe(1);
   });
 
+  describe('agents', () => {
+    it('writes the agent files and says the skill is not installed yet', async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'vflow-cli-'));
+      writeFileSync(join(dir, 'package.json'), '{}');
+
+      const { log, error } = await load(['agents'], dir);
+
+      await vi.waitFor(() => expect(log).toHaveBeenCalledWith(expect.stringContaining('is not installed yet')));
+      expect(log).toHaveBeenCalledWith('UPDATE AGENTS.md\nUPDATE .claude/skills/ngx-vflow/SKILL.md');
+      expect(error).not.toHaveBeenCalled();
+      expect(readFileSync(join(dir, 'AGENTS.md'), 'utf-8')).toContain(
+        'node_modules/ngx-vflow/skills/ngx-vflow/SKILL.md',
+      );
+    });
+
+    it('prints the usage and fails for an argument', async () => {
+      const { log } = await load(['agents', '--force']);
+
+      await vi.waitFor(() => expect(log).toHaveBeenCalledWith(USAGE));
+      expect(process.exitCode).toBe(1);
+    });
+  });
+
   describe('ui', () => {
     let dir: string;
 

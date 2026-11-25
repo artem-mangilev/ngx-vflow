@@ -1,5 +1,6 @@
 `@vflow/cli` copies the [@vflow/ui](/packages/ui/overview) parts and their tokens into your workspace, in the way of
-shadcn/ui: the code becomes yours to edit. It runs with `npx`, so nothing is installed in the workspace.
+shadcn/ui: the code becomes yours to edit, and points coding agents at the docs of the installed `ngx-vflow`. It runs
+with `npx`, so nothing is installed in the workspace.
 
 ## The `ui` command
 
@@ -50,3 +51,22 @@ add the tokens to another application.
 
 The same command is a generator too: with `@vflow/cli` installed, `ng g @vflow/cli:ui` and `nx g @vflow/cli:ui` take
 the same options.
+
+## The `agents` command
+
+`ngx-vflow` ships its docs as an agent skill in `node_modules/ngx-vflow/skills/ngx-vflow`: the guides, the examples
+and the code of every demo, for the installed version. In the root of the project:
+
+```bash
+npx @vflow/cli agents
+```
+
+`agents` writes:
+
+- a short block in `AGENTS.md` that tells the agent to read the skill before writing code with `ngx-vflow`;
+- the same block in `CLAUDE.md` when the project has one, since Claude Code then reads `CLAUDE.md` instead of
+  `AGENTS.md`. A `CLAUDE.md` that imports `@AGENTS.md` is left as it is;
+- `.claude/skills/ngx-vflow/SKILL.md`, a skill that only points at the one in `node_modules`.
+
+The files name a path and hold no docs, so they stay correct when `ngx-vflow` is updated. Commit them. A second run
+replaces the block between its `vflow:start` and `vflow:end` comments and keeps the rest of the file.

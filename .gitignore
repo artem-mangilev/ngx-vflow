@@ -39,6 +39,7 @@ yarn-error.log
 testem.log
 /typings
 **/ctxbrew
+/libs/ngx-vflow/skills
 
 # System files
 .DS_Store

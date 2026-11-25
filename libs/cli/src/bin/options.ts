@@ -1,8 +1,13 @@
 import type { UiGeneratorSchema } from '../generators/ui/schema';
 
-export const USAGE = `Usage: npx @vflow/cli ui [options]
+export const USAGE = `Usage: npx @vflow/cli <command>
 
-Run it in the root of an Angular CLI or Nx workspace.
+Run it in the root of the workspace.
+
+  agents                       Point AGENTS.md, CLAUDE.md and a Claude Code skill at the docs ngx-vflow ships
+  ui [options]                 Copy the @vflow/ui parts and their tokens into an Angular CLI or Nx workspace
+
+Options of ui:
 
   --project <name>             The application that gets the tokens
   --stylesEntryPoint <path>    The global stylesheet, relative to the workspace root
