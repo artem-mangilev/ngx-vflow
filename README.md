@@ -33,20 +33,22 @@
 
 ```bash
 npm i ngx-vflow
+
+# optional design system
+npx @vflow/cli ui
 ```
 
 ```ts
 import { Component, signal } from '@angular/core';
 import { Vui } from '@vflow/ui';
-import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
+import { Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
 
 @Component({
   selector: 'app-flow',
   imports: [Vflow, Vui],
-  host: { class: 'block h-96' },
   template: `
     <vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)">
-      <div *vNode="let ctx of nodes" vuiNode class="px-4 py-2">
+      <div *vNode="let ctx" vuiNode>
         <span vuiPort handleType="target" position="left"></span>
         {{ ctx.data().label }}
         <span vuiPort handleType="source" position="right"></span>
@@ -59,24 +61,18 @@ import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
   `,
 })
 export class FlowComponent {
-  protected readonly nodes = createNodes([
+  nodes = createNodes([
     { id: 'fetch', point: { x: 40, y: 120 }, data: { label: 'Fetch orders' } },
     { id: 'remind', point: { x: 280, y: 120 }, data: { label: 'Send reminder' } },
   ]);
 
-  protected readonly edges = signal<Edge[]>([]);
+  edges = signal<Edge[]>([]);
 
-  protected connect(connection: Connection): void {
-    const edge = { id: crypto.randomUUID(), ...connection };
-
-    this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
+  connect(connection: Connection) {
+    this.edges.update((edges) => [...edges, { id: crypto.randomUUID(), ...connection }]);
   }
 }
 ```
-
-Two nodes you can drag and connect. The look comes from [`@vflow/ui`](https://www.ngx-vflow.org/packages/ui/overview),
-optional Tailwind parts that `npx @vflow/cli ui` copies into your app; without it, style the same elements with your
-own CSS, as the [quickstart](https://www.ngx-vflow.org/docs/getting-started/quickstart) does.
 
 ## Packages
 
