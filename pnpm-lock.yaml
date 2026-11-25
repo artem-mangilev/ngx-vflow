@@ -525,6 +525,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: catalog:libs
         version: 3.2.7(@vitest/browser@3.2.7)(vitest@3.2.7)
+      ctxbrew:
+        specifier: ^0.1.4
+        version: 0.1.4
       happy-dom:
         specifier: catalog:libs
         version: 20.14.5
@@ -1768,6 +1771,31 @@ packages:
   '@csstools/css-tokenizer@4.0.2':
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
+
+  '@ctxbrew/darwin-arm64@0.1.4':
+    resolution: {integrity: sha512-gLU7OnrZmqK1KMWqNWobuheosjEHmPB/Hov92lu268v2Jp/2TulYVeHUgqVao2g9EuRa3dxw9a2ZFNbE5DpOLQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@ctxbrew/darwin-x64@0.1.4':
+    resolution: {integrity: sha512-yxUXaOSC/mp1Xi+xfSsea3nVESYo7mWjlS3MtRPt1h/6L1t3WwjaNIbJCxl3sO5qq/w+UzRZzKdu8P2iWt8IVg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@ctxbrew/linux-arm64@0.1.4':
+    resolution: {integrity: sha512-4U7hOZJvZgXnYsfu0OuMb2wLwCdD/LSZEW4ND2btxae+CdCjYZLsgBwo+ki/r80sipApdnSn/XzwNvY4Z6GLXw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@ctxbrew/linux-x64@0.1.4':
+    resolution: {integrity: sha512-ExmyqC4VpOq8ftQ+88Pfq0m1R2ohLpbI3UA4ChlHDI3KACr3BTNly4e0h6zCtgZgwgLxLJED3Whv3ag6yFofDw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@ctxbrew/win32-x64@0.1.4':
+    resolution: {integrity: sha512-DwAIVhrjKyjEiCDlZ1yFCDXqHx0dbDCJq+5EhXeyBEtDKq+urw/em76Wo89Mw6TZO8A2qoWp4e376Gl8Mma3sw==}
+    cpu: [x64]
+    os: [win32]
 
   '@dagrejs/dagre@3.1.3':
     resolution: {integrity: sha512-X4aUTwOReZvthaZWOVHqlJ52/ZdhZFEM4+Lh/uR4XooUSLE6p71bcy7MPGzYnNUcNh+nj+i/qJQpCMIdQnSmrg==}
@@ -4904,6 +4932,11 @@ packages:
   css-what@8.0.0:
     resolution: {integrity: sha512-DH0Bqq3DNp5tdOReuNyAA+Ev4Y2GS5FMbZpeTLP6C4CDi0h5nL0BmUPChXw3o/qbHLDWHl49sbNqQVY7bMSDdw==}
     engines: {node: '>=20.19.0'}
+
+  ctxbrew@0.1.4:
+    resolution: {integrity: sha512-y4AT4c2bV2UVhICm4Lx4EOtIA/jVT0x+DiJAllwanZgTmE7qBf6CIvatUceE3ZI7I/ciO7lb4zfhSberTK7JXQ==}
+    engines: {bun: '>=1.2.21', node: '>=14'}
+    hasBin: true
 
   cytoscape-cose-bilkent@4.1.0:
     resolution: {integrity: sha512-wgQlVIUJF13Quxiv5e1gstZ08rnZj2XaLHGoFMYXz7SkNfCDOOteKBE6SYRfA9WxxI/iBc3ajfDoc6hb/MRAHQ==}
@@ -9575,6 +9608,21 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
+  '@ctxbrew/darwin-arm64@0.1.4':
+    optional: true
+
+  '@ctxbrew/darwin-x64@0.1.4':
+    optional: true
+
+  '@ctxbrew/linux-arm64@0.1.4':
+    optional: true
+
+  '@ctxbrew/linux-x64@0.1.4':
+    optional: true
+
+  '@ctxbrew/win32-x64@0.1.4':
+    optional: true
+
   '@dagrejs/dagre@3.1.3':
     dependencies:
       '@dagrejs/graphlib': 4.0.6
@@ -12202,6 +12250,14 @@ snapshots:
   css-what@7.0.0: {}
 
   css-what@8.0.0: {}
+
+  ctxbrew@0.1.4:
+    optionalDependencies:
+      '@ctxbrew/darwin-arm64': 0.1.4
+      '@ctxbrew/darwin-x64': 0.1.4
+      '@ctxbrew/linux-arm64': 0.1.4
+      '@ctxbrew/linux-x64': 0.1.4
+      '@ctxbrew/win32-x64': 0.1.4
 
   cytoscape-cose-bilkent@4.1.0(cytoscape@3.34.2):
     dependencies:
