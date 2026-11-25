@@ -21,7 +21,7 @@ interface RelationData {
       @let data = ctx.data();
 
       <svg:g>
-        <svg:path vuiEdge [attr.d]="ctx.path()" />
+        <svg:path vuiEdge />
       </svg:g>
 
       @if (data.start; as text) {

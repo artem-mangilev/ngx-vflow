@@ -16,7 +16,7 @@ import { EdgeData } from '../services/flow-store.service';
   template: `
     @let label = edge.data().label;
 
-    <svg:path vuiEdge [attr.d]="edge.path()" [attr.marker-end]="edge.markerEnd()" />
+    <svg:path vuiEdge />
     <span *vEdgeLabel vuiEdgeLabel class="py-0! pe-0!" [class]="label ? '' : 'ps-0!'">
       {{ label }}
       <button

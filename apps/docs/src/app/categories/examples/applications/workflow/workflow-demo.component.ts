@@ -118,8 +118,6 @@ const KIND_COLOR: Record<StepKind, string> = {
               <svg:path
                 vuiEdge
                 class="data-[state=taken]:not-[[data-v-selected]_*]:stroke-vui-success data-[state=skipped]:not-[[data-v-selected]_*]:opacity-45 data-[state=skipped]:not-[[data-v-selected]_*]:[stroke-dasharray:4_4]"
-                [attr.d]="ctx.path()"
-                [attr.marker-end]="ctx.markerEnd()"
                 [attr.data-state]="state" />
             </svg:g>
             <!-- On a ruled-out branch only the text fades: the label keeps its opaque surface over the dashed line. -->

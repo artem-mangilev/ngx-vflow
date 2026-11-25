@@ -256,15 +256,10 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
           </ng-template>
           <!-- A number travels along a dashed edge. -->
           <svg:g *vEdge="let ctx">
-            <svg:path
-              vuiEdge
-              [attr.d]="ctx.path()"
-              [attr.stroke-dasharray]="ctx.data()?.type === 'number' ? '4 4' : null" />
+            <svg:path vuiEdge [attr.stroke-dasharray]="ctx.data()?.type === 'number' ? '4 4' : null" />
           </svg:g>
-          <ng-template let-ctx vConnection>
-            @if (ctx.path(); as path) {
-              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
-            }
+          <ng-template vConnection>
+            <svg:path vuiConnection stroke-dasharray="4 4" />
           </ng-template>
           <vui-controls vPanel="bottom-left" />
         </vflow>

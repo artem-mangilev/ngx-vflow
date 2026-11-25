@@ -243,19 +243,17 @@ const GLOW_OFFSET = 40;
       <svg:g *vEdge="let ctx">
         <svg:path
           vuiEdge
+          class="hero-wire"
           stroke-dasharray="6 6"
           stroke-linecap="round"
-          [attr.d]="ctx.path()"
           [style.stroke]="ctx.selected() ? null : colorOf(ctx.edge.source)">
           @if (spinning()) {
             <svg:animate attributeName="stroke-dashoffset" values="0;-12" dur="0.8s" repeatCount="indefinite" />
           }
         </svg:path>
       </svg:g>
-      <ng-template let-ctx vConnection>
-        @if (ctx.path(); as path) {
-          <svg:path vuiEdge stroke-dasharray="6 6" stroke-linecap="round" [attr.d]="path" />
-        }
+      <ng-template vConnection>
+        <svg:path vuiConnection stroke-dasharray="6 6" stroke-linecap="round" />
       </ng-template>
     </vflow>
   `,
@@ -476,7 +474,7 @@ export class HeroFlowComponent {
 
     for (const edge of this.edges()) {
       const input = edge.targetHandle as InputId;
-      const wire = this.host.querySelector<SVGPathElement>(`[data-v-edge="${edge.id}"] path.vui-edge`);
+      const wire = this.host.querySelector<SVGPathElement>(`[data-v-edge="${edge.id}"] path.hero-wire`);
       const starts = WIRE_STARTS[input];
 
       // A wire that is not drawn yet has nothing to play: its value is simply there.

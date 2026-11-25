@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, TemplateRef, computed, inject, input } from '@angular/core';
 import { ConnectionService } from '../../services/connection.service';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
@@ -13,12 +13,13 @@ import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { insetPoint, markerInset } from '../../utils/marker-inset';
 import { NodeModel } from '../../models/node.model';
+import { CONNECTION_REF } from '../../utils/inject-connection';
 
 @Component({
   selector: 'g[connection]',
   template: `
     @if (template(); as template) {
-      <ng-container *ngTemplateOutlet="template; context: getContext()" />
+      <ng-container *ngTemplateOutlet="template; context: context; injector: injector" />
     } @else if (path(); as path) {
       <svg:path
         aria-hidden="true"
@@ -30,9 +31,12 @@ import { NodeModel } from '../../models/node.model';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // What a presentation inside the `vConnection` template injects: the object the template gets as its context.
+  providers: [{ provide: CONNECTION_REF, useFactory: () => inject(ConnectionComponent).context.$implicit }],
   imports: [NgTemplateOutlet],
 })
 export class ConnectionComponent {
+  protected readonly injector = inject(Injector);
   private readonly connection = inject(ConnectionService);
   private readonly spacePointContext = inject(SpacePointContextDirective);
   private readonly flowEntitiesService = inject(FlowEntitiesService);
@@ -76,14 +80,7 @@ export class ConnectionComponent {
   protected readonly defaultColor = 'var(--v-connection)';
 
   // TODO: move context to model
-  protected getContext(): ConnectionContext {
-    return {
-      $implicit: {
-        path: this.path,
-        markerEnd: this.markerUrl,
-      },
-    };
-  }
+  readonly context: ConnectionContext = { $implicit: { path: this.path, markerEnd: this.markerUrl } };
 
   private getPathFactoryParams(
     sourcePoint: Point,

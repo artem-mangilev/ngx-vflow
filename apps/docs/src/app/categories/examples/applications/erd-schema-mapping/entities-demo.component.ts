@@ -191,7 +191,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
           </ng-template>
           <ng-template let-ctx vEdge>
             <svg:g>
-              <svg:path vuiEdge [attr.d]="ctx.path()" />
+              <svg:path vuiEdge />
             </svg:g>
             @if (ctx.data()?.label; as label) {
               <span *vEdgeLabel vuiEdgeLabel class="group" [attr.data-selected]="ctx.selected()">
@@ -212,10 +212,8 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
               </span>
             }
           </ng-template>
-          <ng-template let-ctx vConnection>
-            @if (ctx.path(); as path) {
-              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
-            }
+          <ng-template vConnection>
+            <svg:path vuiConnection stroke-dasharray="4 4" />
           </ng-template>
           <vui-controls vPanel="bottom-left" />
         </vflow>

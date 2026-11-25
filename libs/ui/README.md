@@ -38,14 +38,14 @@ cascade layers; unlayered application styles override them.
 | Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
 | Text roles | `vuiTitle`, `vuiMeta`                                                                       |
 | Port       | `vuiPort`: a core handle with the port look                                                 |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                   |
+| Edge       | `vuiEdge` and `vuiConnection` on the SVG path, `vuiEdgeLabel` for HTML labels               |
 | Overlay    | `vuiToolbar`                                                                                |
 | Viewport   | `<vui-controls>` inside `vflow`: zoom in/out, fit view and your own buttons for that flow   |
 
 Buttons and badges come from your design system, as React Flow UI takes them from shadcn/ui; `vui-controls` gives
 its projected buttons the look of its own.
 
-`vuiNode`, `vuiGroup` and `vuiEdge` show the selection of their core host (`data-v-selected`); nothing to bind. Put `vuiPort` with the handle inputs `handleType`,
+`vuiNode`, `vuiGroup` and `vuiEdge` show the selection of their core host (`data-v-selected`); nothing to bind. `vuiEdge` draws the path and the markers of its edge, and `vuiConnection`, inside a `vConnection` template, those of the connection in progress: neither has `d` or markers to bind. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
 gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and the edge hit

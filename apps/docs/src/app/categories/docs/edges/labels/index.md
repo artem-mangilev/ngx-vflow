@@ -11,7 +11,7 @@ together with the edge.
 ```html
 <ng-template let-ctx vEdge>
   <svg:g>
-    <svg:path vuiEdge [attr.d]="ctx.path()" />
+    <svg:path vuiEdge />
   </svg:g>
 
   <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>

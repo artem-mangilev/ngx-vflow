@@ -34,11 +34,7 @@ import { FlowStoreService } from './services/flow-store.service';
       @let data = ctx.data();
 
       <svg:g>
-        <svg:path
-          vuiEdge
-          [attr.d]="ctx.path()"
-          [attr.marker-end]="ctx.markerEnd()"
-          [attr.stroke-dasharray]="data.animated ? '8 4' : null">
+        <svg:path vuiEdge [attr.stroke-dasharray]="data.animated ? '8 4' : null">
           @if (data.animated) {
             <!-- The dashes move by one dash and one gap, so the loop has no seam. -->
             <svg:animate attributeName="stroke-dashoffset" values="0;-12" dur="1s" repeatCount="indefinite" />

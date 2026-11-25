@@ -94,11 +94,7 @@ export class DocsNodeComponent {
   imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg:path
-      vuiEdge
-      [attr.d]="ctx().path()"
-      [attr.marker-start]="ctx().markerStart()"
-      [attr.marker-end]="ctx().markerEnd()" />
+    <svg:path vuiEdge />
     @if (label(); as label) {
       <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
     }

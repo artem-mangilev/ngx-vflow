@@ -67,20 +67,14 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
           <ng-template let-ctx vEdge>
             <svg:g>
               <!-- A link of content to a team is dashed. -->
-              <svg:path
-                vuiEdge
-                [attr.d]="ctx.path()"
-                [attr.marker-end]="ctx.markerEnd()"
-                [attr.stroke-dasharray]="ctx.data()?.link ? '4 4' : null" />
+              <svg:path vuiEdge [attr.stroke-dasharray]="ctx.data()?.link ? '4 4' : null" />
             </svg:g>
             @if (ctx.data()?.label; as label) {
               <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
             }
           </ng-template>
-          <ng-template let-ctx vConnection>
-            @if (ctx.path(); as path) {
-              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
-            }
+          <ng-template vConnection>
+            <svg:path vuiConnection stroke-dasharray="4 4" />
           </ng-template>
           <vui-controls vPanel="bottom-left" />
         </vflow>

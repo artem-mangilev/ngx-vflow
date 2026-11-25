@@ -1,13 +1,23 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Directive, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from '../vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { dispatchMouse, dispatchPointer } from '../../gestures/pointer-events.testing';
+import { injectConnection } from '../../utils/inject-connection';
+
+/** Draws the connection it injects: the template binds nothing. */
+@Directive({
+  selector: 'path[injectedLine]',
+  host: { '[attr.d]': 'connection.path()', '[attr.marker-end]': 'connection.markerEnd()' },
+})
+class InjectedLineDirective {
+  readonly connection = injectConnection();
+}
 
 @Component({
-  imports: [Vflow],
+  imports: [Vflow, InjectedLineDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow style="width: 600px; height: 300px" [nodes]="nodes" [connection]="connection()">
     <div *vNode style="width: 100px; height: 40px">
@@ -19,12 +29,18 @@ import { dispatchMouse, dispatchPointer } from '../../gestures/pointer-events.te
         <svg:path class="custom-line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
       </ng-template>
     }
+    @if (injectedLine()) {
+      <ng-template vConnection>
+        <svg:path injectedLine class="injected-line" />
+      </ng-template>
+    }
   </vflow>`,
 })
 class ConnectionLineHostComponent {
   readonly flow = viewChild.required(VflowComponent);
   readonly connection = signal<ConnectionSettings>({});
   readonly customLine = signal(false);
+  readonly injectedLine = signal(false);
   readonly nodes = createNodes([
     { id: 'a', point: { x: 0, y: 0 } },
     { id: 'b', point: { x: 300, y: 0 } },
@@ -156,5 +172,20 @@ describe('connection line', () => {
 
       expect(root.querySelector('.custom-line')!.getAttribute('marker-end')).toMatch(/^url\(#-?\d+\)$/);
     });
+  });
+
+  it('gives a directive inside the template the connection through injectConnection()', async () => {
+    await setup((host) => {
+      host.injectedLine.set(true);
+      host.connection.set({ curve: 'straight', markerEnd: 'arrow' });
+    });
+
+    await dragFromSourceTo(250, 150);
+    dispatchPointer(window, 'pointermove', { x: pane.left + 200, y: pane.top + 100 });
+    await stable();
+
+    const line = root.querySelector('.injected-line')!;
+    expect(line.getAttribute('d')).toMatch(/^M [\d.]+,20L 1\d\d(\.\d+)?,100$/);
+    expect(line.getAttribute('marker-end')).toMatch(/^url\(#-?\d+\)$/);
   });
 });

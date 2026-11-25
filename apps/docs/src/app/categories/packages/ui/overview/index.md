@@ -45,16 +45,17 @@ built from them; each callout names the part of the element it points at.
 
 {% endraw %}
 
-| Part                                        | Use                                                                                  |
-| ------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `vuiNode`, `vuiNodeHeader`, `vuiNodeFooter` | The card of a node and its optional header and footer                                |
-| `vuiRow`                                    | A row: a field, a typed port, a list item                                            |
-| `vuiGroup`, `vuiGroupHeader`                | A tinted group and its title row                                                     |
-| `vuiTitle`, `vuiMeta`                       | Primary and secondary text in any part                                               |
-| `vuiPort`                                   | A core handle with the port look; `[vuiPortConnected]` fills it while it has edges   |
-| `vuiEdge`, `vuiEdgeLabel`                   | The SVG path of an edge and the surface of an HTML edge label                        |
-| `vuiToolbar`                                | The surface of `v-node-toolbar` content                                              |
-| `<vui-controls>`                            | Zoom in, zoom out and fit view for the flow it is in; projects your own icon buttons |
+| Part                                        | Use                                                                                        |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `vuiNode`, `vuiNodeHeader`, `vuiNodeFooter` | The card of a node and its optional header and footer                                      |
+| `vuiRow`                                    | A row: a field, a typed port, a list item                                                  |
+| `vuiGroup`, `vuiGroupHeader`                | A tinted group and its title row                                                           |
+| `vuiTitle`, `vuiMeta`                       | Primary and secondary text in any part                                                     |
+| `vuiPort`                                   | A core handle with the port look; `[vuiPortConnected]` fills it while it has edges         |
+| `vuiEdge`, `vuiConnection`                  | The line of an edge and of the connection in progress: each draws its own path and markers |
+| `vuiEdgeLabel`                              | The surface of an HTML edge label                                                          |
+| `vuiToolbar`                                | The surface of `v-node-toolbar` content                                                    |
+| `<vui-controls>`                            | Zoom in, zoom out and fit view for the flow it is in; projects your own icon buttons       |
 
 - Selection comes from core: a card, a group or an edge shows the selection of the node or edge it is in.
 - A port shows the connection in progress from the `data-v-handle-state` of its handle: a halo while it can start a

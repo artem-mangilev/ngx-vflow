@@ -38,8 +38,8 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
             <span vuiPort handleType="target" position="left"></span>
             <span vuiPort handleType="source" position="right"></span>
           </article>
-          <svg:g *vEdge="let ctx">
-            <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+          <svg:g *vEdge>
+            <svg:path vuiEdge />
           </svg:g>
           <v-minimap vPanel="top-right" />
         </vflow>

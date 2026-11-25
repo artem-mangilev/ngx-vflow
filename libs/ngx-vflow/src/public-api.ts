@@ -65,6 +65,7 @@ export {
 } from './lib/vflow/interfaces/component-edge-event.interface';
 export { injectNode, type NodeRef } from './lib/vflow/utils/inject-node';
 export { injectEdge, type EdgeRef } from './lib/vflow/utils/inject-edge';
+export { injectConnection } from './lib/vflow/utils/inject-connection';
 export type * from './lib/vflow/interfaces/fit-view-options.interface';
 export type * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export type * from './lib/vflow/interfaces/node-at-point.interface';

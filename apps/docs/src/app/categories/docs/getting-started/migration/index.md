@@ -51,7 +51,7 @@ graph needs templates. There are two working paths:
     </article>
     <ng-template let-ctx vEdge>
       <svg:g>
-        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+        <svg:path vuiEdge />
       </svg:g>
       <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>
     </ng-template>
