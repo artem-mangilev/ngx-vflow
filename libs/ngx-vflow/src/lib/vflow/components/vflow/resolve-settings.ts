@@ -48,8 +48,14 @@ export function resolveSettings(
 
   const plain: PlainSettingInputs = inputs;
 
+  // Only an unbound input falls through: `null` is a value of its own, as in `[background]="null"`, which turns off
+  // a background that was provided.
   const scalar = <K extends PlainSetting>(key: K): Signal<VflowSettings[K]> =>
-    computed(() => plain[key]() ?? providedValue(key) ?? VFLOW_SETTINGS_DEFAULTS[key]);
+    computed(() => {
+      const input = plain[key]();
+
+      return input !== undefined ? input : (providedValue(key) ?? VFLOW_SETTINGS_DEFAULTS[key]);
+    });
 
   const distance = (key: 'paneClickDistance' | 'nodeDragThreshold' | 'connectionDragThreshold'): Signal<number> => {
     const value = scalar(key);
