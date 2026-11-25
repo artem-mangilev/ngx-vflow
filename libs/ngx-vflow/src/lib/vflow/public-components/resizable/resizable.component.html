@@ -1,0 +1,16 @@
+<ng-template #resizer>
+  @if (enabled()) {
+    <div
+      vNoDrag
+      class="v-resize-controls"
+      [style.--_gap.px]="gap()"
+      [style.--_scale]="scale()"
+      (pointerdown)="press($event)">
+      @for (control of controls; track control.position) {
+        <div [attr.data-v-resize-control]="control.kind" [attr.data-v-resize-control-position]="control.position"></div>
+      }
+    </div>
+  }
+</ng-template>
+
+<ng-content />

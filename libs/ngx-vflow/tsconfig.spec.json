@@ -1,0 +1,10 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/spec",
+    "types": ["vitest/globals"]
+  },
+  "include": ["**/*.spec.ts", "**/*.d.ts", "../test-setup/test-setup.ts", "../test-setup/test-setup.zone.ts"],
+  "exclude": ["dist", "node_modules"]
+}

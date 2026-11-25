@@ -1,0 +1,360 @@
+import { Injectable, Injector, inject, signal, untracked } from '@angular/core';
+import { NodeModel } from '../models/node.model';
+import { round } from '../utils/round';
+import { FlowEntitiesService } from './flow-entities.service';
+import { Point } from '../interfaces/point.interface';
+import { FlowSettingsService } from './flow-settings.service';
+import { align } from '../utils/align-number';
+import { ViewportService } from './viewport.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Subject, type Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { KeyboardService } from './keyboard.service';
+import { isGroupNode } from '../utils/is-group-node';
+import { ResizeObserverService } from './resize-observer.service';
+import { clientToFlowPosition } from '../utils/coordinates';
+import { GestureElement, PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/pointer-drag';
+import { isNodeDragPress, pressTarget } from '../utils/press-target';
+import { FlowRenderingService } from './flow-rendering.service';
+import { AlignmentService } from './alignment.service';
+
+/** A node drag gesture, as the flow reports it: the start, each move and the end. */
+export interface NodeDragGestureEvent {
+  type: 'start' | 'move' | 'end';
+  /** The node the pointer grabbed. */
+  node: NodeModel;
+  /** Every node the gesture moves. */
+  nodes: NodeModel[];
+  event: PointerEvent;
+}
+
+@Injectable()
+export class DraggableService {
+  private entitiesService = inject(FlowEntitiesService);
+  private settingsService = inject(FlowSettingsService);
+  private viewportService = inject(ViewportService);
+  private keyboardService = inject(KeyboardService);
+  private resizeObserverService = inject(ResizeObserverService);
+  private alignmentService = inject(AlignmentService);
+  private flowRenderingService = inject(FlowRenderingService);
+  private injector = inject(Injector);
+  private drags = new WeakMap<Element, PointerDrag>();
+
+  /** Whether a node drag is in progress. */
+  public readonly dragging = signal(false);
+
+  /** The node drag gestures, as events: a start followed by a move in the same tick is reported as both. */
+  public readonly events$ = new Subject<NodeDragGestureEvent>();
+
+  /**
+   * Enable draggable behavior for element.
+   *
+   * @param element target element for toggling draggable
+   * @param model model with data for this element
+   */
+  public enable(element: GestureElement, model: NodeModel): void {
+    this.clearDrag(element);
+    this.drags.set(element, this.getDragBehavior(model, element));
+  }
+
+  /**
+   * Disable draggable behavior for element.
+   *
+   * @param element target element for toggling draggable
+   */
+  public disable(element: GestureElement): void {
+    this.clearDrag(element);
+  }
+
+  /** Returns the nodes that were moved. */
+  public moveSelected(model: NodeModel, direction: Point, accelerated: boolean): NodeModel[] {
+    if (!model.selected() || !model.draggable()) return [];
+    const [gridX, gridY] = this.settingsService.snapGrid();
+    const factor = accelerated ? 4 : 1;
+    const nodes = this.getDragNodes(model);
+    for (const node of nodes) {
+      const { x, y } = node.globalPoint();
+      const point = {
+        x: x + direction.x * (gridX > 1 ? gridX : 5) * factor,
+        y: y + direction.y * (gridY > 1 ? gridY : 5) * factor,
+      };
+      this.alignToGrid(point);
+      this.moveNode(node, this.toNodeSpace(node, point));
+    }
+    return nodes;
+  }
+
+  /** Removes the drag listeners of the element and cancels a drag in progress. */
+  public destroy(element: GestureElement): void {
+    this.clearDrag(element);
+  }
+
+  private clearDrag(element: GestureElement) {
+    this.drags.get(element)?.destroy();
+    this.drags.delete(element);
+  }
+
+  /**
+   * Node drag behavior. Updated node's coordinate according to dragging
+   *
+   * @param model
+   * @returns
+   */
+  private getDragBehavior(model: NodeModel, element: GestureElement): PointerDrag {
+    let activated = false;
+    let dragNodes: NodeModel[] = [];
+    /** From the pointer to the origin of each node, in flow space. */
+    let offsets: Point[] = [];
+    let lastClient: Point = { x: 0, y: 0 };
+    let moveNodesOnAutoPanSub: Subscription | null = null;
+    let pane: Element | null = null;
+    let paneRect: DOMRectReadOnly | null = null;
+    let panePositionObserver: IntersectionObserver | null = null;
+    const document = element.ownerDocument;
+    // The document of a server render has no window, and no drag starts there.
+    const view = document.defaultView;
+
+    const invalidatePaneRect = () => {
+      paneRect = null;
+    };
+
+    const handlePaneResize = (entry: ResizeObserverEntry) => {
+      if (paneRect && (entry.contentRect.width !== paneRect.width || entry.contentRect.height !== paneRect.height)) {
+        invalidatePaneRect();
+      }
+    };
+
+    const observePanePosition = () => {
+      if (!pane || !paneRect || !view || typeof IntersectionObserver === 'undefined') {
+        return;
+      }
+
+      panePositionObserver?.disconnect();
+      const rootMargin = `${-paneRect.top}px ${paneRect.right - view.innerWidth}px ${paneRect.bottom - view.innerHeight}px ${-paneRect.left}px`;
+      panePositionObserver = new IntersectionObserver(
+        ([entry]) => {
+          const currentRect = paneRect;
+          if (!pane || !currentRect) {
+            return;
+          }
+
+          if (
+            entry.boundingClientRect.left !== currentRect.left ||
+            entry.boundingClientRect.top !== currentRect.top ||
+            entry.boundingClientRect.width !== currentRect.width ||
+            entry.boundingClientRect.height !== currentRect.height
+          ) {
+            paneRect = entry.boundingClientRect;
+            observePanePosition();
+          }
+        },
+        { rootMargin, threshold: 1 },
+      );
+
+      panePositionObserver.observe(pane);
+    };
+
+    const stopTrackingPaneGeometry = () => {
+      if (pane) {
+        this.resizeObserverService.removeObserver(pane, handlePaneResize);
+      }
+      document.removeEventListener('scroll', invalidatePaneRect, true);
+      view?.removeEventListener('resize', invalidatePaneRect);
+      panePositionObserver?.disconnect();
+      panePositionObserver = null;
+      pane = null;
+      paneRect = null;
+    };
+
+    const startTrackingPaneGeometry = () => {
+      stopTrackingPaneGeometry();
+      pane = this.flowRenderingService.pane() ?? element;
+      paneRect = pane.getBoundingClientRect();
+      observePanePosition();
+      this.resizeObserverService.addObserver(pane, handlePaneResize);
+      document.addEventListener('scroll', invalidatePaneRect, true);
+      view?.addEventListener('resize', invalidatePaneRect);
+    };
+
+    const getPaneRect = () => {
+      if (!pane) {
+        throw new Error('Pane geometry is unavailable outside an active drag');
+      }
+
+      if (!paneRect) {
+        paneRect = pane.getBoundingClientRect();
+        observePanePosition();
+      }
+
+      return paneRect;
+    };
+
+    const moveTo = (client: Point) => {
+      lastClient = client;
+      const flow = this.getFlowPoint(client, getPaneRect());
+      // The nodes keep their flow-space offsets from the pointer, so a node stays under it even while the origin
+      // of an ancestor moves during the drag, for example when a parent grows around its children.
+      const points = offsets.map((offset) => ({ x: flow.x + offset.x, y: flow.y + offset.y }));
+
+      // An aligned axis keeps its alignment; the grid applies to the other one.
+      const aligned = this.alignmentService.snap(points);
+      dragNodes.forEach((model, index) => {
+        this.alignToGrid(points[index], aligned);
+        this.moveNode(model, this.toNodeSpace(model, points[index]));
+      });
+      this.alignmentService.update();
+    };
+
+    const end = ({ event }: PointerDragContext) => {
+      if (!activated) return;
+      activated = false;
+      moveNodesOnAutoPanSub?.unsubscribe();
+      moveNodesOnAutoPanSub = null;
+      stopTrackingPaneGeometry();
+      this.alignmentService.end();
+      dragNodes.forEach((node) => node.dragging.set(false));
+      this.dragging.set(false);
+      this.events$.next({ type: 'end', node: model, nodes: dragNodes, event });
+    };
+
+    return createPointerDrag(element, {
+      filter: this.dragFilter(model),
+      threshold: () => this.settingsService.nodeDragThreshold(),
+      stopCompatibilityEvents: true,
+      onStart: ({ start, point, event }) => {
+        activated = true;
+        lastClient = start;
+        dragNodes = this.getDragNodes(model);
+        dragNodes.forEach((node) => node.dragging.set(true));
+        startTrackingPaneGeometry();
+        this.alignmentService.begin(dragNodes);
+
+        this.dragging.set(true);
+        this.events$.next({ type: 'start', node: model, nodes: dragNodes, event });
+
+        // Offsets are taken at the press, so a drag past the threshold does not lose the distance it took.
+        const flow = this.getFlowPoint(start, getPaneRect());
+
+        offsets = dragNodes.map((node) => {
+          const { x, y } = node.globalPoint();
+          return { x: x - flow.x, y: y - flow.y };
+        });
+
+        // Auto-pan and a wheel zoom move the flow under a still pointer, so the nodes follow the pointer again.
+        moveNodesOnAutoPanSub = this.onViewportChange(() => moveTo(lastClient));
+
+        // A drag that starts past the threshold moves the nodes right away.
+        if (point.x !== start.x || point.y !== start.y) moveTo(point);
+      },
+      onMove: ({ point, event }) => {
+        moveTo(point);
+        this.events$.next({ type: 'move', node: model, nodes: dragNodes, event });
+      },
+      onEnd: end,
+      onCancel: end,
+    });
+  }
+
+  private dragFilter(model: NodeModel) {
+    return (event: PointerEvent) => {
+      // Do not drag group node if selection occurs inside group node (by keyboard)
+      if (isGroupNode(model) && this.keyboardService.isActiveModifier('selection')) {
+        return false;
+      }
+
+      // Primary button only, no ctrl+click (context menu on macOS)
+      if (event.ctrlKey || event.button !== 0) {
+        return false;
+      }
+
+      // Controls and handles keep their presses; with drag handles, only they drag the node
+      return isNodeDragPress(pressTarget(event.target), model.dragHandlesCount() > 0);
+    };
+  }
+
+  /**
+   * Converts a client-space pointer position into flow coordinates,
+   * flow = (client - paneRect - {x,y}) / zoom.
+   */
+  private getFlowPoint(client: Point, paneRect: DOMRectReadOnly): Point {
+    return clientToFlowPosition(client, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: paneRect.left, y: paneRect.top },
+    });
+  }
+
+  private getDragNodes(model: NodeModel) {
+    return model.selected()
+      ? this.entitiesService
+          .nodes()
+          // selected draggable nodes (with current node)
+          .filter((node) => node.selected() && node.draggable())
+          // do not drag descendants if selected ancestor is already dragged
+          .filter((node) => !this.hasSelectedDraggableAncestor(node))
+      : // we only can move current node if it's not selected
+        [model];
+  }
+
+  private hasSelectedDraggableAncestor(node: NodeModel) {
+    let parent = node.parent();
+
+    while (parent) {
+      if (parent.selected() && parent.draggable()) {
+        return true;
+      }
+
+      parent = parent.parent();
+    }
+
+    return false;
+  }
+
+  /** The node-space point at which the node's origin is at `flowPoint`. */
+  private toNodeSpace(model: NodeModel, flowPoint: Point): Point {
+    const parent = model.parent();
+    const origin = parent ? parent.globalPoint() : { x: 0, y: 0 };
+
+    return { x: round(flowPoint.x - origin.x), y: round(flowPoint.y - origin.y) };
+  }
+
+  /**
+   * @todo make it unit testable
+   */
+  private moveNode(model: NodeModel, point: Point) {
+    const parent = model.parent();
+
+    // keep node in bounds of parent
+    if (model.extent() === 'parent' && parent) {
+      point.x = Math.min(parent.width() - model.width(), point.x);
+      point.x = Math.max(0, point.x);
+
+      point.y = Math.min(parent.height() - model.height(), point.y);
+      point.y = Math.max(0, point.y);
+    }
+
+    model.setPoint(point);
+  }
+
+  /** Snaps a flow-space point to the grid, which is drawn in flow space, so nested nodes snap to the same cells. */
+  private alignToGrid(point: Point, skip = { x: false, y: false }) {
+    const [snapX, snapY] = this.settingsService.snapGrid();
+
+    if (snapX > 1 && !skip.x) {
+      point.x = align(point.x, snapX);
+    }
+
+    if (snapY > 1 && !skip.y) {
+      point.y = align(point.y, snapY);
+    }
+
+    return point;
+  }
+
+  private onViewportChange(callback: () => void) {
+    // The first value comes when the effect first runs, which may already be a viewport the drag has not seen.
+    const start = untracked(this.viewportService.readableViewport);
+    return toObservable(this.viewportService.readableViewport, { injector: this.injector })
+      .pipe(filter((viewport) => viewport !== start))
+      .subscribe(callback);
+  }
+}

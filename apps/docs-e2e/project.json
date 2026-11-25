@@ -1,0 +1,30 @@
+{
+  "name": "docs-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["docs"],
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright test",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "e2e-preview": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["docs:site"],
+      "options": {
+        "command": "playwright test smoke.spec.ts",
+        "cwd": "{projectRoot}",
+        "env": { "E2E_TARGET": "preview" }
+      }
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["apps/docs-e2e/**/*.ts"]
+      }
+    }
+  }
+}

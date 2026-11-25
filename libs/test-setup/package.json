@@ -1,0 +1,24 @@
+{
+  "name": "@vflow/test-setup",
+  "version": "0.0.0",
+  "private": true,
+  "description": "What the specs of the Angular libraries share: the Vitest configuration and the TestBed setup files",
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "catalog:libs",
+    "@angular/build": "catalog:libs",
+    "@angular/common": "catalog:libs",
+    "@angular/compiler": "catalog:libs",
+    "@angular/compiler-cli": "catalog:libs",
+    "@angular/core": "catalog:libs",
+    "@angular/platform-browser": "catalog:libs",
+    "@vitest/browser": "catalog:libs",
+    "@vitest/coverage-v8": "catalog:libs",
+    "playwright": "catalog:libs",
+    "rxjs": "catalog:libs",
+    "tslib": "^2.3.0",
+    "typescript": "catalog:libs",
+    "vite": "catalog:libs",
+    "vitest": "catalog:libs",
+    "zone.js": "catalog:libs"
+  }
+}

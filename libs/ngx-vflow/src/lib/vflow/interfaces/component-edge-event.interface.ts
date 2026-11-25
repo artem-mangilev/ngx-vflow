@@ -1,0 +1,27 @@
+import { Type } from '@angular/core';
+import { ComponentOutputEvent } from './component-node-event.interface';
+
+/**
+ * Event of a component edge, narrowed to the outputs of the component class `C`: `eventName` is the property name of
+ * one of its outputs and `eventPayload` its type. {@link isComponentEdgeEvent} narrows an
+ * {@link AnyComponentEdgeEvent} to it.
+ */
+export type ComponentEdgeEvent<C extends object> = { edgeId: string } & ComponentOutputEvent<C>;
+
+/** Payload of `(componentEdgeEvent)`: an output of a component edge, before narrowing. */
+export interface AnyComponentEdgeEvent {
+  edgeId: string;
+  /** The component class that emitted the event. */
+  component: Type<unknown>;
+  /** Property name of the output on the component class. */
+  eventName: string;
+  eventPayload: unknown;
+}
+
+/** Whether the event comes from an edge rendered by `component`; narrows it to the outputs of that class. */
+export function isComponentEdgeEvent<C extends object>(
+  event: AnyComponentEdgeEvent,
+  component: Type<C>,
+): event is ComponentEdgeEvent<C> {
+  return event.component === component;
+}

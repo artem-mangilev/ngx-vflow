@@ -1,0 +1,85 @@
+---
+keyword: 'RenderingEdges'
+---
+
+An edge links two nodes: it has its own `id` and the ids of its `source` and `target` nodes. Pass an `Edge[]` array
+to `vflow`. Core routes the path and owns the click selection; the visible line comes from your presentation, a
+`vEdge` template or a component.
+
+{{ NgDocActions.demoPane("DefaultEdgesDemoComponent") }}
+
+`curve` selects the routing of an edge and `markers` adds arrowheads that follow its stroke color; see
+[Curves](/docs/edges/curves) and [Markers](/docs/edges/markers). Edges are created by the application, also when the
+user connects two handles; see [Connections](/docs/handles/connections).
+
+## Edge templates
+
+To draw edges with a template:
+
+1. Put an SVG element with the structural `vEdge` directive inside `vflow`, usually a `<svg:g>` group, as in the example below
+2. The flow draws a transparent 20px interaction stroke along the edge path, so a click near the line selects the edge. When the template starts with a `<svg:g>`, the stroke is the first child of that group, so the group's listeners and CSS `:hover` see the whole clickable area, and elements you place after it stay on top. A template that starts with another element or with control flow, such as `@if`, gets the stroke in the edge host instead: a click still selects the edge. Set `interactionWidth` on the edge to change the width.
+3. Draw the visible `<svg:path>` inside the group.
+4. The library provides `ctx` to the template with important data for you, such as the `path` signal with current path. Additionally, the `edge` field contains current edge from one the `[edges]`, from which you can read its `data`. Furthermore, you can access `markerStart` and `markerEnd` signals with markers for current `edge`.
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <svg:g *vEdge="let ctx">
+    <svg:path class="edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+  </svg:g>
+</vflow>
+```
+
+The structural form is short for `<ng-template let-ctx vEdge>`. Use the long form when the template has no single root
+element: an edge with a label declares the label next to its SVG group, see `*FeaturesEdgeLabels`, or a template that
+starts with `@if` or `@let`.
+
+If your template draws geometry that differs from the edge path, set `interactionWidth` to `0` and opt your own element into hit-testing with `pointer-events="stroke"`; clicks on it still select the edge. Do not enable pointer events on the whole edge SVG because its bounds would block nodes and canvas panning.
+
+## Context
+
+`ctx` is the `EdgeRef` of the edge, the same object an edge component gets from `injectEdge()`:
+
+```ts
+export interface EdgeRef<T = any> {
+  edge: Edge<T>;
+  data: Signal<T>;
+  path: Signal<string>;
+  markerStart: Signal<string>;
+  markerEnd: Signal<string>;
+  selected: Signal<boolean>;
+  preselected: Signal<boolean>;
+  shouldLoad: Signal<boolean>;
+}
+```
+
+A template cannot take a type argument, so `data` is `any` by default. Name the edges the template renders with `of`
+to type it; the flow never reads this input:
+
+{% raw %}
+
+```html
+<svg:g *vEdge="let ctx; of: edges">{{ ctx.data().label }}</svg:g>
+```
+
+{% endraw %}
+
+## Example
+
+The template of the demo reads the `role` of a link from the edge `data` and draws a standby link dashed. The
+selected edge takes the accent color through `ctx.selected()`, and the line grows thicker while the pointer is over
+the group, which includes the interaction stroke.
+
+{{ NgDocActions.demoPane("TemplateEdgesDemoComponent") }}
+
+## Edge components
+
+An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. Or register the component under a key with `withEdgeComponents()` inside `provideVflow()` and name the key, `component: 'transition'`, as the demo below does; the `VflowEdgeComponents` interface can be augmented to have the keys checked, see [Component keys](/docs/nodes/rendering#refer-to-components-by-key). The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. The interaction stroke is the first child of that group, so host listeners and `:host(:hover)` see the whole clickable area.
+
+An edge component declares labels in its own template with the `vEdgeLabel` structural directive, next to its SVG
+elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label renders in the HTML label layer of the
+flow, outside the component host, so host listeners and `:host(:hover)` do not see it. Put listeners on the label
+element itself; the demo below emits the same output from a click on the line and on the label.
+
+Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the component class, the property name of the output and its payload. `isComponentEdgeEvent(event, Cmp)` narrows an event to the outputs of one edge component class, as `ComponentEdgeEvent<Cmp>`.
+
+{{ NgDocActions.demoPane("ComponentEdgesDemoComponent") }}

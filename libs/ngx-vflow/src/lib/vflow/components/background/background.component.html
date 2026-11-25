@@ -1,0 +1,61 @@
+@if (pattern(); as pattern) {
+  @switch (pattern.type) {
+    @case ('dots') {
+      <svg:pattern
+        patternUnits="userSpaceOnUse"
+        [attr.id]="patternId"
+        [attr.x]="pattern.x"
+        [attr.y]="pattern.y"
+        [attr.width]="pattern.gap"
+        [attr.height]="pattern.gap">
+        <svg:circle
+          data-v-background-pattern
+          [attr.cx]="pattern.radius"
+          [attr.cy]="pattern.radius"
+          [attr.r]="pattern.radius" />
+      </svg:pattern>
+
+      <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
+    }
+
+    @case ('grid') {
+      <svg:pattern
+        patternUnits="userSpaceOnUse"
+        [attr.id]="patternId"
+        [attr.x]="pattern.x"
+        [attr.y]="pattern.y"
+        [attr.width]="pattern.gap"
+        [attr.height]="pattern.gap">
+        <svg:path
+          data-v-background-pattern
+          [attr.d]="'M ' + pattern.gap + ' 0 L 0 0 0 ' + pattern.gap"
+          [attr.stroke-width]="pattern.strokeWidth" />
+      </svg:pattern>
+
+      <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
+    }
+
+    @case ('image') {
+      @if (pattern.repeat) {
+        <svg:pattern
+          patternUnits="userSpaceOnUse"
+          [attr.id]="patternId"
+          [attr.x]="pattern.x"
+          [attr.y]="pattern.y"
+          [attr.width]="pattern.width"
+          [attr.height]="pattern.height">
+          <svg:image [attr.href]="pattern.src" [attr.width]="pattern.width" [attr.height]="pattern.height" />
+        </svg:pattern>
+
+        <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
+      } @else {
+        <svg:image
+          [attr.x]="pattern.x"
+          [attr.y]="pattern.y"
+          [attr.width]="pattern.width"
+          [attr.height]="pattern.height"
+          [attr.href]="pattern.src" />
+      }
+    }
+  }
+}

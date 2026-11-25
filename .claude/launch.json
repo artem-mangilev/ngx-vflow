@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--port", "4200"],
+      "port": 4200
+    },
+    {
+      "name": "docs-4201",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--port", "4201"],
+      "port": 4201
+    },
+    {
+      "name": "docs-prod",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--configuration", "production", "--port", "4300"],
+      "port": 4300
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@vflow/routing",
+  "version": "2.7.0",
+  "description": "Obstacle-avoiding edge routing for ngx-vflow",
+  "license": "MIT",
+  "homepage": "https://www.ngx-vflow.org/",
+  "author": "Artem Mangilev",
+  "keywords": [
+    "angular",
+    "ngx-vflow",
+    "edge routing",
+    "orthogonal",
+    "diagram"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/routing"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "ngx-vflow": "^3.0.0-alpha.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "devDependencies": {
+    "@angular/build": "catalog:libs",
+    "@angular/common": "catalog:libs",
+    "@angular/compiler": "catalog:libs",
+    "@angular/compiler-cli": "catalog:libs",
+    "@angular/core": "catalog:libs",
+    "@angular/platform-browser": "catalog:libs",
+    "@vitest/browser": "catalog:libs",
+    "@vitest/coverage-v8": "catalog:libs",
+    "ng-packagr": "catalog:libs",
+    "ngx-vflow": "workspace:*",
+    "playwright": "catalog:libs",
+    "rxjs": "catalog:libs",
+    "typescript": "catalog:libs",
+    "vite": "catalog:libs",
+    "vitest": "catalog:libs"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

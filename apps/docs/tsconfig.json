@@ -1,0 +1,44 @@
+/* The docs compile with their own Angular and TypeScript versions, so this file does not extend the root one. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./out-tsc",
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "sourceMap": true,
+    "declaration": false,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "useDefineForClassFields": false,
+    "lib": ["ES2022", "dom"],
+    "paths": {
+      "@ng-doc/generated": ["./ng-doc/docs/index.ts"],
+      "@ng-doc/generated/*": ["./ng-doc/docs/*"],
+      "@docs/shared": ["./src/app/shared/index.ts"],
+      // The libraries as an application gets them: packages built into dist with the Angular version of the
+      // workspace root, and the @vflow/ui parts as sources. `libs/` is their copy, see scripts/libs.mjs.
+      "ngx-vflow": ["./libs/ngx-vflow"],
+      "@vflow/routing": ["./libs/routing"],
+      "@vflow/auto-size": ["./libs/auto-size"],
+      "@vflow/layout": ["./libs/layout"],
+      "@vflow/layout/d3-hierarchy": ["./libs/layout/d3-hierarchy"],
+      "@vflow/layout/dagre": ["./libs/layout/dagre"],
+      "@vflow/layout/elk": ["./libs/layout/elk"],
+      "@vflow/layout/d3-force": ["./libs/layout/d3-force"],
+      "@vflow/ui": ["./libs/ui/public-api.ts"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

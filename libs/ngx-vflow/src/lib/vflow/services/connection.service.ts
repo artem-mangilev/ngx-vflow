@@ -1,0 +1,308 @@
+import { DOCUMENT } from '@angular/common';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { Subject } from 'rxjs';
+import { NodeModel } from '../models/node.model';
+import { HandleModel } from '../models/handle.model';
+import { EdgeModel } from '../models/edge.model';
+import { Point } from '../interfaces/point.interface';
+import { Connection } from '../interfaces/connection.interface';
+import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
+import { ConnectionInternal } from '../interfaces/connection.internal.interface';
+import {
+  ConnectEndEvent,
+  ConnectionEndpoint,
+  ConnectionHandle,
+  ConnectionEventOutcome,
+  ConnectStartEvent,
+  ReconnectEndEvent,
+  ReconnectEvent,
+  ReconnectStartEvent,
+} from '../interfaces/connection-events.interface';
+import { FlowEntitiesService } from './flow-entities.service';
+import { FlowSettingsService } from './flow-settings.service';
+import { FlowRenderingService } from './flow-rendering.service';
+import { ViewportService } from './viewport.service';
+import { adjustDirection } from '../utils/adjust-direction';
+import { sameConnection } from '../utils/same-connection';
+import { listen } from '../utils/listen';
+import { clientToFlowPosition } from '../utils/coordinates';
+import { createPointerTracker } from '../gestures/pointer-drag';
+
+/** The handle under the pointer and whether the connection it would make is valid. */
+export interface ConnectionCandidate {
+  node: NodeModel;
+  handle: HandleModel;
+  valid: boolean;
+}
+
+/** A connection gesture in progress: a reconnection is a connection dragged from one end of an existing edge. */
+export interface ConnectionGesture {
+  /** The node and handle the connection is dragged from. */
+  source: NodeModel;
+  sourceHandle: HandleModel;
+  /** The edge being reconnected; a new connection has none. */
+  oldEdge?: EdgeModel;
+  candidate: ConnectionCandidate | null;
+}
+
+/**
+ * The connection gesture of the flow: it starts on a handle or a reconnection handle, validates the handle under the
+ * pointer and ends on the release. The gesture is one signal; the nodes, handles and edge it involves carry their
+ * state themselves, written on each transition, so that a transition costs its participants and not every entity.
+ */
+@Injectable()
+export class ConnectionService {
+  private readonly settings = inject(FlowSettingsService);
+  private readonly entities = inject(FlowEntitiesService);
+  private readonly rendering = inject(FlowRenderingService);
+  private readonly viewport = inject(ViewportService);
+  private readonly document = inject(DOCUMENT);
+
+  public readonly gesture = signal<ConnectionGesture | null>(null);
+
+  /** Whether a connection gesture is in progress. */
+  public readonly active = computed(() => this.gesture() !== null);
+
+  /** Client position of the pointer of the gesture, from its press on. Its own signal: a move invalidates nothing else. */
+  public readonly pointer = signal<Point>({ x: 0, y: 0 });
+
+  public readonly connectStart$ = new Subject<ConnectStartEvent>();
+  /** An application-owned structural connection request, after validation. */
+  public readonly connect$ = new Subject<Connection>();
+  public readonly connectEnd$ = new Subject<ConnectEndEvent>();
+  public readonly reconnectStart$ = new Subject<ReconnectStartEvent>();
+  public readonly reconnect$ = new Subject<ReconnectEvent>();
+  public readonly reconnectEnd$ = new Subject<ReconnectEndEvent>();
+
+  /** What the tracked press begins once it passes the drag threshold. */
+  private pendingStart: (() => void) | null = null;
+  private stopContextMenu: (() => void) | null = null;
+
+  private readonly tracker = createPointerTracker(
+    {
+      threshold: () => this.settings.connectionDragThreshold(),
+      onStart: ({ point }) => {
+        this.pointer.set(point);
+        const begin = this.pendingStart;
+        this.pendingStart = null;
+        begin?.();
+      },
+      onMove: ({ point }) => this.pointer.set(point),
+      onEnd: ({ point }) => {
+        this.pointer.set(point);
+        this.end();
+      },
+      onCancel: () => this.end(),
+    },
+    this.document,
+  );
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this.tracker.destroy();
+      this.stopContextMenu?.();
+    });
+  }
+
+  /**
+   * Starts a connection from the handle, or the reconnection of `oldEdge` from the handle that stays attached. With
+   * a pointer event the gesture begins once the pointer passes the drag threshold and follows it to the release;
+   * without one it begins at once and ends with {@link end}.
+   */
+  public start(handle: HandleModel, event?: PointerEvent, oldEdge?: EdgeModel): void {
+    if (!oldEdge && !handle.canStart()) return;
+
+    this.tracker.release();
+    this.pendingStart = null;
+
+    if (!event) {
+      this.begin(handle, oldEdge);
+      return;
+    }
+
+    releaseImplicitCapture(event);
+    this.pendingStart = () => this.begin(handle, oldEdge);
+    this.tracker.press(event);
+  }
+
+  /**
+   * The pointer entered a handle, or the magnet around it: the handle becomes the candidate. The handle the
+   * connection is dragged from never does: a connection of a handle to itself means nothing, and the pointer is over
+   * that handle when the gesture begins. Releasing there is a drop.
+   */
+  public hover(handle: HandleModel): void {
+    const gesture = this.gesture();
+    if (!gesture || handle === gesture.sourceHandle) return;
+
+    const valid = handle.canAccept() && this.isValid(this.toEnds(gesture, handle), gesture.oldEdge);
+
+    this.setGesture({ ...gesture, candidate: { node: handle.parentNode, handle, valid } });
+  }
+
+  /** The pointer left the candidate; leaving any other handle, the origin included, changes nothing. */
+  public leave(handle: HandleModel): void {
+    const gesture = this.gesture();
+    if (!gesture || gesture.candidate?.handle !== handle) return;
+
+    this.setGesture({ ...gesture, candidate: null });
+  }
+
+  /**
+   * The release: on a candidate that accepts, the connection is validated again and reported; anywhere else the
+   * gesture is dropped. Either way the end is reported with the sides it connected, or `null` for a drop.
+   */
+  public end(): void {
+    this.tracker.release();
+    this.pendingStart = null;
+    this.stopContextMenu?.();
+    this.stopContextMenu = null;
+
+    const gesture = this.gesture();
+    if (!gesture) return;
+
+    const { sourceHandle, oldEdge, candidate } = gesture;
+    const from = endpoint(sourceHandle);
+    let outcome: ConnectionEventOutcome = { valid: null, to: null };
+    let connection: Connection | null = null;
+
+    if (candidate && candidate.handle.canAccept()) {
+      const ends = this.toEnds(gesture, candidate.handle);
+      connection = toConnection(ends);
+      outcome = { valid: this.isValid(ends, oldEdge), to: endpoint(candidate.handle) };
+    }
+
+    this.setGesture(null);
+
+    if (oldEdge) {
+      if (outcome.valid && connection) this.reconnect$.next({ edge: oldEdge.edge, connection });
+      this.reconnectEnd$.next({ edge: oldEdge.edge, from, ...outcome });
+    } else {
+      if (outcome.valid && connection) this.connect$.next(connection);
+      this.connectEnd$.next({ from, point: this.flowPointer(), ...outcome });
+    }
+  }
+
+  /** The pointer in flow space. The pane is the origin of flow coordinates; a service tested on its own has none. */
+  private flowPointer(): Point {
+    const pane = this.rendering.pane()?.getBoundingClientRect();
+
+    return clientToFlowPosition(this.pointer(), {
+      viewport: this.viewport.readableViewport(),
+      containerPosition: { x: pane?.left ?? 0, y: pane?.top ?? 0 },
+    });
+  }
+
+  private begin(handle: HandleModel, oldEdge?: EdgeModel) {
+    if (!oldEdge && !handle.canStart()) return;
+
+    const source = handle.parentNode;
+    this.setGesture({ source, sourceHandle: handle, oldEdge, candidate: null });
+    // A context menu takes the pointer away without a release the gesture would see.
+    this.stopContextMenu?.();
+    this.stopContextMenu = listen(this.document, 'contextmenu', () => this.end());
+
+    const start = endpoint(handle);
+    if (oldEdge) this.reconnectStart$.next({ edge: oldEdge.edge, ...start });
+    else this.connectStart$.next(start);
+  }
+
+  /** Writes the state of the entities that leave or join the gesture, then publishes it. */
+  private setGesture(next: ConnectionGesture | null) {
+    const previous = this.gesture();
+    const previousNodes = participants(previous);
+    const nextNodes = participants(next);
+    for (const node of previousNodes) if (!nextNodes.has(node)) node.connectionActive.set(false);
+    for (const node of nextNodes) if (!previousNodes.has(node)) node.connectionActive.set(true);
+
+    const previousCandidate = previous?.candidate?.handle;
+    const nextCandidate = next?.candidate?.handle;
+    if (previousCandidate && previousCandidate !== nextCandidate) previousCandidate.state.set('idle');
+    if (next?.candidate) next.candidate.handle.state.set(next.candidate.valid ? 'valid' : 'invalid');
+
+    // The handle a connection is dragged from is `connecting` for the whole gesture: it is never the candidate.
+    const previousOrigin = previous?.sourceHandle;
+    const nextOrigin = next?.sourceHandle;
+    if (previousOrigin && previousOrigin !== nextOrigin) previousOrigin.state.set('idle');
+    if (nextOrigin) nextOrigin.state.set('connecting');
+
+    if (previous?.oldEdge !== next?.oldEdge) {
+      previous?.oldEdge?.reconnecting.set(false);
+      next?.oldEdge?.reconnecting.set(true);
+    }
+
+    this.gesture.set(next);
+  }
+
+  /**
+   * The ends of the connection the gesture would make with the handle. Typed handles keep their roles whichever end
+   * the gesture started from.
+   */
+  private toEnds(gesture: ConnectionGesture, handle: HandleModel): ConnectionEnds {
+    const { sourceHandle, targetHandle } = adjustDirection({
+      source: gesture.source,
+      sourceHandle: gesture.sourceHandle,
+      target: handle.parentNode,
+      targetHandle: handle,
+    } satisfies ConnectionInternal);
+
+    return { source: endpoint(sourceHandle), target: endpoint(targetHandle) };
+  }
+
+  /**
+   * Rejects a duplicate before the validators run, so the application validator sees only connections the built-in
+   * rules accept. A reconnected edge is no duplicate of itself, and the validators are told which edge it is.
+   */
+  private isValid(ends: ConnectionEnds, reconnectedEdge?: EdgeModel) {
+    const settings = this.entities.connection();
+    const connection = toConnection(ends);
+    const duplicate =
+      !settings.allowDuplicateConnections &&
+      this.entities.edges().some((model) => model !== reconnectedEdge && sameConnection(model.edge, connection));
+
+    return (
+      !duplicate && settings.validator(reconnectedEdge ? { ...ends, reconnectedEdge: reconnectedEdge.edge } : ends)
+    );
+  }
+}
+
+/** Both ends of a connection in their edge roles: what the validators read, without the reconnected edge. */
+type ConnectionEnds = Pick<ConnectionForValidation, 'source' | 'target'>;
+
+/** The connection as the flow reports it and as an edge stores it: the ids of its ends. */
+function toConnection({ source, target }: ConnectionEnds): Connection {
+  return {
+    source: source.node.id,
+    target: target.node.id,
+    sourceHandle: source.handle.id,
+    targetHandle: target.handle.id,
+  };
+}
+
+/** The nodes a gesture involves: the source, the candidate and both ends of a reconnected edge. */
+function participants(gesture: ConnectionGesture | null): Set<NodeModel> {
+  const nodes = new Set<NodeModel>();
+  if (!gesture) return nodes;
+  nodes.add(gesture.source);
+  if (gesture.candidate) nodes.add(gesture.candidate.node);
+  for (const node of [gesture.oldEdge?.source(), gesture.oldEdge?.target()]) if (node) nodes.add(node);
+  return nodes;
+}
+
+function connectionHandle(handle: HandleModel): ConnectionHandle {
+  return { id: handle.id(), type: handle.type(), position: handle.position() };
+}
+
+function endpoint(handle: HandleModel): ConnectionEndpoint {
+  return { node: handle.parentNode.rawNode, handle: connectionHandle(handle) };
+}
+
+/**
+ * A touch pointer is captured by the element it pressed. A connection gesture releases it, so that, like the mouse,
+ * the finger reports the handles and magnets it moves over and is released on.
+ */
+function releaseImplicitCapture(event: PointerEvent) {
+  const target = event.target;
+  if (event.pointerType === 'touch' && target instanceof Element && target.hasPointerCapture?.(event.pointerId)) {
+    target.releasePointerCapture(event.pointerId);
+  }
+}

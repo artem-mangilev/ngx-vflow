@@ -1,0 +1,90 @@
+<div
+  #flow
+  vflowKeyboard
+  flowSizeController
+  data-v-root
+  [vflowA11y]="{ role: 'region', label: ariaLabels().flowLabel, description: ariaLabels().flowDescription }">
+  <div class="v-a11y-live" vflowLiveRegion></div>
+  <!-- Background (fixed, full-size svg behind everything) -->
+  <svg class="v-background-svg" aria-hidden="true">
+    <g background />
+  </svg>
+
+  <!-- Pane: target of viewport gestures -->
+  <div #pane class="v-pane" viewportGestures spacePointContext autoPan selectionBoxContext>
+    <!-- Viewport: transformed by zoom/pan -->
+    <div #viewportElement class="v-viewport">
+      <!-- Content of the application below the graph, declared by ng-template[vPortal] with the layer 'below' -->
+      <div class="v-portal-layer" data-v-portal-layer="below">
+        @for (entry of portalService.below(); track entry) {
+          <div portalHost [entry]="entry"></div>
+        }
+      </div>
+
+      <!-- Shared marker defs -->
+      <svg class="v-defs-svg" aria-hidden="true">
+        <defs flowDefs [markers]="markers()" [shapes]="markerShapes()" />
+      </svg>
+
+      <!-- Overlays: connection line, selection box, alignment helper (flow coords) -->
+      <svg class="v-overlay-svg" aria-hidden="true">
+        @if (alignmentHelper()) {
+          <svg:g alignmentHelper />
+        }
+
+        <svg:g selectionBox />
+      </svg>
+
+      <!-- Connection line overlay (high z-index, above edges/nodes) -->
+      <svg class="v-connection-svg">
+        <svg:g connection [model]="connectionModel()" [template]="connectionTemplateDirective()?.templateRef" />
+      </svg>
+
+      <!-- DOM order follows application input; z-index controls visual elevation. -->
+      <div class="v-nodes-layer">
+        <!-- Read once: a read per item would re-link this signal to the template on every check of every item. -->
+        @let nodeTemplate = nodeTemplateDirective()?.templateRef;
+        @for (model of orderedNodes(); track trackNodes($index, model)) {
+          <div
+            node
+            [vflowA11y]="model"
+            [vflowKeyboardEntity]="model"
+            [model]="model"
+            [nodeTemplate]="nodeTemplate"></div>
+        }
+      </div>
+
+      <!-- Edges -->
+      <div class="v-edges-layer">
+        @let edgeTemplate = edgeTemplateDirective()?.templateRef;
+        @for (model of orderedEdges(); track trackEdges($index, model)) {
+          <svg edge [vflowA11y]="model" [vflowKeyboardEntity]="model" [model]="model" [edgeTemplate]="edgeTemplate" />
+        }
+      </div>
+
+      <!-- HTML edge labels declared by ng-template[vEdgeLabel] inside edge presentations -->
+      <div class="v-edge-labels-layer">
+        @for (model of orderedEdges(); track trackEdges($index, model)) {
+          @for (label of model.labelEntries(); track label.position) {
+            <div
+              edgeLabelHost
+              [position]="label.position"
+              [template]="label.template"
+              [orient]="label.orient"
+              [edgeModel]="model"></div>
+          }
+        }
+      </div>
+
+      <!-- Content of the application above the graph, declared by ng-template[vPortal] -->
+      <div class="v-portal-layer" data-v-portal-layer="above">
+        @for (entry of portalService.above(); track entry) {
+          <div portalHost [entry]="entry"></div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Every element of the flow content, such as a minimap or viewport controls: above the pane, positioned against the flow -->
+  <div class="v-content-layer"><ng-content /></div>
+</div>

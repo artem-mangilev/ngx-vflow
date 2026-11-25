@@ -1,0 +1,50 @@
+<!--
+  The hit area of the edge. An effect moves it into the group the presentation starts with, so the styles are inline:
+  the styles of a presentation must not repaint it. A click on an edge that cannot be selected does nothing, so the
+  stroke does not promise one with a cursor.
+-->
+<svg:path
+  #interactionStroke
+  aria-hidden="true"
+  data-v-interactive-edge
+  style="fill: none; stroke: transparent; pointer-events: stroke"
+  [attr.d]="model().path().path"
+  [style.display]="model().interactionWidth() > 0 ? null : 'none'"
+  [style.cursor]="model().selectable() ? 'pointer' : null"
+  [style.stroke-width.px]="model().interactionWidth()" />
+
+<svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
+
+@if (model().component; as component) {
+  <ng-container
+    [entityComponentOutlet]="component"
+    [entityComponentOutletLoad]="model().shouldLoad()"
+    [entityComponentOutletInjector]="injector"
+    [entityComponentOutletSvgHost]="true"
+    (entityComponentHost)="presentationRoot.set($event)"
+    (entityComponentEvent)="pushComponentEvent($event)" />
+} @else if (edgeTemplate()) {
+  <ng-container #templateOutlet />
+}
+
+@if (model().sourceHandle() && model().targetHandle()) {
+  @if (model().reconnectable() === true || model().reconnectable() === 'source') {
+    <svg:circle
+      data-v-reconnect-handle
+      data-v-no-select
+      r="10"
+      [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
+      [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
+      (pointerdown)="startReconnection($event, model().targetHandle()!)" />
+  }
+
+  @if (model().reconnectable() === true || model().reconnectable() === 'target') {
+    <svg:circle
+      data-v-reconnect-handle
+      data-v-no-select
+      r="10"
+      [attr.cx]="model().targetHandle()!.pointAbsolute().x"
+      [attr.cy]="model().targetHandle()!.pointAbsolute().y"
+      (pointerdown)="startReconnection($event, model().sourceHandle()!)" />
+  }
+}

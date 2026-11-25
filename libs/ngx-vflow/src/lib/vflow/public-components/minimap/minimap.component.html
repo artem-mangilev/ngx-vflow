@@ -1,0 +1,13 @@
+<svg aria-hidden="true">
+  <g [attr.transform]="matrix()">
+    @for (batch of batches(); track $index) {
+      <path [attr.d]="batch.d" [style.fill]="batch.background" [style.stroke]="batch.borderColor" />
+    }
+  </g>
+</svg>
+<div
+  class="v-minimap-viewport"
+  [style.left.px]="marked().x"
+  [style.top.px]="marked().y"
+  [style.width.px]="marked().width"
+  [style.height.px]="marked().height"></div>

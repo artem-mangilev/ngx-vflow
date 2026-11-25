@@ -1,0 +1,198 @@
+/*
+ * The one stylesheet of the docs: Tailwind for the shell, the landing, the demos and the @vflow/ui parts.
+ *
+ * NgDoc owns the base styles of the page, so Tailwind's reset (`preflight.css`) is left out: only the theme and the
+ * utilities are imported. Utilities live in a cascade layer; the styles of NgDoc and of components are unlayered and
+ * win over them, which is why a flow gets its size from a sized parent and not from a height utility on `vflow`.
+ *
+ * `vflow-ui.css` and the parts in `libs/ui` are the copy an application gets through `@vflow/cli ui`; their `vui`
+ * keys (`bg-vui-surface`, `p-vui-3`) are the theme of every demo.
+ */
+@layer theme, base, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@import '../libs/ui/vflow-ui.css';
+@source '../libs/ui/lib';
+@source './app/**/*.{ts,html}';
+
+/* `dark:` follows the theme toggle of the docs, which the root component mirrors into `data-vui-theme` on `<html>`. */
+@custom-variant dark (&:where([data-vui-theme='dark'], [data-vui-theme='dark'] *));
+
+@theme inline {
+  /* The canvas under the nodes: the one vflow UI role the parts have no key for. */
+  --color-canvas: var(--vui-background);
+
+  /* Colors of the demos' own controls, standing in for the design system of an application. */
+  --color-demo-primary: var(--demo-primary);
+  --color-demo-warning: var(--demo-warning);
+
+  /* The NgDoc theme, for the shell and the pages outside NgDoc: the landing and the showcase. */
+  --color-doc-text: var(--ng-doc-text);
+  --color-doc-muted: var(--ng-doc-text-muted);
+  --color-doc-heading: var(--ng-doc-heading-color);
+  --color-doc-border: var(--ng-doc-border-color);
+  --color-doc-link: var(--ng-doc-link-color);
+  --color-doc-primary: var(--ng-doc-primary);
+  --color-doc-base-0: var(--ng-doc-base-0);
+  --color-doc-base-1: var(--ng-doc-base-1);
+  --color-doc-base-2: var(--ng-doc-base-2);
+  --color-doc-base-3: var(--ng-doc-base-3);
+  --font-doc: var(--ng-doc-font-family);
+  --font-doc-mono: var(--ng-doc-code-font, ui-monospace, monospace);
+
+  /* The palette of the logo. */
+  --color-brand-ink: #1b262c;
+  --color-brand-deep: #0f4c75;
+  --color-brand: #3282b8;
+  --color-brand-pale: #bbe1fa;
+}
+
+/*
+ * The gradient of the landing hero as three typed properties, so that a change of a color or of the angle can be a
+ * transition: a gradient itself does not interpolate.
+ */
+@property --mix-from {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+@property --mix-to {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+@property --mix-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 90deg;
+}
+
+@layer base {
+  :root {
+    /* The curve of something that arrives: fast at first, a long settle. The built-in `ease-out` is weaker. */
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+    /* A fixed blue under white text (5.3:1) in both themes; the lighter dark accent is for rings and lines. */
+    --demo-primary: oklch(0.546 0.245 262.881);
+    --demo-warning: oklch(0.555 0.163 48.998);
+  }
+  [data-vui-theme='dark'] {
+    --demo-warning: oklch(0.828 0.189 84.429);
+  }
+}
+
+/* The column of the landing page: at most 1080px of content, centered, with the gutter of the page at its sides. */
+@utility landing-width {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(1080px + 2 * var(--lp-gutter));
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter);
+}
+
+/*
+ * Where the middle of the room for the hero's flow is in the hero, for the dots that gather around it. It restates
+ * the layout of the hero in landing.component.html, so that the dots are in place before the flow exists to measure
+ * the room: two columns of 5 and 6 parts with a 40px gap in the landing column, the room being the second; under
+ * 900px one column with the room at its bottom, 26rem tall, and 19rem under 600px.
+ */
+@utility hero-slot-center {
+  --landing-column: min(1080px, 100% - 2 * var(--lp-gutter));
+  --slot-x: calc(50% + var(--landing-column) * 5 / 22 + 120px / 11);
+  --slot-y: 50%;
+
+  @media (width < 900px) {
+    --slot-x: 50%;
+    --slot-y: calc(100% - 13rem);
+  }
+  @media (width < 600px) {
+    --slot-y: calc(100% - 9.5rem);
+  }
+}
+
+/*
+ * A flow appears. The library keeps a flow hidden until it has laid itself out, and then shows it in one frame; on
+ * a page that was prerendered, and has been on screen for a while, that reads as a pop. Here what the library kept
+ * hidden fades in instead. Every flow of the site gets this, in a demo or outside one.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  vflow :is(.v-background-svg, .v-viewport) {
+    transition: opacity 300ms var(--ease-out-strong);
+  }
+  vflow.v-initializing:not(.v-no-layout) :is(.v-background-svg, .v-viewport) {
+    opacity: 0;
+  }
+}
+
+/* The chevron of the demos' select, drawn in the text color so it follows the theme. */
+@utility demo-chevron {
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 13px) 50%,
+    calc(100% - 9px) 50%;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+}
+
+/* The demos' slider: a theme track filled up to the value, which `docsRange` writes into `--fill`. */
+@utility demo-range {
+  --fill: 0%;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--vui-accent) var(--fill), var(--vui-border) var(--fill));
+  }
+  &::-moz-range-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--vui-accent) var(--fill), var(--vui-border) var(--fill));
+  }
+  &::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border: 2px solid var(--vui-accent);
+    border-radius: 50%;
+    background: var(--vui-surface);
+    appearance: none;
+  }
+  &::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--vui-accent);
+    border-radius: 50%;
+    background: var(--vui-surface);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--vui-accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * A zero-width strut gives an icon slot the baseline of a line centered on it, so a picture in a header sits on the
+ * first line of the title.
+ */
+@utility demo-strut {
+  &::before {
+    content: '\200b';
+  }
+}
+
+/*
+ * A demo pane keeps the code of a demo behind the demo, collapsed by an inline width that a binding sets; the
+ * stylesheet of NgDoc starts it at 100%. A flow measures its host while the page is created, before that binding
+ * runs, and the style computed for the measurement started a transition from 100%: every page opened with the code
+ * sliding away, and the flow laid out its first viewport in the strip that was left. Collapsed is the start here.
+ */
+:root ng-doc-pane > .ng-doc-pane-back.ng-doc-pane-back {
+  width: 0;
+}

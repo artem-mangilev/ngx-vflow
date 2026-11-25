@@ -1,0 +1,68 @@
+import { Rect } from '../interfaces/rect';
+import { ViewportState } from '../interfaces/viewport.interface';
+
+export interface ViewportForBoundsOptions {
+  minZoom: number;
+  maxZoom: number;
+  /** Share of the bounds added around them, `0.1` = 10 %. Default: `0`. */
+  padding?: number;
+}
+
+/**
+ * Returns the translated and clamped viewport that centers the supplied bounds in a flow of the given size.
+ * Zero-sized bounds are treated as a point and use `maxZoom`.
+ */
+export function getViewportForBounds(
+  bounds: Rect,
+  { width, height }: { width: number; height: number },
+  { minZoom, maxZoom, padding = 0 }: ViewportForBoundsOptions,
+): ViewportState {
+  if (
+    ![bounds.x, bounds.y, bounds.width, bounds.height, width, height, minZoom, maxZoom, padding].every(
+      Number.isFinite,
+    ) ||
+    bounds.width < 0 ||
+    bounds.height < 0 ||
+    width <= 0 ||
+    height <= 0 ||
+    minZoom <= 0 ||
+    minZoom > maxZoom ||
+    padding <= -1
+  ) {
+    throw new RangeError('getViewportForBounds received invalid bounds, viewport, zoom, or padding');
+  }
+
+  const xZoom = width / (bounds.width * (1 + padding));
+  const yZoom = height / (bounds.height * (1 + padding));
+  const zoom = Math.min(xZoom, yZoom);
+  const clampedZoom = clamp(zoom, minZoom, maxZoom);
+  const boundsCenterX = bounds.x + bounds.width / 2;
+  const boundsCenterY = bounds.y + bounds.height / 2;
+  const x = width / 2 - boundsCenterX * clampedZoom;
+  const y = height / 2 - boundsCenterY * clampedZoom;
+
+  return { x, y, zoom: clampedZoom };
+}
+
+export function clamp(value: number, min = 0, max = 1): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Calculates the visible area bounds in world coordinates based on the current viewport state
+ *
+ * @param viewport Current viewport state (x, y, zoom)
+ * @param flowWidth Width of the flow container
+ * @param flowHeight Height of the flow container
+ * @returns Rect representing the visible area in world coordinates
+ */
+export function getViewportBounds(viewport: ViewportState, flowWidth: number, flowHeight: number): Rect {
+  const zoom = viewport.zoom;
+
+  return {
+    x: -viewport.x / zoom,
+    y: -viewport.y / zoom,
+    width: flowWidth / zoom,
+    height: flowHeight / zoom,
+  };
+}

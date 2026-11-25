@@ -1,0 +1,322 @@
+// Public theme tokens of core: one per part that core draws itself, named after its public class. A theme maps its
+// own roles onto them (see @vflow/ui), core only reads them. Registration gives each one its default without declaring
+// it on the flow element, so a value set on any ancestor still inherits into the flow and its parts, and a value set
+// on a descendant still wins for that subtree.
+@property --v-background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+
+// Dots and grid lines of `[data-v-background-pattern]`.
+@property --v-background-pattern {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(177, 177, 183);
+}
+
+// Stroke of `[data-v-selection-box]`; its fill is the same color at 12%.
+@property --v-selection-box {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f4c75;
+}
+
+// Handles and lines of `[data-v-resize-control]`, and the border that separates a handle from the node under it.
+@property --v-resize-control {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f4c75;
+}
+
+@property --v-resize-control-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+
+// `[data-v-alignment-guide]`, drawn at 50%.
+@property --v-alignment-guides {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b262c;
+}
+
+// The line of a connection in progress when the flow has no connection template.
+@property --v-connection {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(177, 177, 183);
+}
+
+// Minimap, drawn with SVG. Nodes: a fill, an outline of one pixel of the minimap where its color is set, and a
+// corner radius in flow pixels, the unit of the node's own `border-radius`. Groups have a fill and an outline of their
+// own and the radius of nodes; `--v-minimap-group-border` is not registered, so that it defaults to the node fill.
+// Then the mask over the part of the graph outside the viewport, and the outline of the viewport. The block itself
+// is styled with CSS on `v-minimap`.
+@property --v-minimap-node {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(226, 226, 226);
+}
+
+@property --v-minimap-node-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --v-minimap-node-radius {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 2px;
+}
+
+@property --v-minimap-group {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --v-minimap-mask {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(240 240 240 / 0.6);
+}
+
+@property --v-minimap-viewport {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+// Focus of nodes and edges: a translucent halo of this color around nodes and along edges.
+@property --v-focus {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #005fcc;
+}
+
+// How far the halo reaches beyond the node's border box and to each side of an edge. A flow length: the halo is part
+// of the zoomed content, like borders. The radius is the corner radius of the focused node itself, in flow units, so
+// the halo follows its shape.
+@property --v-focus-halo {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 4px;
+}
+
+@property --v-focus-radius {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+:host {
+  display: block;
+  position: relative;
+  // The flow is one stacking context: the z-index of its layers, entities and content orders them against each other
+  // only, never against the page. Dialogs, menus and other overlays of the application stay above the flow.
+  isolation: isolate;
+
+  width: 100%;
+  height: 100%;
+  user-select: none;
+
+  ::ng-deep {
+    // Touches on these start library gestures, so they must not scroll the page even where the pane lets it.
+    [data-v-handle-type],
+    [data-v-drag-handle],
+    [data-v-reconnect-handle],
+    [data-v-resize-control] {
+      touch-action: none;
+    }
+
+    // A handle in the `auto` layout: the directive writes `top` and `left` of a point on the node side, and the
+    // element is centered on it. `translate` leaves `transform` and `scale` to the application. It lies above the
+    // resize controls, which follow the node content in the DOM: a port on a side takes the press, not the line
+    // that crosses it.
+    [data-v-handle-placed] {
+      position: absolute;
+      translate: -50% -50%;
+      z-index: 1;
+    }
+  }
+}
+
+// A node, edge, label, handle or minimap waits for its first measurement with `data-v-pending`, and an edge
+// being reconnected hides the same way. A DOM without layout, such as jsdom, never measures anything: there the
+// host carries `v-no-layout`, nothing waits, and the content stays visible to a test with sizes of zero.
+:host(:not(.v-no-layout)) ::ng-deep [data-v-pending] {
+  visibility: hidden;
+}
+
+// High contrast: the feedback parts keep their meaning through system colors, the minimap included.
+@media (forced-colors: active) {
+  :host {
+    --v-background: Canvas;
+    --v-background-pattern: GrayText;
+    --v-selection-box: Highlight;
+    --v-resize-control: Highlight;
+    --v-resize-control-border: Canvas;
+    --v-alignment-guides: CanvasText;
+    --v-connection: GrayText;
+    --v-minimap-node: CanvasText;
+    --v-minimap-mask: transparent;
+    --v-minimap-viewport: Highlight;
+    --v-focus: Highlight;
+  }
+}
+
+[data-v-root] {
+  // The application sizes the `vflow` element with CSS; the root fills it.
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--v-background);
+}
+
+// Until the first layout is complete only the canvas is painted: the layers below follow the viewport, which the
+// application may still change in reaction to `initialized`. Entities inherit this, they never force visible.
+:host(.v-initializing:not(.v-no-layout)) {
+  .v-background-svg,
+  .v-viewport {
+    visibility: hidden;
+  }
+}
+
+.v-a11y-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Background sits behind everything (first in DOM, painted before the pane)
+.v-background-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+// The application's own overlays. The layer lets the pointer through to the pane; the elements in it take it.
+.v-content-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  ::ng-deep > * {
+    pointer-events: auto;
+  }
+}
+
+// `vPanel`: an element of the flow content against a corner or a side of the flow. Without specificity, so the CSS of
+// the application always wins; the gap to the edge is the margin.
+::ng-deep :where([data-v-panel]) {
+  position: absolute;
+  margin: 10px;
+}
+
+::ng-deep :where([data-v-panel^='top']) {
+  top: 0;
+}
+
+::ng-deep :where([data-v-panel^='bottom']) {
+  bottom: 0;
+}
+
+::ng-deep :where([data-v-panel$='left']) {
+  left: 0;
+}
+
+::ng-deep :where([data-v-panel$='right']) {
+  right: 0;
+}
+
+// A centered panel is moved by half its own size, so the margin of that axis must not shift it.
+::ng-deep :where([data-v-panel$='-center']) {
+  left: 50%;
+  margin-inline: 0;
+  translate: -50% 0;
+}
+
+::ng-deep :where([data-v-panel^='center-']) {
+  top: 50%;
+  margin-block: 0;
+  translate: 0 -50%;
+}
+
+// Target of the viewport gestures.
+.v-pane {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// Transformed layer (translate + scale). Must never block the pane.
+.v-viewport {
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+// The layers in flow space: no size, at the origin of the viewport, and the pointer goes through them to the pane.
+// The edges and nodes layers have no z-index, so the z-index of each edge competes with the z-index of each node.
+.v-viewport,
+.v-defs-svg,
+.v-edges-layer,
+.v-nodes-layer,
+.v-edge-labels-layer,
+.v-portal-layer,
+.v-overlay-svg,
+.v-connection-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.v-defs-svg,
+.v-overlay-svg,
+.v-connection-svg {
+  overflow: visible;
+}
+
+.v-defs-svg {
+  width: 0;
+  height: 0;
+}
+
+.v-overlay-svg,
+.v-connection-svg {
+  width: 1px;
+  height: 1px;
+}
+
+// Content of the application in flow space. The layers have no size and let the pointer through; so does the
+// content, unless it asks for the pointer itself. Below every entity, groups under edges included; above every entity
+// and under the overlays, so the alignment guides, the selection box and the connection line stay visible.
+.v-portal-layer {
+  &[data-v-portal-layer='below'] {
+    z-index: -1000000;
+  }
+
+  &[data-v-portal-layer='above'] {
+    z-index: 999999;
+  }
+}
+
+.v-overlay-svg {
+  z-index: 1000000;
+}
+
+.v-connection-svg {
+  z-index: 1000001;
+}

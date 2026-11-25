@@ -1,0 +1,42 @@
+<div
+  nodeHandlesController
+  nodeMeasure
+  class="v-node-wrapper"
+  [model]="model()"
+  [style.width.px]="wrapperSize()?.width ?? null"
+  [style.height.px]="wrapperSize()?.height ?? null">
+  @if (model().component; as component) {
+    <ng-container
+      [entityComponentOutlet]="component"
+      [entityComponentOutletLoad]="model().shouldLoad()"
+      [entityComponentOutletInjector]="injector"
+      (entityComponentEvent)="pushComponentEvent($event)" />
+  } @else if (nodeTemplate(); as template) {
+    <ng-container
+      [ngTemplateOutlet]="template"
+      [ngTemplateOutletContext]="model().context"
+      [ngTemplateOutletInjector]="injector" />
+  }
+</div>
+
+<!-- Resizer -->
+@if (model().resizerTemplate(); as template) {
+  <ng-template [ngTemplateOutlet]="template" />
+}
+
+<!-- Magnets: the snap area around each measured port while a connection is in progress; a dynamic handle is its own drop zone, and a handle scrolled out of view is no snap target -->
+@if (connectionActive()) {
+  @for (handle of model().handles(); track handle) {
+    @if (handle.isMeasured() && !handle.dynamic() && !handle.clipped()) {
+      <div
+        class="v-magnet"
+        aria-hidden="true"
+        [style.left.px]="handle.localPoint().x"
+        [style.top.px]="handle.localPoint().y"
+        [style.width.px]="model().magnetRadius * 2"
+        [style.height.px]="model().magnetRadius * 2"
+        (pointerover)="hoverHandle(handle)"
+        (pointerout)="leaveHandle(handle)"></div>
+    }
+  }
+}

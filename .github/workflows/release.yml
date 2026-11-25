@@ -1,40 +1,87 @@
 name: release
 
 on:
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview only; do not publish, commit or push'
+        type: boolean
+        default: true
+      version:
+        description: 'Empty: a stable version from the commits. 3.0.0-alpha: a snapshot of this commit under the alpha dist-tag'
+        type: string
+        default: ''
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 env:
-  NODE_VERSION: '20.9.0' # Node.js version
+  NX_DAEMON: 'false'
 
 jobs:
-  release-and-publish:
+  release:
+    # A stable release comes from main; a prerelease pushes nothing, so any branch may publish one.
+    if: github.ref == 'refs/heads/main' || contains(inputs.version, '-')
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
         with:
-          registry-url: 'https://registry.npmjs.org/'
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      # Step 3: Install dependencies
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Library
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      # This job publishes to npm and pushes to the repository, so no install script of a dependency runs in it.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm lint
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test
+      - run: pnpm build
+      - name: Configure release author
         run: |
-          cd projects/ngx-vflow-lib
-          npm run build
-
-      # Step 4: Analyze version and publish using Semantic Release
-      - name: Run Semantic Release
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      # A prerelease is a snapshot of its commit, 3.0.0-alpha.<commit count>.g<hash>: nobody numbers it, the count keeps
+      # the versions in order, and the "g" keeps a hash of digits only from being read as a number. It goes under its
+      # own dist-tag, so latest stays the stable version.
+      - name: Resolve version and dist-tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          TAG=latest
+          if [[ "$VERSION" == *-* ]]; then
+            TAG="${VERSION#*-}"
+            TAG="${TAG%%.*}"
+            VERSION="$VERSION.$(git rev-list --count HEAD).g$(git rev-parse --short HEAD)"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+      # Nx commits the versions, tags the commit, pushes both and creates the GitHub release with the changelog. All of
+      # it reaches the repository before the packages reach npm: a push that fails then leaves nothing published.
+      - name: Version, tag and GitHub release of a stable version
+        if: env.TAG == 'latest'
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm nx release $VERSION --skip-publish --dry-run="$DRY_RUN"
+      # A snapshot leaves no commit, tag or release: its version goes into the built manifests only.
+      - name: Version of a snapshot
+        if: env.TAG != 'latest'
+        run: for dir in libs/*/dist; do npm pkg set version="$VERSION" --prefix "$dir"; done
+      - name: Show the packages
+        if: ${{ inputs.dry_run }}
+        run: for dir in libs/*/dist; do npm pack --dry-run "./$dir"; done
+      # A preview publishes nothing: npm 11 refuses even a dry run of a version that is already published, and a dry
+      # run leaves the current version in the manifests.
+      - name: Publish all release packages
+        if: ${{ !inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: npx semantic-release
+        run: pnpm nx release publish --tag "$TAG"

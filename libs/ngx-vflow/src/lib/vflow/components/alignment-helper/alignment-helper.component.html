@@ -1,0 +1,17 @@
+@for (line of guides().lines; track $index) {
+  <svg:line
+    data-v-alignment-guide="line"
+    [attr.stroke-dasharray]="line.center ? 4 : null"
+    [attr.x1]="line.from.x"
+    [attr.y1]="line.from.y"
+    [attr.x2]="line.to.x"
+    [attr.y2]="line.to.y" />
+}
+
+@if (gaps(); as gaps) {
+  <svg:path data-v-alignment-guide="line" [attr.d]="gaps" />
+}
+
+@if (points(); as points) {
+  <svg:path data-v-alignment-guide="point" [attr.d]="points" />
+}

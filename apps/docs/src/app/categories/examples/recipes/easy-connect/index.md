@@ -1,0 +1,42 @@
+Nodes without ports: a connection starts anywhere on a node and ends anywhere on another one, and edges meet the nodes on the side facing the other node, or at the center. The header of a node drags it.
+
+{{ NgDocActions.demoPane("EasyConnectDemoComponent") }}
+
+## The node is the handle
+
+The root element of the node presentation carries `vHandle` with `handleType="any"`, so the whole card starts and accepts connections in either direction, and `position="auto"`, so every edge meets the node on the side that faces the other end. Dragging the node needs its own surface: an element with `vDragHandle` inside the handle keeps dragging the node, and everywhere else a press starts a connection.
+
+{% raw %}
+
+```html
+<article vuiNode vHandle handleType="any" position="auto">
+  <header vuiNodeHeader vDragHandle>{{ node.data().title }}</header>
+  <div>Drag from here to connect</div>
+</article>
+```
+
+{% endraw %}
+
+While a connection is in progress the handle element itself is the drop zone: the node under the pointer becomes the candidate, and carries `data-v-handle-state="valid"`, while the node the connection started from carries `data-v-handle-state="connecting"`. The card of the demo styles both with Tailwind variants of that attribute, such as `data-[v-handle-state=valid]:border-vui-success`. No connection settings are needed beyond the marker of the preview line.
+
+## Border or center
+
+`position="auto"` takes the middle of the side facing the other node, which works with every built-in curve, including the stepped ones, and keeps arrow markers visible. `position="center"` runs edges to the node center, the look of force-directed graphs; the edge layer lies under the nodes, so markers are hidden there. The demo switches between both.
+
+## Exact crossing of the border
+
+For endpoints that slide along the border, on the crossing of the line between the node centers, keep `position="auto"` and replace the endpoints in a custom curve. Every curve factory receives `sourceNode`, `targetNode` and `markerInset`; `getFloatingEdgeParams` computes the crossing for rectangles, other shapes need their own border function. The pointer of a connection in progress comes as `targetPoint`, already moved by the marker inset.
+
+```ts
+const crossingCurve: CurveFactory = (params) => {
+  if (params.targetNode) {
+    return getBezierPath(getFloatingEdgeParams(params.sourceNode, params.targetNode, { inset: params.markerInset }));
+  }
+
+  const pointer = { ...params.targetPoint, width: 0, height: 0 };
+
+  return getBezierPath(getFloatingEdgeParams(params.sourceNode, pointer, { inset: { start: params.markerInset.start } }));
+};
+```
+
+The curve goes to every edge through `curve` and to the preview through `curve` of `ConnectionSettings`; the third option of the demo does exactly that.

@@ -1,0 +1,78 @@
+{
+  "name": "@vflow/layout",
+  "version": "2.7.0",
+  "description": "Automatic layouts for ngx-vflow: a layout contract, a host that applies positions, and adapters",
+  "license": "MIT",
+  "homepage": "https://www.ngx-vflow.org/",
+  "author": "Artem Mangilev",
+  "keywords": [
+    "angular",
+    "ngx-vflow",
+    "layout",
+    "dagre",
+    "elk",
+    "diagram",
+    "tree"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/layout"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "ngx-vflow": "^3.0.0-alpha.0",
+    "rxjs": "^7.4.0",
+    "@dagrejs/dagre": "^3.0.0",
+    "elkjs": ">=0.9.0 <0.13.0",
+    "d3-force": "^3.0.0",
+    "d3-hierarchy": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@dagrejs/dagre": {
+      "optional": true
+    },
+    "elkjs": {
+      "optional": true
+    },
+    "d3-force": {
+      "optional": true
+    },
+    "d3-hierarchy": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "devDependencies": {
+    "@angular/build": "catalog:libs",
+    "@angular/common": "catalog:libs",
+    "@angular/compiler": "catalog:libs",
+    "@angular/compiler-cli": "catalog:libs",
+    "@angular/core": "catalog:libs",
+    "@angular/platform-browser": "catalog:libs",
+    "@dagrejs/dagre": "^3.1.3",
+    "@types/d3-force": "^3.0.10",
+    "@types/d3-hierarchy": "^3.1.7",
+    "@vitest/browser": "catalog:libs",
+    "@vitest/coverage-v8": "catalog:libs",
+    "d3-force": "^3.0.0",
+    "d3-hierarchy": "^3.1.3",
+    "elkjs": "^0.9.3",
+    "happy-dom": "catalog:libs",
+    "jsdom": "catalog:libs",
+    "ng-packagr": "catalog:libs",
+    "ngx-vflow": "workspace:*",
+    "playwright": "catalog:libs",
+    "rxjs": "catalog:libs",
+    "typescript": "catalog:libs",
+    "vite": "catalog:libs",
+    "vitest": "catalog:libs",
+    "zone.js": "catalog:libs"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

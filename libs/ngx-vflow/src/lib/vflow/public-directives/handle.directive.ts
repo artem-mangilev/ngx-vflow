@@ -1,0 +1,135 @@
+import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@angular/core';
+import { NODE_MODEL } from '../utils/node-model.token';
+import { HandleModel } from '../models/handle.model';
+import { ConnectionService } from '../services/connection.service';
+import { bindDomAttributes } from '../directives/entity-accessibility.directive';
+import { DomAttributes } from '../interfaces/dom-attributes.interface';
+import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
+import { pressTarget } from '../utils/press-target';
+
+/**
+ * Makes an element of a node presentation a connection point: a port on a node side, or, with `position="auto"`
+ * or `"center"`, a surface such as the whole node whose edges meet the node wherever the other end is. The
+ * library registers, measures and, in the `auto` layout, positions a port; its size and look belong to the
+ * application. State is exposed as
+ * `data-v-handle-*` attributes for CSS and as signals of this directive for code: `#h="vHandle"` in a
+ * template, `inject(VflowHandleDirective)` in a component that applies it through `hostDirectives` or in content of
+ * a handle element.
+ */
+@Directive({
+  selector: '[vHandle]',
+  exportAs: 'vHandle',
+  standalone: true,
+  host: {
+    'data-v-handle': '',
+    '[attr.data-v-handle-type]': 'handleType()',
+    '[attr.data-v-handle-position]': 'position()',
+    '[attr.data-v-handle-state]': 'state()',
+    '[attr.data-v-handle-can-start]': "canStart() ? '' : null",
+    '[attr.data-v-handle-can-accept]': "canAccept() ? '' : null",
+    '[attr.data-v-pending]': "pending() ? '' : null",
+    '[attr.data-v-handle-clipped]': "clipped() ? '' : null",
+    '[attr.data-v-handle-placed]': "placed() ? '' : null",
+    '[style.top]': 'styles()?.top ?? null',
+    '[style.left]': 'styles()?.left ?? null',
+    '(pointerdown)': 'startConnection($event)',
+    '(pointerenter)': 'pointerEnter()',
+    '(pointerleave)': 'pointerLeave()',
+  },
+})
+export class VflowHandleDirective {
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly connection = inject(ConnectionService);
+
+  /** `source`, `target`, or `any` for both directions. */
+  public readonly handleType = input<HandleType>('source');
+
+  /**
+   * Where the connection point is: a side of the node, `auto` (the side facing the other end of each edge) or
+   * `center`. With `auto` and `center` the element is not positioned and only starts and accepts connections.
+   */
+  public readonly position = input<HandlePosition>('top');
+
+  /** Identifies the handle when a node has more than one handle of a role; `Edge.sourceHandle` and `targetHandle` refer to it. */
+  public readonly handleId = input<string>();
+
+  /** `auto` positions the element on the node side; `manual` leaves positioning to the application. Sides only. */
+  public readonly layout = input<HandleLayout>('auto');
+
+  /** Shift of the element and its connection point in the `auto` layout, in flow units: positive is right and down. */
+  public readonly offsetX = input(0);
+  public readonly offsetY = input(0);
+
+  public readonly canStart = input(true);
+  public readonly canAccept = input(true);
+  /** `data-*`, `title`, `lang` and `dir` applied to the element. */
+  public readonly domAttributes = input<DomAttributes>();
+
+  private readonly model = new HandleModel(
+    {
+      element: this.element,
+      type: this.handleType,
+      position: this.position,
+      id: this.handleId,
+      layout: this.layout,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      canStart: this.canStart,
+      canAccept: this.canAccept,
+    },
+    this.requireNode(),
+  );
+
+  public readonly state = this.model.state.asReadonly();
+
+  /** Rendered but not measured yet, so not placed: the flow stylesheet hides it until the next measurement. */
+  protected readonly pending = computed(() => this.model.hasBox() && !this.model.isMeasured());
+
+  /** Scrolled out of view inside the node; the point waits on the border of the scroll container. */
+  protected readonly clipped = this.model.clipped;
+
+  /** The flow stylesheet makes a placed element absolute and centers it on the `top` and `left` written here. */
+  protected readonly placed = computed(() => this.layout() === 'auto' && !this.model.dynamic());
+  protected readonly styles = this.model.layoutStyles;
+
+  constructor() {
+    const node = this.model.parentNode;
+    node.handles.update((handles) => [...handles, this.model]);
+    inject(DestroyRef).onDestroy(() =>
+      node.handles.update((handles) => handles.filter((handle) => handle !== this.model)),
+    );
+
+    // Handles have no keyboard operation and are not exposed to assistive technology; only metadata is applied.
+    bindDomAttributes(this.domAttributes);
+  }
+
+  /**
+   * The event also reaches the node, whose drag and the pane's pan reject targets inside a handle. A drag handle
+   * inside the handle element keeps dragging the node instead of starting a connection.
+   */
+  protected startConnection(event: PointerEvent) {
+    const { dragHandle } = pressTarget(event.target);
+    if (dragHandle && this.element.contains(dragHandle)) return;
+
+    this.connection.start(this.model, event);
+  }
+
+  /** The element is a drop zone of the connection in progress, in addition to the magnet around its point. */
+  protected pointerEnter() {
+    this.connection.hover(this.model);
+  }
+
+  protected pointerLeave() {
+    this.connection.leave(this.model);
+  }
+
+  private requireNode() {
+    const node = inject(NODE_MODEL, { optional: true });
+
+    if (!node) {
+      throw new Error('[ngx-vflow] vHandle must be placed inside a node presentation.');
+    }
+
+    return node;
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/ui/src",
+  "targets": {
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["libs/ui/src/**/*.ts"]
+      }
+    },
+    "sync-cli": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node libs/ui/scripts/sync-cli.mjs"
+      }
+    }
+  }
+}

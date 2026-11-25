@@ -1,0 +1,44 @@
+---
+keyword: 'PackagesAutoSize'
+---
+
+`@vflow/auto-size` grows a parent node around its children while they are dragged or resized, through every level of nesting. Drag Backend or Frontend out of the squad, or the squad out of the team: the parent grows to keep it, with a padding, and keeps its other children where they are. With `vxAutoSizeShrink` on, the parents always fit their children: drag the node back in and the squad shrinks with it. Turn it off, and a parent only grows.
+
+{{ NgDocActions.demoPane("AutoSizeDemoComponent") }}
+
+## Installation
+
+```bash
+npm i @vflow/auto-size
+```
+
+The package depends on `ngx-vflow` 3 and ships no styles.
+
+## Usage
+
+Put the `vxAutoSize` directive on the flow:
+
+```html
+<vflow vxAutoSize [vxAutoSizePadding]="16" [nodes]="nodes" />
+```
+
+```ts
+import { VxAutoSize } from '@vflow/auto-size';
+```
+
+The directive fits the parents once when the flow is initialized, before the first paint, then reacts to the drag events and the size changes of the flow. It writes the `point`, `width` and `height` signals of the parents, as the resizer does. The graph state stays with the application.
+
+## Inputs
+
+| Input                    | Default | Meaning                                                                                                   |
+| ------------------------ | ------- | --------------------------------------------------------------------------------------------------------- |
+| `vxAutoSizePadding`      | `24`    | Space kept between the children and the sides of the parent: a number, or `{ top, right, bottom, left }`. |
+| `vxAutoSizeShouldResize` | all     | `(parent: Node) => boolean`: which parents grow, for example only the nodes marked as groups.             |
+| `vxAutoSizeShrink`       | `false` | Whether a parent also shrinks, so it always fits its children, on every frame of a drag.                  |
+
+## What a parent needs
+
+- `width` and `height`, as every group has; see [Subflows](/docs/nodes/subflows). The directive writes the new size into these signals and never adds signals to your nodes. An axis without its signal follows the content of the parent itself, which the children do not affect, so it is left alone.
+- Children with `extent: null`. With `extent: 'parent'`, the default, the flow holds a dragged child inside its parent before the parent can grow.
+
+A change on the left or the top moves the origin of the parent and compensates every child, so nothing moves on screen; the flow keeps the dragged node under the pointer while its parent moves. A parent that is itself a child sizes its own parent in turn, the deepest first.

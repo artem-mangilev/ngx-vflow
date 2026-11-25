@@ -1,31 +1,42 @@
 name: deploy-docs
 
 on:
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+  # Once a day: the build asks GitHub and npm for the numbers of the landing page and prerenders them into it, so
+  # they are a day old at most. GitHub runs a schedule from the default branch only.
+  schedule:
+    - cron: '23 3 * * *'
 
-env:
-  NODE_VERSION: '20.9.0' # Node.js version
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
-
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          registry-url: 'https://registry.npmjs.org/'
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Deploy Documentation
-        run: npx ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser --name="Artem Mangilev" --email="artmnglv@gmail.com"
-        env:
-          CI: true
-          GH_TOKEN: ${{ github.token }}
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      # The production build, which prerenders every page into its own index.html, and what a static host needs
+      # beside the pages: sitemap.xml, 404.html and the redirects from the addresses of the 2.x site.
+      - run: pnpm nx site docs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/apps/docs/browser
+      - uses: actions/deploy-pages@v4
+        id: deployment

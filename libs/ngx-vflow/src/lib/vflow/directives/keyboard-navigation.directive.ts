@@ -1,0 +1,134 @@
+import { Directive, ElementRef, afterRenderEffect, contentChildren, inject, signal, untracked } from '@angular/core';
+import { FlowEntity } from '../interfaces/flow-entity.interface';
+import { KeyboardService } from '../services/keyboard.service';
+import { KeyboardEntityCommandsService } from '../services/keyboard-entity-commands.service';
+import { KeyboardViewportCommandsService } from '../services/keyboard-viewport-commands.service';
+import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
+import { ARROW_COMMANDS } from '../utils/keyboard-commands';
+import { KeyboardEntityDirective } from './keyboard-entity.directive';
+
+interface KeyboardCommand {
+  name: KeyboardCommandName;
+  /** Whether holding the key runs the command again. */
+  repeat: boolean;
+  /** Whether the command took the press. Declining leaves the key to the commands behind it. */
+  run: (model: FlowEntity, event: KeyboardEvent) => boolean;
+}
+
+/**
+ * Native Tab traversal, focus release when the focused entity disappears, and the one listener that turns a key press on a
+ * focused entity wrapper into a command. A press is answered by the first command whose key it carries and that accepts
+ * it. The container itself is not focusable: a click on the pane leaves focus to the page, as in other flow libraries.
+ */
+@Directive({
+  selector: '[vflowKeyboard]',
+  host: {
+    '(focusin)': 'onFocusIn($event)',
+    '(focusout)': 'onFocusOut($event)',
+    '(keydown)': 'onKeydown($event)',
+    '(scroll)': 'resetScroll()',
+  },
+})
+export class KeyboardNavigationDirective {
+  private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private entities = contentChildren(KeyboardEntityDirective, { descendants: true });
+  private keyboard = inject(KeyboardService);
+  private entityCommands = inject(KeyboardEntityCommandsService);
+  private viewportCommands = inject(KeyboardViewportCommandsService);
+  private focused = signal<{ entity: KeyboardEntityDirective; target: Element } | undefined>(undefined);
+
+  /** Every command in the order a press consults them. */
+  private readonly commands: KeyboardCommand[] = [
+    { name: 'select', repeat: false, run: (model) => this.entityCommands.select(model) },
+    { name: 'clearSelection', repeat: false, run: () => this.entityCommands.clearSelection() },
+    { name: 'delete', repeat: false, run: (model) => this.entityCommands.requestDeletion(model) },
+    ...ARROW_COMMANDS.map((arrow): KeyboardCommand => ({
+      name: arrow.move,
+      repeat: true,
+      run: (model, event) => this.entityCommands.move(model, arrow, event.shiftKey),
+    })),
+    ...ARROW_COMMANDS.map((arrow): KeyboardCommand => ({
+      name: arrow.pan,
+      repeat: true,
+      run: (_model, event) => this.viewportCommands.pan(arrow, event.shiftKey),
+    })),
+    { name: 'zoomIn', repeat: true, run: () => this.viewportCommands.zoom(1) },
+    { name: 'zoomOut', repeat: true, run: () => this.viewportCommands.zoom(-1) },
+    { name: 'fitView', repeat: false, run: () => this.viewportCommands.fitView() },
+  ];
+
+  constructor() {
+    // Tracks the entity list and the focused entity only. Reading the eligibility of every entity here would
+    // subscribe one consumer to thousands of signals and rerun it on every culling change.
+    afterRenderEffect(() => {
+      const entities = this.entities();
+      const focused = this.focused();
+      if (!focused) return;
+      const { entity, target } = focused;
+      if (entities.includes(entity) && (isEligible(entity) || target !== entity.element)) return;
+      untracked(() => {
+        this.focused.set(undefined);
+        // Focus goes back to the page rather than to another entity, so a removal does not move the keyboard user
+        // onto a node or edge they did not choose. A removed wrapper has already lost focus; one that stopped being
+        // focusable must not keep it. The container is not a focus target.
+        if (
+          this.element.ownerDocument.activeElement === target &&
+          (target instanceof HTMLElement || target instanceof SVGElement)
+        )
+          target.blur();
+      });
+    });
+  }
+
+  protected onKeydown(event: KeyboardEvent) {
+    const target = event.composedPath()[0];
+    if (
+      event.defaultPrevented ||
+      !(target instanceof Element) ||
+      target !== this.element.ownerDocument.activeElement ||
+      target.closest('[data-v-no-keyboard]') ||
+      target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])') ||
+      // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
+      this.keyboard.isModifierKey(event)
+    )
+      return;
+
+    // Embedded application content keeps its own keys: only a library wrapper issues commands.
+    const entity = this.entities().find((candidate) => candidate.element === target);
+    if (!entity || !entity.vflowKeyboardEntity().focusable()) return;
+    const model = entity.vflowKeyboardEntity();
+
+    for (const command of this.commands) {
+      if (!this.keyboard.isCommand(command.name, event)) continue;
+      // Auto-repeat holds the key for its command while only the repeating ones run again.
+      if (!(event.repeat && !command.repeat) && !command.run(model, event)) continue;
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+  }
+
+  protected onFocusIn(event: FocusEvent) {
+    const target = event.composedPath()[0];
+    const entity = this.entities().find((entry) => target instanceof Element && entry.element.contains(target));
+    this.focused.set(entity && target instanceof Element ? { entity, target } : undefined);
+  }
+
+  protected resetScroll() {
+    // Focusing offscreen transformed content must not scroll the graph's clipping container.
+    this.element.scrollTop = 0;
+    this.element.scrollLeft = 0;
+  }
+
+  protected onFocusOut(event: FocusEvent) {
+    if (event.relatedTarget instanceof Element && !this.element.contains(event.relatedTarget)) {
+      this.focused.set(undefined);
+    }
+  }
+}
+
+/** A Tab stop that keyboard focus may land on: focusable and, under virtualization, in layout. */
+function isEligible(entity: KeyboardEntityDirective): boolean {
+  const model = entity.vflowKeyboardEntity();
+  return model.focusable() && !model.culled();
+}

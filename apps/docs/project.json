@@ -1,0 +1,100 @@
+{
+  "name": "docs",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/docs/src",
+  "prefix": "app",
+  "implicitDependencies": ["ngx-vflow", "routing", "auto-size", "layout"],
+  "targets": {
+    "libs": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "command": "node apps/docs/scripts/libs.mjs"
+      }
+    },
+    "watch-libs": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "nx watch --projects=docs --includeDependencies -- nx run docs:libs",
+        "env": {
+          "NX_DAEMON": "true"
+        }
+      }
+    },
+    "build": {
+      "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-application",
+      "dependsOn": ["libs"],
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "configFile": "apps/docs/vite.config.mjs",
+        "outputPath": "dist/apps/docs"
+      },
+      "configurations": {
+        "production": {
+          "mode": "production"
+        },
+        "development": {
+          "mode": "development",
+          "ssr": false
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "site": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "node apps/docs/scripts/site.mjs"
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": ["site"],
+      "options": {
+        "command": "node apps/docs/scripts/preview.mjs"
+      }
+    },
+    "serve": {
+      "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-dev-server",
+      "continuous": true,
+      "dependsOn": ["libs", "watch-libs"],
+      "readyWhen": {
+        "port": "{options.port ?? 4200}"
+      },
+      "options": {
+        "configFile": "apps/docs/vite.config.mjs"
+      },
+      "configurations": {
+        "production": {
+          "mode": "production"
+        },
+        "development": {
+          "mode": "development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["libs"],
+      "options": {
+        "command": "pnpm exec tsc -p tsconfig.spec.json --noEmit && pnpm exec vitest run",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "watch": {
+          "command": "pnpm exec vitest"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["apps/docs/src/**/*.ts", "apps/docs/src/**/*.component.html"]
+      }
+    }
+  }
+}

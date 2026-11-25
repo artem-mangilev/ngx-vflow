@@ -2,3 +2,10 @@ node_modules
 ng-doc
 dist
 .angular
+**/index.html
+
+.nx
+.cache
+pnpm-lock.yaml
+# Copies of the built libraries and of the @vflow/ui sources
+apps/docs/libs

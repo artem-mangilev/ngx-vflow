@@ -1,0 +1,223 @@
+import { DOCUMENT } from '@angular/common';
+import { ElementRef, Injectable, Signal, computed, inject, untracked } from '@angular/core';
+import { KeyboardCommandName, KeyboardModifierName, KeyboardShortcuts } from '../types/keyboard-shortcuts.type';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subject, fromEvent, merge } from 'rxjs';
+import { DeleteRequest } from '../interfaces/delete-request.interface';
+import { bindableSignal } from '../utils/signals/bindable-signal';
+import {
+  KeyboardModifierFlag,
+  ParsedBinding,
+  bindingModifierFlag,
+  isMacPlatform,
+  matchesBinding,
+  matchesBindingKey,
+  parseBinding,
+  resolveBindingKey,
+} from '../utils/keyboard-binding';
+
+interface RawShortcuts {
+  modifiers: Record<KeyboardModifierName, string[]>;
+  commands: Record<KeyboardCommandName, string[]>;
+}
+
+interface ShortcutState {
+  raw: RawShortcuts;
+  modifiers: Record<KeyboardModifierName, ParsedBinding[]>;
+  commands: Record<KeyboardCommandName, ParsedBinding[]>;
+  /** Modifier flags the multiselection binding occupies, which the select command therefore tolerates. */
+  selectTolerates: KeyboardModifierFlag[];
+}
+
+/** Modifiers armed only outside editable content, so typing in a field cannot start a viewport gesture. */
+const GESTURE_MODIFIERS: KeyboardModifierName[] = ['panActivation', 'zoomActivation'];
+
+function defaultShortcuts(): RawShortcuts {
+  return {
+    modifiers: {
+      selection: ['Shift'],
+      multiSelection: ['Mod'],
+      panActivation: [],
+      zoomActivation: [],
+      alignmentBypass: ['Alt'],
+    },
+    commands: {
+      select: ['Enter', 'Space'],
+      clearSelection: ['Escape'],
+      delete: ['Delete', 'Backspace'],
+      moveUp: ['ArrowUp'],
+      moveDown: ['ArrowDown'],
+      moveLeft: ['ArrowLeft'],
+      moveRight: ['ArrowRight'],
+      panUp: ['ArrowUp'],
+      panDown: ['ArrowDown'],
+      panLeft: ['ArrowLeft'],
+      panRight: ['ArrowRight'],
+      zoomIn: ['+', '=', 'NumpadAdd'],
+      zoomOut: ['-', 'NumpadSubtract'],
+      fitView: ['0', 'Numpad0'],
+    },
+  };
+}
+
+/** Keeps the supplied entries of one section, drops omitted ones and tolerates a non-array from JavaScript. */
+function suppliedEntries<K extends string>(section: Partial<Record<K, string[]>> = {}): Partial<Record<K, string[]>> {
+  const entries: Partial<Record<K, string[]>> = {};
+  for (const [name, keys] of Object.entries<string[] | undefined>(section)) {
+    if (keys !== undefined) entries[name as K] = Array.isArray(keys) ? keys : [];
+  }
+  return entries;
+}
+
+/** Parses one entry, dropping bindings that do not read as `[<Modifier>+]*<Key>`. */
+function parseEntry(bindings: string[], held: boolean) {
+  return bindings.flatMap((binding) => {
+    const parsed = parseBinding(binding);
+    if (!parsed) return [];
+    // A modifier entry names one key that is held, so a prefix on it would have nothing to qualify.
+    if (held) return [{ ...parsed, mod: false, modifiers: [] }];
+    return [parsed];
+  });
+}
+
+function mapSection<Name extends string>(
+  section: Record<Name, string[]>,
+  held: boolean,
+): Record<Name, ParsedBinding[]> {
+  const entries = Object.entries(section) as [Name, string[]][];
+  return Object.fromEntries(entries.map(([name, bindings]) => [name, parseEntry(bindings, held)])) as Record<
+    Name,
+    ParsedBinding[]
+  >;
+}
+
+/** A key bound both as a modifier and in a command stays with the modifier. */
+function resolveShortcuts(raw: RawShortcuts, mac: boolean): ShortcutState {
+  const modifiers = mapSection(raw.modifiers, true);
+  const commands = mapSection(raw.commands, false);
+
+  return {
+    raw,
+    modifiers,
+    commands,
+    selectTolerates: modifiers.multiSelection
+      .map((binding) => bindingModifierFlag(binding, mac))
+      .filter((flag): flag is KeyboardModifierFlag => flag !== null),
+  };
+}
+
+@Injectable()
+export class KeyboardService {
+  private host = inject(ElementRef<HTMLElement>, { optional: true })?.nativeElement;
+  private mac = isMacPlatform();
+  private shortcuts = bindableSignal<KeyboardShortcuts>({});
+  /** The configuration with defaults for omitted entries: an omitted entry never keeps a previous value. */
+  private state = computed<ShortcutState>(() => {
+    const shortcuts = this.shortcuts();
+    const defaults = defaultShortcuts();
+    return resolveShortcuts(
+      {
+        modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts.modifiers) },
+        commands: { ...defaults.commands, ...suppliedEntries(shortcuts.commands) },
+      },
+      this.mac,
+    );
+  });
+  /** Keyboard deletion requests from focused entity wrappers; the flow exposes them as an output. */
+  public deleteRequest$ = new Subject<DeleteRequest>();
+  /** Keys currently down, as lowercased code to lowercased key. */
+  private pressed = new Map<string, string>();
+  /** Codes of the keys that may arm a viewport gesture, which excludes presses inside editable content. */
+  private gesture = new Set<string>();
+
+  constructor() {
+    const document = inject(DOCUMENT);
+    // The document of a server render has no window.
+    const view = document.defaultView;
+
+    merge(
+      fromEvent<KeyboardEvent>(document, 'keydown'),
+      fromEvent<KeyboardEvent>(document, 'keyup'),
+      view ? fromEvent(view, 'blur') : EMPTY,
+    )
+      .pipe(takeUntilDestroyed())
+      .subscribe((event) => {
+        if (event instanceof KeyboardEvent) {
+          const target = event.composedPath()[0] ?? event.target;
+          const element = target instanceof Element ? target : null;
+          const editable = !!element?.closest(
+            'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-v-no-keyboard]',
+          );
+          const code = event.code.toLowerCase();
+          if (event.type === 'keydown') {
+            this.pressed.set(code, event.key.toLowerCase());
+            if (!editable) this.gesture.add(code);
+            else this.gesture.clear();
+          } else {
+            this.pressed.delete(code);
+            this.gesture.delete(code);
+          }
+          if (
+            event.type === 'keydown' &&
+            code === 'space' &&
+            this.isActiveModifier('panActivation') &&
+            (this.host?.contains(element) || this.host?.matches(':hover')) &&
+            !element?.closest('button, a')
+          ) {
+            event.preventDefault();
+          }
+        } else {
+          this.pressed.clear();
+          this.gesture.clear();
+        }
+      });
+  }
+
+  /** Whether a key bound as a modifier is down. Modifier entries name one held key and constrain nothing else. */
+  private isHeld(binding: ParsedBinding, gestureOnly: boolean) {
+    const wanted = resolveBindingKey(binding, this.mac);
+    for (const [code, key] of this.pressed) {
+      if (gestureOnly && !this.gesture.has(code)) continue;
+      if (key === wanted || code === wanted) return true;
+    }
+    return false;
+  }
+
+  /** Reads the configuration from `shortcuts` from now on. */
+  public bindShortcuts(shortcuts: Signal<KeyboardShortcuts>): void {
+    this.shortcuts.bind(shortcuts);
+  }
+
+  /** Whether a key bound as the modifier is down. Not reactive: the pressed keys are not a signal. */
+  public isActiveModifier(name: KeyboardModifierName): boolean {
+    const gestureOnly = GESTURE_MODIFIERS.includes(name);
+    return untracked(this.state).modifiers[name].some((binding) => this.isHeld(binding, gestureOnly));
+  }
+
+  /** Whether the pressed key is bound as a modifier, so entity commands leave it to the gesture layer. */
+  public isModifierKey(event: KeyboardEvent): boolean {
+    return Object.values(this.state().modifiers).some((bindings) =>
+      bindings.some((binding) => matchesBindingKey(binding, event, this.mac)),
+    );
+  }
+
+  /** Whether the event runs the command. Reactive, so descriptions follow the configuration. */
+  public isCommand(command: KeyboardCommandName, event: KeyboardEvent): boolean {
+    const state = this.state();
+    // Holding the multiselection modifier turns selection into a toggle, so it must not block the select command.
+    const ignoreModifiers = command === 'select' ? state.selectTolerates : undefined;
+    return state.commands[command].some((binding) =>
+      matchesBinding(binding, event, { mac: this.mac, ignoreModifiers }),
+    );
+  }
+
+  /** The keys of one command, for the instructions and the shortcut list. Reactive. */
+  public commandBindings(command: KeyboardCommandName): readonly ParsedBinding[] {
+    return this.state().commands[command];
+  }
+
+  /** The keys held for one modifier. Reactive. */
+  public modifierBindings(modifier: KeyboardModifierName): readonly ParsedBinding[] {
+    return this.state().modifiers[modifier];
+  }
+}

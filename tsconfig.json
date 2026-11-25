@@ -22,10 +22,12 @@
     "stripInternal": true,
     "skipLibCheck": true,
     "paths": {
-      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
-      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
-      "ngx-vflow": ["projects/ngx-vflow-lib/src/public-api"],
-      "ngx-vflow/testing": ["projects/ngx-vflow-lib/testing/src/public-api"]
+      "@vflow/layout": ["libs/layout/src/public-api"],
+      "@vflow/layout/d3-hierarchy": ["libs/layout/d3-hierarchy/src/public-api"],
+      "@vflow/layout/dagre": ["libs/layout/dagre/src/public-api"],
+      "@vflow/layout/elk": ["libs/layout/elk/src/public-api"],
+      "@vflow/layout/d3-force": ["libs/layout/d3-force/src/public-api"],
+      "ngx-vflow": ["libs/ngx-vflow/src/public-api"]
     }
   },
   "angularCompilerOptions": {

@@ -1,0 +1,78 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/ngx-vflow/src",
+  "prefix": "lib",
+  "name": "ngx-vflow",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "skill": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/build-skill.mjs",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": [
+        "{projectRoot}/scripts/build-skill.mjs",
+        "{projectRoot}/agent-skill.md",
+        "{workspaceRoot}/apps/docs/src/app/categories/**/*",
+        "{workspaceRoot}/apps/docs/src/app/shared/flow-presentations.ts"
+      ],
+      "outputs": ["{projectRoot}/skills"],
+      "cache": true
+    },
+    "build": {
+      "options": {
+        "project": "libs/ngx-vflow/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ngx-vflow/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ngx-vflow/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production",
+      "executor": "./libs/ngx-vflow/node_modules/@angular/build:ng-packagr",
+      "inputs": [
+        "production",
+        {
+          "dependentTasksOutputFiles": "**/*.d.ts",
+          "transitive": true
+        },
+        "{projectRoot}/agent-skill.md",
+        "{workspaceRoot}/apps/docs/src/app/categories/**/*"
+      ],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build", "skill"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run && vitest run --config vitest.node-dom.config.mts && vitest run --config vitest.server.config.mts",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        },
+        "coverage": {
+          "command": "vitest run --coverage"
+        }
+      }
+    },
+    "lint": {
+      "options": {
+        "lintFilePatterns": ["libs/ngx-vflow/**/*.ts", "libs/ngx-vflow/**/*.component.html"]
+      },
+      "executor": "@angular-eslint/builder:lint"
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "{projectRoot}/dist"
+      }
+    }
+  },
+  "tags": ["release"]
+}

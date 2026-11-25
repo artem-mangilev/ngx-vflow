@@ -1,0 +1,78 @@
+<!--
+  The landing page lays itself out: NgDoc's padding around the content is off there, so the hero starts under the
+  navbar and its sections reach the sides of the window, and the navbar is as wide as the page's column, 1080px and
+  the navbar's own padding.
+-->
+<ng-doc-root
+  [sidebar]="!!section()"
+  [noWidthLimit]="!section()"
+  [style.--ng-doc-app-max-width]="activeTab() ? null : '1128px'"
+  [style.--ng-doc-page-padding]="activeTab() ? null : '0'">
+  <ng-doc-navbar [hamburger]="!!section()">
+    <a
+      ngDocNavbarLeft
+      class="flex items-center gap-2 text-doc-heading no-underline"
+      routerLink="/"
+      aria-label="vflow, home">
+      <!-- The lockup: the mark and the word "vflow" as outlines, one file per theme. -->
+      <img
+        class="h-7 w-auto dark:hidden [@media(width<=520px)]:h-6"
+        src="assets/lockup.svg"
+        width="102"
+        height="28"
+        alt="" />
+      <img
+        class="hidden h-7 w-auto dark:block [@media(width<=520px)]:h-6"
+        src="assets/lockup-dark.svg"
+        width="102"
+        height="28"
+        alt="" />
+    </a>
+
+    <nav ngDocNavbarCenter class="flex items-center gap-1" aria-label="Sections">
+      @for (tab of tabs; track tab.id) {
+        <a
+          class="rounded-md px-3 py-1.5 text-(length:--ng-doc-text-sm-size) leading-5 font-medium whitespace-nowrap text-doc-muted no-underline hover:bg-doc-base-1 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-doc-primary aria-[current=page]:bg-doc-base-2 aria-[current=page]:text-doc-heading"
+          [routerLink]="tab.link"
+          [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
+          {{ tab.title }}
+        </a>
+      }
+    </nav>
+
+    <div ngDocNavbarRight class="flex items-center gap-3 [@media(width<=520px)]:gap-0">
+      <ng-doc-theme-toggle />
+
+      <a
+        href="https://github.com/artem-mangilev/ngx-vflow"
+        ng-doc-button-icon
+        ngDocTooltip="Repository on GitHub"
+        aria-label="Repository on GitHub"
+        size="large"
+        target="_blank"
+        rel="noreferrer">
+        <ng-doc-icon customIcon="github" [size]="24" />
+      </a>
+    </div>
+  </ng-doc-navbar>
+
+  @if (section(); as current) {
+    <app-section-sidebar ngDocCustomSidebar [section]="current" />
+  }
+
+  <!-- The navbar hides its center slot on narrow screens; the same tabs then sit above the page. -->
+  <nav
+    class="hidden items-center gap-1 overflow-x-auto border-b border-b-doc-border px-4 py-2 [@media(width<=1024px)]:flex"
+    aria-label="Sections">
+    @for (tab of tabs; track tab.id) {
+      <a
+        class="rounded-md px-3 py-1.5 text-(length:--ng-doc-text-sm-size) leading-5 font-medium whitespace-nowrap text-doc-muted no-underline hover:bg-doc-base-1 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-doc-primary aria-[current=page]:bg-doc-base-2 aria-[current=page]:text-doc-heading"
+        [routerLink]="tab.link"
+        [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
+        {{ tab.title }}
+      </a>
+    }
+  </nav>
+
+  <router-outlet />
+</ng-doc-root>

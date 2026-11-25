@@ -1,0 +1,275 @@
+import { signal } from '@angular/core';
+import { Connection } from '../interfaces/connection.interface';
+import { Edge } from '../interfaces/edge.interface';
+import { Node } from '../interfaces/node.interface';
+import { Point } from '../interfaces/point.interface';
+import { sameConnection } from './same-connection';
+
+/*
+ * Each helper takes what it reads and returns what it writes: a helper that changes one collection returns that
+ * array, so it fits `signal.update()`; a helper that changes both returns both.
+ */
+
+export interface NodeReparentOperation {
+  id: string;
+  parentId: string | null;
+}
+
+/** Matches `ReconnectEvent`, so `reconnectEdges([event], graph)` applies the gesture. */
+export interface EdgeReconnectOperation {
+  edge: { id: string };
+  connection: Connection;
+}
+
+/** Matches `DeleteRequest`, so `removeElements(request, graph)` applies the request. */
+export interface RemoveElementsRequest {
+  nodeIds?: readonly string[];
+  edgeIds?: readonly string[];
+}
+
+export interface RemoveElementsResult<NodeType extends Node, EdgeType extends Edge> {
+  nodes: NodeType[];
+  edges: EdgeType[];
+  removedNodes: NodeType[];
+  removedEdges: EdgeType[];
+}
+
+/** Appends valid nodes in input order. */
+export function addNodes<ExistingNodeType extends Node, AddedNodeType extends Node>(
+  nodesToAdd: readonly AddedNodeType[],
+  nodes: readonly ExistingNodeType[],
+): Array<ExistingNodeType | AddedNodeType> {
+  let result: readonly (ExistingNodeType | AddedNodeType)[] = nodes;
+
+  for (const node of nodesToAdd) {
+    if (!node.id) continue;
+
+    if (findUniqueIndex(result, node.id).count) continue;
+
+    const parentId = node.parentId?.() ?? null;
+    if (parentId) {
+      const parent = findUniqueIndex(result, parentId);
+      if (parent.count !== 1) continue;
+
+      const ancestry = getFlowPoint(result[parent.index], result, node.id);
+      if ('error' in ancestry) continue;
+    }
+
+    result = [...result, node];
+  }
+
+  return result as Array<ExistingNodeType | AddedNodeType>;
+}
+
+/** Removes the edges, the nodes with their descendants, and every edge incident to a removed node. */
+export function removeElements<NodeType extends Node, EdgeType extends Edge>(
+  { nodeIds = [], edgeIds = [] }: RemoveElementsRequest,
+  { nodes, edges }: { nodes: readonly NodeType[]; edges: readonly EdgeType[] },
+): RemoveElementsResult<NodeType, EdgeType> {
+  const nodesById = new Map<string, NodeType[]>();
+  const children = new Map<string, NodeType[]>();
+  for (const node of nodes) {
+    const matches = nodesById.get(node.id);
+    if (matches) matches.push(node);
+    else nodesById.set(node.id, [node]);
+    const parentId = node.parentId?.();
+    if (parentId) {
+      const siblings = children.get(parentId);
+      if (siblings) siblings.push(node);
+      else children.set(parentId, [node]);
+    }
+  }
+
+  const removedNodeSet = new Set<NodeType>();
+  const removedIds = new Set<string>();
+  for (const id of nodeIds) {
+    const matches = nodesById.get(id);
+    if (!matches?.length) continue;
+    if (matches.length > 1) continue;
+
+    const descendants = new Set<NodeType>(matches);
+    const pending = [...matches];
+    const expandedIds = new Set<string>();
+    while (pending.length) {
+      const parent = pending.pop()!;
+      if (expandedIds.has(parent.id)) continue;
+      expandedIds.add(parent.id);
+      for (const child of children.get(parent.id) ?? []) {
+        if (removedNodeSet.has(child)) continue;
+        if (descendants.has(child)) continue;
+        descendants.add(child);
+        pending.push(child);
+      }
+    }
+
+    const ids = new Set<string>();
+    for (const node of descendants) {
+      removedNodeSet.add(node);
+      removedIds.add(node.id);
+      ids.add(node.id);
+    }
+    for (const removedId of ids) {
+      const remaining = nodesById.get(removedId)!.filter((node) => !removedNodeSet.has(node));
+      if (remaining.length) nodesById.set(removedId, remaining);
+      else nodesById.delete(removedId);
+    }
+  }
+
+  const keptEdges = new Set(removeEdges(edgeIds, edges));
+  const removedEdges = edges.filter(
+    (edge) => !keptEdges.has(edge) || removedIds.has(edge.source) || removedIds.has(edge.target),
+  );
+  const removedEdgeSet = new Set(removedEdges);
+  return {
+    nodes: (removedNodeSet.size ? nodes.filter((node) => !removedNodeSet.has(node)) : nodes) as NodeType[],
+    edges: (removedEdges.length ? edges.filter((edge) => !removedEdgeSet.has(edge)) : edges) as EdgeType[],
+    removedNodes: nodes.filter((node) => removedNodeSet.has(node)),
+    removedEdges,
+  };
+}
+
+/** Reparents nodes through their existing signals without changing their flow-space positions. */
+export function reparentNodes<NodeType extends Node>(
+  operations: readonly NodeReparentOperation[],
+  nodes: readonly NodeType[],
+): NodeType[] {
+  let changed = false;
+
+  for (const { id, parentId } of operations) {
+    const source = findUniqueIndex(nodes, id);
+    if (source.count !== 1) continue;
+
+    const node = nodes[source.index];
+    if ((node.parentId?.() ?? null) === parentId) continue;
+
+    const sourcePoint = getFlowPoint(node, nodes);
+    if ('error' in sourcePoint) continue;
+
+    let parentPoint: Point = { x: 0, y: 0 };
+    if (parentId) {
+      const parent = findUniqueIndex(nodes, parentId);
+      if (parent.count !== 1) continue;
+
+      const resolvedParentPoint = getFlowPoint(nodes[parent.index], nodes, id);
+      if ('error' in resolvedParentPoint) continue;
+      parentPoint = resolvedParentPoint.point;
+    }
+
+    node.point.set({ x: sourcePoint.point.x - parentPoint.x, y: sourcePoint.point.y - parentPoint.y });
+    if (node.parentId) node.parentId.set(parentId);
+    else node.parentId = signal(parentId);
+    changed = true;
+  }
+
+  return (changed ? [...nodes] : nodes) as NodeType[];
+}
+
+/**
+ * Appends edges with unique ids and valid endpoints. Duplicate connections and self-connections are valid: the
+ * connection gesture rejects them by default, see `allowDuplicateConnections` and `allowSelfConnections`.
+ */
+export function addEdges<ExistingEdgeType extends Edge, AddedEdgeType extends Edge>(
+  edgesToAdd: readonly AddedEdgeType[],
+  { nodes, edges }: { nodes: readonly { id: string }[]; edges: readonly ExistingEdgeType[] },
+): Array<ExistingEdgeType | AddedEdgeType> {
+  let result: readonly (ExistingEdgeType | AddedEdgeType)[] = edges;
+
+  for (const edge of edgesToAdd) {
+    if (!edge.id) continue;
+    if (findUniqueIndex(result, edge.id).count) continue;
+    if (!hasUniqueEndpoint(nodes, edge.source) || !hasUniqueEndpoint(nodes, edge.target)) continue;
+
+    result = [...result, edge];
+  }
+
+  return result as Array<ExistingEdgeType | AddedEdgeType>;
+}
+
+/** Removes uniquely addressed edges. */
+export function removeEdges<EdgeType extends Edge>(edgeIds: readonly string[], edges: readonly EdgeType[]): EdgeType[] {
+  let result: readonly EdgeType[] = edges;
+
+  for (const id of edgeIds) {
+    const match = findUniqueIndex(result, id);
+    if (!match.count) continue;
+    if (match.count > 1) continue;
+    result = result.filter((_, index) => index !== match.index);
+  }
+
+  return result as EdgeType[];
+}
+
+/** Replaces connection fields while preserving edge ids, slots, metadata, and signals. */
+export function reconnectEdges<EdgeType extends Edge>(
+  operations: readonly EdgeReconnectOperation[],
+  { nodes, edges }: { nodes: readonly { id: string }[]; edges: readonly EdgeType[] },
+): EdgeType[] {
+  let result: readonly EdgeType[] = edges;
+
+  for (const { edge: target, connection } of operations) {
+    const match = findUniqueIndex(result, target.id);
+    if (match.count !== 1) continue;
+    if (!hasUniqueEndpoint(nodes, connection.source) || !hasUniqueEndpoint(nodes, connection.target)) continue;
+
+    const edge = result[match.index];
+    if (sameConnection(edge, connection)) continue;
+
+    const replacement = {
+      ...edge,
+      source: connection.source,
+      target: connection.target,
+      sourceHandle: connection.sourceHandle,
+      targetHandle: connection.targetHandle,
+    };
+    result = result.map((candidate, index) => (index === match.index ? replacement : candidate));
+  }
+
+  return result as EdgeType[];
+}
+
+// ponytail: linear scans keep small operation batches simple; index snapshots if profiling shows large-batch cost.
+function findUniqueIndex(items: readonly { id: string }[], id: string): { count: number; index: number } {
+  let count = 0;
+  let index = -1;
+  items.forEach((item, itemIndex) => {
+    if (item.id === id) {
+      count++;
+      index = itemIndex;
+    }
+  });
+  return { count, index };
+}
+
+function getFlowPoint<NodeType extends Node>(
+  node: NodeType,
+  nodes: readonly NodeType[],
+  forbiddenAncestorId?: string,
+): { point: Point } | { error: 'ambiguous ancestry' | 'cyclic ancestry' | 'descendant parent' } {
+  const visited = new Set<NodeType>();
+  let current: NodeType | undefined = node;
+  let x = 0;
+  let y = 0;
+
+  while (current) {
+    if (current.id === forbiddenAncestorId) return { error: 'descendant parent' };
+    if (visited.has(current)) return { error: 'cyclic ancestry' };
+    visited.add(current);
+    x += current.point().x;
+    y += current.point().y;
+
+    const parentId = current.parentId?.();
+    if (!parentId) break;
+    if (parentId === forbiddenAncestorId) return { error: 'descendant parent' };
+
+    const parent = findUniqueIndex(nodes, parentId);
+    if (!parent.count) break;
+    if (parent.count > 1) return { error: 'ambiguous ancestry' };
+    current = nodes[parent.index];
+  }
+
+  return { point: { x, y } };
+}
+
+function hasUniqueEndpoint(nodes: readonly { id: string }[], id: string): boolean {
+  return findUniqueIndex(nodes, id).count === 1;
+}
